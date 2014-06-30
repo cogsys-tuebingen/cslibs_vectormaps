@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package>
+  <name>utils_gdal</name>
+  <version>0.0.1</version>
+  <description>
+    The utils_gdal package contains extensions and simplifying
+    interfaces for the gdal library.
+  </description>
+
+
+  <maintainer email="richard.hanten@uni-tuebingen.de">Richard Hanten</maintainer>
+
+  <license>BSD</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>utils_boost_geometry</build_depend>
+  <run_depend>utils_boost_geometry</run_depend>
+
+  <export>
+  </export>
+</package>
