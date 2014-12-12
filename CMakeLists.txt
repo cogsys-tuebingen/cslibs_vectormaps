@@ -6,6 +6,8 @@ find_package(catkin REQUIRED utils_boost_geometry)
 find_package(GDAL   REQUIRED)
 find_package(Boost  REQUIRED)
 
+find_package(OpenCV QUIET)
+
 set(CMAKE_BUILD_TYPE Release)
 
 catkin_package(
@@ -31,6 +33,21 @@ target_link_libraries(utils_gdal
     ${GDAL_LIBRARIES}
     ${Boost_LIBRARIES}
 )
+
+if(${OpenCV_FOUND})
+include_directories(${OpenCV_INCLUDE_DIRS})
+
+message("test")
+
+add_executable(dxf_map_visualizer
+    src/dxf_map_visualizer.cpp
+)
+
+target_link_libraries(dxf_map_visualizer
+    ${catkin_LIBRARIES}
+    ${OpenCV_LIBRARIES}
+)
+endif()
 
 ## Declare a cpp executable
 # add_executable(utils_gdal_node src/utils_gdal_node.cpp)
