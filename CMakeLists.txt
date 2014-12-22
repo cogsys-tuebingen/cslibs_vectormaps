@@ -7,6 +7,8 @@ find_package(GDAL   REQUIRED)
 find_package(Boost  REQUIRED)
 
 find_package(OpenCV QUIET)
+find_package(roscpp QUIET)
+
 
 set(CMAKE_BUILD_TYPE Release)
 
@@ -34,11 +36,9 @@ target_link_libraries(utils_gdal
     ${Boost_LIBRARIES}
 )
 
-if(${OpenCV_FOUND})
+if(${OpenCV_FOUND} AND ${roscpp_FOUND})
 include_directories(${OpenCV_INCLUDE_DIRS})
-
-message("test")
-
+include_directories(${roscpp_INCLUDE_DIRS})
 add_executable(dxf_map_visualizer
     src/dxf_map_visualizer.cpp
 )
@@ -46,6 +46,8 @@ add_executable(dxf_map_visualizer
 target_link_libraries(dxf_map_visualizer
     ${catkin_LIBRARIES}
     ${OpenCV_LIBRARIES}
+    ${roscpp_LIBRARIES}
+    utils_gdal
 )
 endif()
 
