@@ -17,7 +17,7 @@ void run()
     std::string topic_name("/dxf_map");
     std::string frame_name("/vector_map");
     double rate(30.0);
-    double resolution(0.2); // m / px
+    double resolution(0.05); // m / px
 
     nh_.getParam("topic_name", topic_name);
     nh_.getParam("frame_name", frame_name);
@@ -53,7 +53,7 @@ void run()
     occ.info.resolution        = resolution;
     occ.info.origin.position.x = min.x();
     occ.info.origin.position.y = min.y();
-    occ.data.resize(rows * cols, -1);
+    occ.data.resize(rows * cols, 0);
 
     cv::Mat mat(rows, cols, CV_8SC1, occ.data.data());
 
