@@ -1,0 +1,19 @@
+<?xml version="1.0" ?>
+
+<sdf version="1.4">
+  <world name="default" xmlns:xacro="http://www.ros.org/wiki/xacro">
+    <xacro:property name="world_path" value="$(find utils_gdal)/res" />
+
+    <!-- A global light source -->
+    <include>
+      <uri>model://sun</uri>
+    </include>
+    <!-- A ground plane -->
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+    <plugin filename="libgazebo_dxf_map_plugin.so" name="gazebo_dxf">
+      <map>${world_path}/test.dxf</map>
+    </plugin>
+  </world>
+</sdf>
