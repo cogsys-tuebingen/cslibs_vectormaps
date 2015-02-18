@@ -4,7 +4,7 @@ project(utils_gdal)
 
 find_package(catkin REQUIRED utils_boost_geometry)
 find_package(GDAL   REQUIRED)
-find_package(Boost  REQUIRED)
+find_package(Boost  REQUIRED system filesystem)
 
 find_package(OpenCV QUIET)
 find_package(roscpp QUIET)
@@ -53,10 +53,15 @@ target_link_libraries(dxf_map_visualizer
 endif()
 
 if(${gazebo_FOUND} AND ${xacro_FOUND})
-    include_directories(${GAZEBO_INCLUDE_DIRS})
+    find_package(Eigen3 REQUIRED)
+    include_directories(
+        ${GAZEBO_INCLUDE_DIRS}
+        ${EIGEN_INCLUDE_DIRS}
+    )
 
     add_library(gazebo_dxf_map_plugin
         src/dxf_map_gazebo.cpp
+        src/mesh.cpp
     )
     target_link_libraries(gazebo_dxf_map_plugin
         ${GAZEBO_LIBRARIES}
@@ -66,6 +71,7 @@ if(${gazebo_FOUND} AND ${xacro_FOUND})
                          "${CMAKE_CURRENT_LIST_DIR}/gazebo/launch/empty.world")
 
     add_custom_target(world ALL DEPENDS "gazebo/launch/empty.world")
+
 endif()
 ## Declare a cpp executable
 # add_executable(utils_gdal_node src/utils_gdal_node.cpp)
