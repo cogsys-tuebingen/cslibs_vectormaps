@@ -13,7 +13,7 @@
       <uri>model://ground_plane</uri>
     </include>
     <plugin filename="libgazebo_dxf_map_plugin.so" name="gazebo_dxf">
-      <map>${world_path}/test.dxf</map>
+      <map>${world_path}/walls.dxf</map>
     </plugin>
   </world>
 </sdf>
