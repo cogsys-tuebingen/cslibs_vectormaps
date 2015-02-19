@@ -32,7 +32,7 @@ void DXFMapGazebo::Load(physics::WorldPtr _parent, sdf::ElementPtr _sdf)
     std::string mesh_material    = _sdf->Get<std::string>("material");
     std::string mesh_name        = _sdf->Get<std::string>("mesh_name");
     double      mesh_height      = _sdf->Get<double>("height");
-    bool        debug_sphere     = _sdf->Get<bool>("debug_sphere");
+    bool        debug_sphere     = _sdf->Get<std::string>("debug_sphere") == "true";
 
     utils_gdal::dxf::DXFMap map;
     if(!map.open(map_path)) {
