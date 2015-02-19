@@ -72,6 +72,15 @@ if(${gazebo_FOUND} AND ${xacro_FOUND})
 
     add_custom_target(world ALL DEPENDS "gazebo/launch/empty.world")
 
+    add_executable(dxf_to_world
+        src/dxf_to_world.cpp
+        src/mesh.cpp
+    )
+    target_link_libraries(dxf_to_world
+        ${GAZEBO_LIBRARIES}
+        utils_gdal
+    )
+
 endif()
 ## Declare a cpp executable
 # add_executable(utils_gdal_node src/utils_gdal_node.cpp)
