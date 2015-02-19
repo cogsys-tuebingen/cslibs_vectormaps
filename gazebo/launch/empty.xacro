@@ -15,6 +15,10 @@
     <plugin filename="libgazebo_dxf_map_plugin.so" name="gazebo_dxf">
       <map>${utils_gdal_res}/walls.dxf</map>
       <mesh_common>${utils_gdal_res}/mesh_common.dae</mesh_common>
+      <material>BlueTransparent</material>
+      <height>2.0</height>
+      <mesh_name>map</mesh_name>
+      <debug_sphere>false</debug_sphere>
     </plugin>
   </world>
 </sdf>

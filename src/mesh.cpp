@@ -233,6 +233,7 @@ inline void addTriangles(const Vec3di &first_lower,  const Vec3di &first_upper,
 
 
 inline void generateWall(const DXFMap::Vector &vector,
+                         const double          height,
                          Mesh       &m,
                          MeshPoints &ps)
 {
@@ -242,7 +243,7 @@ inline void generateWall(const DXFMap::Vector &vector,
     first_lower.data[1] = vector.first.y();
     first_lower.data[2] = 0.0;
     first_upper.data = first_lower.data;
-    first_upper.data[2] = 2.5;
+    first_upper.data[2] = height;
 
     first_lower.index = ps.size();
     ps.push_back(first_lower);
@@ -255,7 +256,7 @@ inline void generateWall(const DXFMap::Vector &vector,
     second_lower.data[1] = vector.second.y();
     second_lower.data[2] = 0.0;
     second_upper.data = second_lower.data;
-    second_upper.data[2] = 2.5;
+    second_upper.data[2] = height;
 
     second_lower.index = ps.size();
     ps.push_back(second_lower);
@@ -269,7 +270,8 @@ inline void generateWall(const DXFMap::Vector &vector,
 
 inline void generateMesh(const DXFMap::Vectors &vectors,
                          const std::string     &mesh_path,
-                         const std::string     &common_path)
+                         const std::string     &common_path,
+                         const double           height)
 {
     Mesh       m;
     MeshPoints ps;
@@ -280,6 +282,7 @@ inline void generateMesh(const DXFMap::Vectors &vectors,
         ++it) {
         const DXFMap::Vector &vector = *it;
         generateWall(vector,
+                     height,
                      m,
                      ps);
     }
@@ -290,6 +293,14 @@ inline void generateMesh(const DXFMap::Vectors &vectors,
     in.close();
     out.close();
 }
+}
+
+Mesh::Mesh(const std::string _material,
+           const double _height) :
+    material(_material),
+    height(_height)
+{
+
 }
 
 bool Mesh::generate(const DXFMap::Vectors &vectors,
@@ -303,7 +314,8 @@ bool Mesh::generate(const DXFMap::Vectors &vectors,
     std::string   mesh_path = save_path + "_mesh.dae";
     impl::generateMesh(vectors,
                        mesh_path,
-                       fs_common_content_path.string());
+                       fs_common_content_path.string(),
+                       height);
 
     std::ofstream out(save_path.c_str());
 
@@ -337,7 +349,7 @@ bool Mesh::generate(const DXFMap::Vectors &vectors,
         << std::endl;
     out << "</geometry>"
         << std::endl;
-    out << "<material><script><name>Gazebo/GreenTransparent</name></script></material>"
+    out << "<material><script><name>Gazebo/" + material + "</name></script></material>"
         << std::endl;
     out << "</visual>"
         << std::endl;
@@ -372,7 +384,8 @@ bool Mesh::generate(const DXFMap::Vectors &vectors,
 
     impl::generateMesh(vectors,
                        fs_mesh_path.string(),
-                       fs_common_content_path.string());
+                       fs_common_content_path.string(),
+                       height);
 
     obj_string << "<sdf version='1.4'>"
                << std::endl;
@@ -404,7 +417,7 @@ bool Mesh::generate(const DXFMap::Vectors &vectors,
                << std::endl;
     obj_string << "</geometry>"
                << std::endl;
-    obj_string << "<material><script><name>Gazebo/GreenTransparent</name></script></material>"
+    obj_string << "<material><script><name>Gazebo/" + material + "</name></script></material>"
                << std::endl;
     obj_string << "</visual>"
                << std::endl;

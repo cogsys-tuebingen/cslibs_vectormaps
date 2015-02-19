@@ -29,6 +29,10 @@ void DXFMapGazebo::Load(physics::WorldPtr _parent, sdf::ElementPtr _sdf)
 
     std::string map_path         = _sdf->Get<std::string>("map");
     std::string mesh_common_path = _sdf->Get<std::string>("mesh_common");
+    std::string mesh_material    = _sdf->Get<std::string>("material");
+    std::string mesh_name        = _sdf->Get<std::string>("mesh_name");
+    double      mesh_height      = _sdf->Get<double>("height");
+    bool        debug_sphere     = _sdf->Get<bool>("debug_sphere");
 
     utils_gdal::dxf::DXFMap map;
     if(!map.open(map_path)) {
@@ -39,36 +43,42 @@ void DXFMapGazebo::Load(physics::WorldPtr _parent, sdf::ElementPtr _sdf)
 
     dxf::DXFMap::Vectors vs;
     map.getVectors(vs);
-    Mesh mesh;
+    Mesh mesh(mesh_material,
+              mesh_height);
     if(!mesh.generate(vs, mesh_common_path)) {
         gzerr << "Failed to generate mesh!" << std::endl;
     }
 
-    mesh.setName("walls");
+    if(mesh_name == "")
+        mesh_name = "walls";
+
+    mesh.setName(mesh_name);
     _parent->InsertModelSDF(*mesh.model);
 
-    sdf::SDF sphereSDF;
-    sphereSDF.SetFromString(
-       "<sdf version ='1.4'>\
-          <model name ='sphere'>\
-            <pose>1 0 0 0 0 0</pose>\
-            <link name ='link'>\
-              <pose>0 0 .5 0 0 0</pose>\
-              <collision name ='collision'>\
+    if(debug_sphere) {
+        sdf::SDF sphereSDF;
+        sphereSDF.SetFromString(
+                    "<sdf version ='1.4'>\
+                    <model name ='sphere'>\
+                <pose>1 0 0 0 0 0</pose>\
+                <link name ='link'>\
+                <pose>0 0 .5 0 0 0</pose>\
+                <collision name ='collision'>\
                 <geometry>\
-                  <sphere><radius>0.5</radius></sphere>\
+                <sphere><radius>0.5</radius></sphere>\
                 </geometry>\
-              </collision>\
-              <visual name ='visual'>\
+                </collision>\
+                <visual name ='visual'>\
                 <geometry>\
-                  <sphere><radius>0.5</radius></sphere>\
+                <sphere><radius>0.5</radius></sphere>\
                 </geometry>\
-              </visual>\
-            </link>\
-          </model>\
-        </sdf>");
-    // Demonstrate using a custom model name.
-    sdf::ElementPtr model = sphereSDF.root->GetElement("model");
-    model->GetAttribute("name")->SetFromString("unique_sphere");
-    _parent->InsertModelSDF(sphereSDF);
+                </visual>\
+                </link>\
+                </model>\
+                </sdf>");
+                // Demonstrate using a custom model name.
+                sdf::ElementPtr model = sphereSDF.root->GetElement("model");
+                model->GetAttribute("name")->SetFromString("debug_sphere");
+        _parent->InsertModelSDF(sphereSDF);
+    }
 }

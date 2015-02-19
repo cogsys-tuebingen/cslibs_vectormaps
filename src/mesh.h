@@ -6,6 +6,11 @@
 
 struct Mesh {
     sdf::SDFPtr  model;
+    std::string  material;
+    double       height;
+
+    Mesh(const std::string _material = "GreenTransparent",
+         const double      _height = 2.5);
 
     bool generate(const utils_gdal::dxf::DXFMap::Vectors &vectors,
                   const std::string &common_content_path,
