@@ -123,27 +123,86 @@ void DXFMap::printInfo()
 }
 
 namespace {
+/// DECLARATION
+inline void geometryToVectors(OGRGeometry     *geometry,
+                              DXFMap::Vectors &vectors,
+                              const bool debug = false);
+/// IMPLEMENTATION
+inline DXFMap::Point asDXF(const OGRPoint &pt)
+{
+    return DXFMap::Point(pt.getX(), pt.getY());
+}
+
+inline DXFMap::Vector asDXF(const OGRPoint &pt1,
+                            const OGRPoint &pt2)
+{
+    return DXFMap::Vector(asDXF(pt1), asDXF(pt2));
+}
+
 inline void lineStringToVectors(OGRLineString *line_string,
                                 DXFMap::Vectors &vectors)
 {
-    int                      points_num = line_string->getNumPoints();
-    std::vector<OGRRawPoint> points(points_num);
-    OGRRawPoint             *points_ptr = points.data();
-    line_string->getPoints(points_ptr);
+    int points_num = line_string->getNumPoints();
+    if(points_num < 2)
+        return;
 
-    unsigned int i = 0;
-    unsigned int j = 1;
+    OGRPoint last;
+    OGRPoint curr;
+    line_string->getPoint(0, &last);
+    for(int j = 1 ; j < points_num ; ++j) {
+        line_string->getPoint(j, &curr);
+        vectors.push_back(asDXF(last, curr));
+        last = curr;
+    }
+}
 
-    while(j < points_num) {
-        vectors.push_back(
-                    DXFMap::Vector(
-                    DXFMap::Point(points_ptr[i].x,
-                                  points_ptr[i].y),
-                    DXFMap::Point(points_ptr[j].x,
-                                  points_ptr[j].y))
-                    );
-        ++i;
-        ++j;
+inline void multiLineStringToVectors(OGRMultiLineString *line_strings,
+                                     DXFMap::Vectors    &vectors)
+{
+    int geom_num = line_strings->getNumGeometries();
+    for(int i = 0 ; i < geom_num ; ++i) {
+        OGRLineString *line_string = (OGRLineString*) line_strings->getGeometryRef(i);
+        lineStringToVectors(line_string, vectors);
+    }
+}
+
+inline void geometryCollectionToVectors(OGRGeometryCollection *collection,
+                                        DXFMap::Vectors &vectors)
+{
+    int geom_num = collection->getNumGeometries();
+    for(int i = 0 ; i < geom_num ; ++i) {
+        OGRGeometry *geom = collection->getGeometryRef(i);
+        geometryToVectors(geom, vectors);
+    }
+}
+
+inline void geometryToVectors(OGRGeometry     *geometry,
+                              DXFMap::Vectors &vectors,
+                              const bool debug)
+{
+    OGRwkbGeometryType type = wkbFlatten(geometry->getGeometryType());
+    switch(type) {
+    case wkbPoint:
+        if(debug)
+            std::cerr << "Single points will not be inserted into vector map!" << std::endl;
+        break;
+    case wkbLineString:
+        lineStringToVectors((OGRLineString*) geometry, vectors);
+        break;
+    case wkbMultiLineString:
+        multiLineStringToVectors((OGRMultiLineString*) geometry, vectors);
+        break;
+    case wkbGeometryCollection:
+        geometryCollectionToVectors((OGRGeometryCollection*) geometry, vectors);
+        break;
+    case wkbPolygon:
+        if(debug)
+            std::cerr << "[DXFVectorMap] : Polygon will not be inserted into vector map!" << std::endl;
+        break;
+    default:
+        if(debug)
+            std::cerr << "[DXFVectorMap] : Unknown geometry type!" << std::endl;
+        break;
     }
 }
 }
@@ -182,33 +241,7 @@ void DXFMap::retrieveVectors(Vectors &vectors)
         OGRGeometry *geometry = feature->GetGeometryRef();
 
         if(geometry != NULL) {
-            OGRwkbGeometryType type = wkbFlatten(geometry->getGeometryType());
-            switch(type) {
-            case wkbPoint:
-                if(debug_) {
-                std::cerr << "[DXFVectorMap] : Got a point - "
-                          << "only 'LineStrings'  will be processed!"
-                          << std::endl;
-                }
-                break;
-            case wkbLineString:
-                lineStringToVectors((OGRLineString*) geometry, vectors);
-                break;
-            case wkbPolygon:
-                if(debug_) {
-                std::cerr << "[DXFVectorMap] : Got a polygon - "
-                          << "only 'LineStrings'  will be processed!"
-                          << std::endl;
-                }
-                break;
-            default:
-                if(debug_) {
-                std::cerr << "[DXFVectorMap] : Got an unknown geometry type - "
-                          << "only 'LineStrings'  will be processed!"
-                          << std::endl;
-                }
-                break;
-            }
+            geometryToVectors(geometry, vectors);
         }
         OGRFeature::DestroyFeature(feature);
     }
