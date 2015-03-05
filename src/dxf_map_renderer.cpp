@@ -75,6 +75,7 @@ void run(const std::string &map,
 
     }
 
+    cv::flip(mat, mat, 0);
     cv::imshow("map", mat);
     cv::waitKey(0);
 
