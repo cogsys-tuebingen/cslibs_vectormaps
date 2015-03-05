@@ -45,19 +45,21 @@ bool DXFMap::open(const std::string &path)
     return retrieveBounding();
 }
 
-void DXFMap::getVectors(Vectors &vectors)
+void DXFMap::getVectors(Vectors &vectors,
+                        const std::string &attrib_filter)
 {
-    retrieveVectors(vectors);
+    retrieveVectors(vectors, attrib_filter);
 }
 
 void DXFMap::getVectors(const BoundingBox &bounding,
-                              Vectors &vectors)
+                        Vectors &vectors,
+                        const std::string &attrib_filter)
 {
     const Point &min = bounding.min_corner();
     const Point &max = bounding.max_corner();
     dxf_layer_->SetSpatialFilterRect(min.x(), min.y(),
                                      max.x(), max.y());
-    retrieveVectors(vectors);
+    retrieveVectors(vectors, attrib_filter);
     dxf_layer_->SetSpatialFilter(NULL);
 }
 
@@ -65,21 +67,23 @@ void DXFMap::getVectors(const BoundingBox &bounding,
 
 void DXFMap::getVectors(const Point &min,
                         const Point &max,
-                              Vectors &vectors)
+                              Vectors &vectors,
+                        const std::string &attrib_filter)
 {
     dxf_layer_->SetSpatialFilterRect(min.x(), min.y(),
                                      max.x(), max.y());
-    retrieveVectors(vectors);
+    retrieveVectors(vectors, attrib_filter);
     dxf_layer_->SetSpatialFilter(NULL);
 }
 
 void DXFMap::getVectors(const double min_x, const double min_y,
                         const double max_x, const double max_y,
-                              Vectors &vectors)
+                              Vectors &vectors,
+                        const std::string &attrib_filter)
 {
     dxf_layer_->SetSpatialFilterRect(min_x, min_y,
                                      max_x, max_y);
-    retrieveVectors(vectors);
+    retrieveVectors(vectors, attrib_filter);
     dxf_layer_->SetSpatialFilter(NULL);
 
 }
@@ -120,6 +124,16 @@ void DXFMap::printInfo()
               << "," << bounding_.max_corner().y()
               << "]" << std::endl;
 
+}
+
+void DXFMap::getLayerNames(std::vector<std::string> &names)
+{
+    OGRLayer *layers = dxf_source_->ExecuteSQL("SELECT DISTINCT Layer FROM entities", NULL, NULL);
+    for(int i = 0 ; i < layers->GetFeatureCount() ; ++i) {
+        OGRFeature *feature = layers->GetFeature(i);
+        names.push_back(feature->GetFieldAsString("Layer"));
+        OGRFeature::DestroyFeature(feature);
+    }
 }
 
 namespace {
@@ -231,9 +245,15 @@ bool DXFMap::retrieveBounding()
     return true;
 }
 
-void DXFMap::retrieveVectors(Vectors &vectors)
+void DXFMap::retrieveVectors(Vectors &vectors,
+                             const std::string &attrib_filter)
 {
     dxf_layer_->ResetReading();
+    OGRErr err = dxf_layer_->SetAttributeFilter(attrib_filter.c_str());
+    if(err != 0) {
+        std::cerr << "[DXFVectorMap] : Error attribute filter '"<< err << "'!" << std::endl;
+    }
+
 
     OGRFeature *feature(NULL);
     while((feature = dxf_layer_->GetNextFeature()) != NULL) {

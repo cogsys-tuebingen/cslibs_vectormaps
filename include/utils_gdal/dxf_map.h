@@ -61,7 +61,8 @@ public:
      *        (! CURRENTLY ONLY SUPPORT FOR LINE STRINGS!)
      * @param vectors   the set of lines retrieved
      */
-    void getVectors(Vectors &vectors);
+    void getVectors(Vectors &vectors,
+                    const std::string &attrib_filter = "");
 
     /**
      * @brief Get vectors of the map.
@@ -70,7 +71,8 @@ public:
      * @param vectors   the set of vectors retrieved
      */
     void getVectors(const BoundingBox &bounding,
-                    Vectors           &vectors);
+                    Vectors           &vectors,
+                    const std::string &attrib_filter = "");
 
     /**
      * @brief Get vectors of the map.
@@ -81,7 +83,8 @@ public:
      */
     void getVectors(const Point &min,
                     const Point &max,
-                    Vectors     &vectors);
+                    Vectors     &vectors,
+                    const std::string &attrib_filter = "");
 
     /**
      * @brief Get vectors of the map.
@@ -94,7 +97,8 @@ public:
      */
     void getVectors(const double min_x, const double min_y,
                     const double max_x, const double max_y,
-                    Vectors &vectors);
+                    Vectors &vectors,
+                    const std::string &attrib_filter = "");
 
     /**
      * @brief Get the global bounding box of the map.
@@ -131,6 +135,23 @@ public:
      */
     void printInfo();
 
+    /**
+     * @brief Get the names of existing layers.
+     * @param names     the names to be returned
+     */
+    void getLayerNames(std::vector<std::string> &names);
+
+    /**
+     * @brief Attribute filter string for layer names.
+     * @param layer_name    the layer to be accessed
+     * @return              the attribute filter for the layer name
+     */
+    inline static std::string getLayerAttribFilter
+        (const std::string &layer_name)
+    {
+        return "Layer='" + layer_name + "'";
+    }
+
 private:
     bool                 debug_;
     OGRDataSource       *dxf_source_;
@@ -140,7 +161,8 @@ private:
     double               width_;
 
     bool retrieveBounding();
-    void retrieveVectors(Vectors &vectors);
+    void retrieveVectors(Vectors &vectors,
+                         const std::string &attrib_filter = "");
 
 };
 }
