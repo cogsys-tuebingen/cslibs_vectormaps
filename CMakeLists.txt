@@ -40,16 +40,26 @@ target_link_libraries(utils_gdal
 if(${OpenCV_FOUND} AND ${roscpp_FOUND})
 include_directories(${OpenCV_INCLUDE_DIRS})
 include_directories(${roscpp_INCLUDE_DIRS})
-add_executable(dxf_map_visualizer
-    src/dxf_map_visualizer.cpp
+add_executable(dxf_map_top_occupancy
+    src/dxf_to_occupancy.cpp
 )
 
-target_link_libraries(dxf_map_visualizer
+target_link_libraries(dxf_map_top_occupancy
     ${catkin_LIBRARIES}
     ${OpenCV_LIBRARIES}
     ${roscpp_LIBRARIES}
     utils_gdal
 )
+
+add_executable(dxf_map_renderer
+    src/dxf_map_renderer.cpp
+)
+
+target_link_libraries(dxf_map_renderer
+    ${OpenCV_LIBRARIES}
+    utils_gdal
+)
+
 endif()
 
 if(${gazebo_FOUND} AND ${xacro_FOUND})
