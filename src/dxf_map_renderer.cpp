@@ -76,8 +76,14 @@ void run(const std::string &map,
     }
 
     cv::flip(mat, mat, 0);
-    cv::imshow("map", mat);
-    cv::waitKey(0);
+
+    while(true) {
+        cv::imshow("map", mat);
+        int key = cv::waitKey(19) & 0xFF;
+        if(key == 27)
+            break;
+    }
+
 
     std::cout << "Have a nice day!" << std::endl;
 }
