@@ -1,0 +1,5 @@
+output_path: /tmp/world_from_dxf.world
+mesh_common_path: /home/rauscher/ws/tmp/src/utils/utils_gdal/res/mesh_common.dae
+mesh_material: BlueTransparent
+mesh_name: map
+mesh_height: 0.3

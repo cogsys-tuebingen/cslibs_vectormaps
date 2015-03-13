@@ -89,6 +89,7 @@ if(${gazebo_FOUND} AND ${xacro_FOUND})
     target_link_libraries(dxf_to_world
         ${GAZEBO_LIBRARIES}
         utils_gdal
+        yaml-cpp
     )
 
 endif()
