@@ -3,6 +3,7 @@
 #include <utils_boost_geometry/algorithms.h>
 #include <boost/geometry/algorithms/difference.hpp>
 #include <boost/geometry/strategies/strategies.hpp>
+#include <boost/geometry/geometries/ring.hpp>
 
 using namespace utils_gdal;
 using namespace dxf;
@@ -49,7 +50,6 @@ bool DXFMap::open(const std::string &path)
 }
 
 void DXFMap::getPolygon(Polygon &polygon,
-                        Polygons &diffs,
                         const std::string &attrib_filter)
 {
     /// first find the containing polygon
@@ -84,18 +84,18 @@ void DXFMap::getPolygon(Polygon &polygon,
     }
 
     /// second step calculate all intersections
-    Polygon bounding_polygon = *bounding_polygon_it;
     polygons.erase(bounding_polygon_it);
+    polygon = *bounding_polygon_it;
+
 
     if(polygons.size() > 0) {
         for(Polygons::iterator
             it  = polygons.begin() ;
             it != polygons.end() ;
             ++it) {
-            Polygons tmp;
-            boost::geometry::difference(bounding_polygon, *it, tmp);
-            std::cout << "diffs " << tmp.size() << std::endl;
-            diffs.insert(diffs.end(), tmp.begin(), tmp.end());
+            Polygon::ring_type ring;
+            ring.insert(ring.begin(), it->outer().begin(), it->outer().end());
+            polygon.inners().push_back(ring);
         }
     }
 }

@@ -81,8 +81,7 @@ void run(const std::string &map,
     dxf_map.getPolygons(polies, dxf::DXFMap::getLayerAttribFilter("valid_area"));
 
     dxf::DXFMap::Polygon poly;
-    dxf::DXFMap::Polygons poly_diffs;
-    dxf_map.getPolygon(poly, poly_diffs, dxf::DXFMap::getLayerAttribFilter("valid_area"));
+    dxf_map.getPolygon(poly, dxf::DXFMap::getLayerAttribFilter("valid_area"));
     std::cout << poly.outer().size() << std::endl;
 
     cv::flip(mat, mat, 0);
@@ -93,21 +92,21 @@ void run(const std::string &map,
             break;
     }
 
-    std::cout << "diffs all " << poly_diffs.size() << std::endl;
-    for(unsigned int i = 0 ; i < poly_diffs.size() ; ++i) {
+    std::cout << "diffs all " << poly.inners().size() << std::endl;
+    for(unsigned int i = 0 ; i <  poly.inners().size() ; ++i) {
         std::cout << "diff number " << i << std::endl;
         cv::Mat tmp = mat_poly.clone();
         cv::Scalar color = randomColor(rng);
-        dxf::DXFMap::Polygon &pol = poly_diffs.at(i);
+        dxf::DXFMap::Polygon::ring_type &ring = poly.inners().at(i);
         unsigned int first   = 0;
         unsigned int second  = 1;
-        for(unsigned int i = 0; i < pol.outer().size() ; ++i) {
+        for(unsigned int i = 0; i < ring.size() ; ++i) {
             cv::Point p1;
             cv::Point p2;
-            p1.x = pol.outer().at(first).x() / resolution;
-            p1.y = pol.outer().at(first).y() / resolution;
-            p2.x = pol.outer().at(second).x()/ resolution;
-            p2.y = pol.outer().at(second).y()/ resolution;
+            p1.x = ring.at(first).x() / resolution;
+            p1.y = ring.at(first).y() / resolution;
+            p2.x = ring.at(second).x()/ resolution;
+            p2.y = ring.at(second).y()/ resolution;
 
             p1.x -= min.x() / resolution;
             p1.y -= min.y() / resolution;
@@ -118,15 +117,9 @@ void run(const std::string &map,
             cv::line(tmp, p1, p2, color, 1, CV_AA);
             ++first;
             ++second;
-            first  %= pol.outer().size();
-            second %= pol.outer().size();
+            first  %= ring.size();
+            second %= ring.size();
         }
-
-        for(unsigned int i = 0 ; i < pol.inners().size() ; ++i) {
-
-        }
-
-
 
         cv::flip(tmp, tmp, 0);
         cv::imshow("map", tmp);
