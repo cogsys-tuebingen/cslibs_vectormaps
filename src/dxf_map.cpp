@@ -1,6 +1,8 @@
 /// HEADER
 #include <utils_gdal/dxf_map.h>
 #include <utils_boost_geometry/algorithms.h>
+#include <boost/geometry/algorithms/difference.hpp>
+#include <boost/geometry/strategies/strategies.hpp>
 
 using namespace utils_gdal;
 using namespace dxf;
@@ -47,13 +49,14 @@ bool DXFMap::open(const std::string &path)
 }
 
 void DXFMap::getPolygon(Polygon &polygon,
+                        Polygons &diffs,
                         const std::string &attrib_filter)
 {
     /// first find the containing polygon
     Polygons polygons;
     getPolygons(polygons, attrib_filter);
 
-    Polygons::iterator bounding_polygon = polygons.end();
+    Polygons::iterator bounding_polygon_it = polygons.end();
 
     for(Polygons::iterator
         outer_it  = polygons.begin() ;
@@ -68,22 +71,33 @@ void DXFMap::getPolygon(Polygon &polygon,
         }
 
         if(contains_all) {
-            bounding_polygon = outer_it;
+            bounding_polygon_it = outer_it;
             break;
         }
     }
 
-    if(bounding_polygon == polygons.end()) {
+    if(bounding_polygon_it == polygons.end()) {
         if(debug_)
             std::cerr << "Couldn't find a bounding polygon!" << std::endl;
         polygon = Polygon();
         return;
-    } else {
-        polygon = *bounding_polygon;
     }
 
-
     /// second step calculate all intersections
+    Polygon bounding_polygon = *bounding_polygon_it;
+    polygons.erase(bounding_polygon_it);
+
+    if(polygons.size() > 0) {
+        for(Polygons::iterator
+            it  = polygons.begin() ;
+            it != polygons.end() ;
+            ++it) {
+            Polygons tmp;
+            boost::geometry::difference(bounding_polygon, *it, tmp);
+            std::cout << "diffs " << tmp.size() << std::endl;
+            diffs.insert(diffs.end(), tmp.begin(), tmp.end());
+        }
+    }
 }
 
 void DXFMap::getPolygons(Polygons &polygons,

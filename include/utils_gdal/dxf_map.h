@@ -70,6 +70,7 @@ public:
      * @param polygon           the polygon
      */
     void getPolygon(Polygon &polygon,
+                    Polygons &diffs,
                     const std::string &attrib_filter = "");
 
     void getPolygons(Polygons &polygons,

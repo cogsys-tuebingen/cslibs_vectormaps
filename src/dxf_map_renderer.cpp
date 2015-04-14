@@ -47,6 +47,8 @@ void run(const std::string &map,
         std::cout << "[" << i << "] " << layers.at(i) << std::endl;
     std::cout << std::endl;
 
+    cv::Mat mat_poly = mat.clone();
+
     for(unsigned int i = 0 ; i < layers.size() ; ++i) {
         cv::Scalar color = randomColor(rng);
 
@@ -79,11 +81,11 @@ void run(const std::string &map,
     dxf_map.getPolygons(polies, dxf::DXFMap::getLayerAttribFilter("valid_area"));
 
     dxf::DXFMap::Polygon poly;
-    dxf_map.getPolygon(poly, dxf::DXFMap::getLayerAttribFilter("valid_area"));
+    dxf::DXFMap::Polygons poly_diffs;
+    dxf_map.getPolygon(poly, poly_diffs, dxf::DXFMap::getLayerAttribFilter("valid_area"));
     std::cout << poly.outer().size() << std::endl;
 
     cv::flip(mat, mat, 0);
-
     while(true) {
         cv::imshow("map", mat);
         int key = cv::waitKey(19) & 0xFF;
@@ -91,7 +93,51 @@ void run(const std::string &map,
             break;
     }
 
+    std::cout << "diffs all " << poly_diffs.size() << std::endl;
+    for(unsigned int i = 0 ; i < poly_diffs.size() ; ++i) {
+        std::cout << "diff number " << i << std::endl;
+        cv::Mat tmp = mat_poly.clone();
+        cv::Scalar color = randomColor(rng);
+        dxf::DXFMap::Polygon &pol = poly_diffs.at(i);
+        unsigned int first   = 0;
+        unsigned int second  = 1;
+        for(unsigned int i = 0; i < pol.outer().size() ; ++i) {
+            cv::Point p1;
+            cv::Point p2;
+            p1.x = pol.outer().at(first).x() / resolution;
+            p1.y = pol.outer().at(first).y() / resolution;
+            p2.x = pol.outer().at(second).x()/ resolution;
+            p2.y = pol.outer().at(second).y()/ resolution;
 
+            p1.x -= min.x() / resolution;
+            p1.y -= min.y() / resolution;
+            p2.x -= min.x() / resolution;
+            p2.y -= min.y() / resolution;
+
+
+            cv::line(tmp, p1, p2, color, 1, CV_AA);
+            ++first;
+            ++second;
+            first  %= pol.outer().size();
+            second %= pol.outer().size();
+        }
+
+        for(unsigned int i = 0 ; i < pol.inners().size() ; ++i) {
+
+        }
+
+
+
+        cv::flip(tmp, tmp, 0);
+        cv::imshow("map", tmp);
+        int key = cv::waitKey(0) & 0xFF;
+        while(key != 10 && key != 27) {
+            key = cv::waitKey(0) & 0xFF;
+        }
+        if(key == 27)
+            break;
+
+    }
     std::cout << "Have a nice day!" << std::endl;
 }
 }
