@@ -1,5 +1,6 @@
 /// HEADER
 #include <utils_gdal/dxf_map.h>
+#include <utils_boost_geometry/algorithms.h>
 
 using namespace utils_gdal;
 using namespace dxf;
@@ -48,7 +49,41 @@ bool DXFMap::open(const std::string &path)
 void DXFMap::getPolygon(Polygon &polygon,
                         const std::string &attrib_filter)
 {
-    std::cerr << "Not implemented!" << std::endl;
+    /// first find the containing polygon
+    Polygons polygons;
+    getPolygons(polygons, attrib_filter);
+
+    Polygons::iterator bounding_polygon = polygons.end();
+
+    for(Polygons::iterator
+        outer_it  = polygons.begin() ;
+        outer_it != polygons.end() ;
+        ++outer_it) {
+        bool contains_all = true;
+        for(Polygons::iterator
+            inner_it  = polygons.begin() ;
+            inner_it != polygons.end() ;
+            ++inner_it) {
+            utils_boost_geometry::algorithms::within<Point>(*inner_it, *outer_it);
+        }
+
+        if(contains_all) {
+            bounding_polygon = outer_it;
+            break;
+        }
+    }
+
+    if(bounding_polygon == polygons.end()) {
+        if(debug_)
+            std::cerr << "Couldn't find a bounding polygon!" << std::endl;
+        polygon = Polygon();
+        return;
+    } else {
+        polygon = *bounding_polygon;
+    }
+
+
+    /// second step calculate all intersections
 }
 
 void DXFMap::getPolygons(Polygons &polygons,

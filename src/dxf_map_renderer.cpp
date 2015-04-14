@@ -76,7 +76,11 @@ void run(const std::string &map,
     }
 
     dxf::DXFMap::Polygons polies;
-    dxf_map.getPolygons(polies,  dxf::DXFMap::getLayerAttribFilter("valid_area"));
+    dxf_map.getPolygons(polies, dxf::DXFMap::getLayerAttribFilter("valid_area"));
+
+    dxf::DXFMap::Polygon poly;
+    dxf_map.getPolygon(poly, dxf::DXFMap::getLayerAttribFilter("valid_area"));
+    std::cout << poly.outer().size() << std::endl;
 
     cv::flip(mat, mat, 0);
 
