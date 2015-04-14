@@ -24,11 +24,20 @@ public:
     typedef utils_boost_geometry::types::Point2d
     Point;
 
+    typedef utils_boost_geometry::types::Point2d
+    Points;
+
     typedef utils_boost_geometry::types::Line2d
     Vector;
 
     typedef utils_boost_geometry::types::LineSet2d
     Vectors;
+
+    typedef utils_boost_geometry::types::Polygon2d
+    Polygon;
+
+    typedef std::vector<utils_boost_geometry::types::Polygon2d>
+    Polygons;
 
     typedef utils_boost_geometry::types::Box2d
     BoundingBox;
@@ -55,6 +64,16 @@ public:
      * @return          true if successful
      */
     bool open(const std::string &path);
+
+    /**
+     * @brief Get map layer as polygon.
+     * @param polygon           the polygon
+     */
+    void getPolygon(Polygon &polygon,
+                    const std::string &attrib_filter = "");
+
+    void getPolygons(Polygons &polygons,
+                     const std::string &attrib_filter = "");
 
     /**
      * @brief Get vectors of the map.
@@ -163,6 +182,9 @@ private:
     bool retrieveBounding();
     void retrieveVectors(Vectors &vectors,
                          const std::string &attrib_filter = "");
+
+    void retrievePolygons(Polygons &polygons,
+                          const std::string &attrib_filter = "");
 
 };
 }

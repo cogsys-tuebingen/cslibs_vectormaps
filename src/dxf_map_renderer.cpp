@@ -75,6 +75,9 @@ void run(const std::string &map,
 
     }
 
+    dxf::DXFMap::Polygons polies;
+    dxf_map.getPolygons(polies,  dxf::DXFMap::getLayerAttribFilter("valid_area"));
+
     cv::flip(mat, mat, 0);
 
     while(true) {

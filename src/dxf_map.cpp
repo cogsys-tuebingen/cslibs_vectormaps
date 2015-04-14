@@ -45,6 +45,18 @@ bool DXFMap::open(const std::string &path)
     return retrieveBounding();
 }
 
+void DXFMap::getPolygon(Polygon &polygon,
+                        const std::string &attrib_filter)
+{
+    std::cerr << "Not implemented!" << std::endl;
+}
+
+void DXFMap::getPolygons(Polygons &polygons,
+                         const std::string &attrib_filter)
+{
+    retrievePolygons(polygons, attrib_filter);
+}
+
 void DXFMap::getVectors(Vectors &vectors,
                         const std::string &attrib_filter)
 {
@@ -141,6 +153,10 @@ namespace {
 inline void geometryToVectors(OGRGeometry     *geometry,
                               DXFMap::Vectors &vectors,
                               const bool debug = false);
+inline void geometryToPolygons(OGRGeometry *geometry,
+                               DXFMap::Polygons &polygons,
+                               const bool debug = false);
+
 /// IMPLEMENTATION
 inline DXFMap::Point asDXF(const OGRPoint &pt)
 {
@@ -190,6 +206,39 @@ inline void geometryCollectionToVectors(OGRGeometryCollection *collection,
     }
 }
 
+inline void lineStringToPolygon(OGRLineString   *line_string,
+                                DXFMap::Polygons &polygons)
+{
+    OGRPoint point;
+    DXFMap::Polygon poly;
+    int points_num = line_string->getNumPoints();
+    for(int i = 0 ; i < points_num ; ++i) {
+        line_string->getPoint(i, &point);
+        boost::geometry::append(poly.outer(), asDXF(point));
+    }
+    polygons.push_back(poly);
+}
+
+inline void multiLineStringToPolygons(OGRMultiLineString *line_strings,
+                                      DXFMap::Polygons     &polygons)
+{
+    int geom_num = line_strings->getNumGeometries();
+    for(int i = 0 ; i < geom_num ; ++i) {
+        OGRLineString *line_string = (OGRLineString*) line_strings->getGeometryRef(i);
+        lineStringToPolygon(line_string, polygons);
+    }
+}
+
+inline void geometryCollectionToPolygons(OGRGeometryCollection *collection,
+                                         DXFMap::Polygons      &polygons)
+{
+    int geom_num = collection->getNumGeometries();
+    for(int i = 0 ; i < geom_num ; ++i) {
+        OGRGeometry *geom = collection->getGeometryRef(i);
+        geometryToPolygons(geom, polygons);
+    }
+}
+
 inline void geometryToVectors(OGRGeometry     *geometry,
                               DXFMap::Vectors &vectors,
                               const bool debug)
@@ -208,6 +257,36 @@ inline void geometryToVectors(OGRGeometry     *geometry,
         break;
     case wkbGeometryCollection:
         geometryCollectionToVectors((OGRGeometryCollection*) geometry, vectors);
+        break;
+    case wkbPolygon:
+        if(debug)
+            std::cerr << "[DXFVectorMap] : Polygon will not be inserted into vector map!" << std::endl;
+        break;
+    default:
+        if(debug)
+            std::cerr << "[DXFVectorMap] : Unknown geometry type!" << std::endl;
+        break;
+    }
+}
+
+inline void geometryToPolygons(OGRGeometry      *geometry,
+                              DXFMap::Polygons  &polygons,
+                              const bool debug)
+{
+    OGRwkbGeometryType type = wkbFlatten(geometry->getGeometryType());
+    switch(type) {
+    case wkbPoint:
+        if(debug)
+            std::cerr << "Single points will not be inserted into vector map!" << std::endl;
+        break;
+    case wkbLineString:
+        lineStringToPolygon((OGRLineString*) geometry, polygons);
+        break;
+    case wkbMultiLineString:
+        multiLineStringToPolygons((OGRMultiLineString*) geometry, polygons);
+        break;
+    case wkbGeometryCollection:
+        geometryCollectionToPolygons((OGRGeometryCollection*) geometry, polygons);
         break;
     case wkbPolygon:
         if(debug)
@@ -262,6 +341,27 @@ void DXFMap::retrieveVectors(Vectors &vectors,
 
         if(geometry != NULL) {
             geometryToVectors(geometry, vectors);
+        }
+        OGRFeature::DestroyFeature(feature);
+    }
+}
+
+void DXFMap::retrievePolygons(Polygons &polygons,
+                              const std::string &attrib_filter)
+{
+    dxf_layer_->ResetReading();
+    OGRErr err = dxf_layer_->SetAttributeFilter(attrib_filter.c_str());
+    if(err != 0) {
+        std::cerr << "[DXFVectorMap] : Error attribute filter '"<< err << "'!" << std::endl;
+    }
+
+    OGRFeature *feature(NULL);
+    while((feature = dxf_layer_->GetNextFeature()) != NULL) {
+        /// MAYBE CHECK FOR LABEL
+        OGRGeometry *geometry = feature->GetGeometryRef();
+
+        if(geometry != NULL) {
+            geometryToPolygons(geometry, polygons);
         }
         OGRFeature::DestroyFeature(feature);
     }
