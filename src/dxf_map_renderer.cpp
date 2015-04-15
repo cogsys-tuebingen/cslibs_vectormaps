@@ -4,6 +4,7 @@
 #include <opencv2/opencv.hpp>
 #include <utils_gdal/dxf_map.h>
 #include <boost/geometry/geometry.hpp>
+#include <utils_boost_geometry/algorithms.h>
 
 using namespace utils_gdal;
 
@@ -162,15 +163,34 @@ void run(const std::string &map,
         while(true) {
             if(pos.x > 0.0 && pos.y > 0.0) {
                 pos.y = mat_polygons_buff.rows - pos.y;
+                cv::Point2d bmin(pos.x - 0.5 / resolution, pos.y - 0.5 / resolution);
+                cv::Point2d bmax(pos.x + 0.5 / resolution, pos.y + 0.5 / resolution);
 
                 mat_polygons_buff = mat_polygons.clone();
                 dxf::DXFMap::Point dp = transfomrToDXF(min, resolution, pos);
-                cv::Scalar color(0, 0, 255);
-                if(boost::geometry::within(dp, polygon)) {
-                    color = cv::Scalar(0, 255, 0);
+
+                const static double dx[] = {-0.5, 0.5, -0.5, 0.5};
+                const static double dy[] = {-0.5, -0.5, 0.5, 0,5};
+
+                dxf::DXFMap::Polygon db;
+                for(unsigned int i = 0 ; i < 4 ; ++i) {
+                    boost::geometry::append(db.outer(), dxf::DXFMap::Point(dp.x() + dx[i], dp.y() + dy[i]));
                 }
 
-                cv::circle(mat_polygons_buff, pos, 2, color, CV_FILLED, CV_AA);
+                cv::Scalar pcolor(0, 0, 255);
+                cv::Scalar bcolor(0, 0, 255);
+                if(boost::geometry::within(dp, polygon)) {
+                    pcolor = cv::Scalar(0, 255, 0);
+                }
+
+                /// example for checking for coverage
+                if(boost::geometry::intersects(db, polygon) ||
+                        utils_boost_geometry::algorithms::within<dxf::DXFMap::Point>(db, polygon)) {
+                    bcolor = cv::Scalar(0, 255, 0);
+                }
+
+                cv::circle(mat_polygons_buff, pos, 2, pcolor, CV_FILLED, CV_AA);
+                cv::rectangle(mat_polygons_buff, bmin, bmax, bcolor);
                 pos.x = -1.0;
                 pos.y = -1.0;
                 cv::flip(mat_polygons_buff, mat_polygons_buff, 0);
