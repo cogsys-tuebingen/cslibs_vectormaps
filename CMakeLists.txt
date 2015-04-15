@@ -11,7 +11,7 @@ find_package(roscpp QUIET)
 find_package(gazebo QUIET)
 find_package(xacro  QUIET)
 
-set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_BUILD_TYPE Release)
 
 catkin_package(
   INCLUDE_DIRS include
