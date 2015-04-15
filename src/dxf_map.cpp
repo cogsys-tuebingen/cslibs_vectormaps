@@ -84,8 +84,8 @@ void DXFMap::getPolygon(Polygon &polygon,
     }
 
     /// second step calculate all intersections
-    polygons.erase(bounding_polygon_it);
     polygon = *bounding_polygon_it;
+    polygons.erase(bounding_polygon_it);
 
 
     if(polygons.size() > 0) {

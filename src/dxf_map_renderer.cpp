@@ -3,16 +3,56 @@
 #include <nav_msgs/OccupancyGrid.h>
 #include <opencv2/opencv.hpp>
 #include <utils_gdal/dxf_map.h>
+#include <boost/geometry/geometry.hpp>
 
 using namespace utils_gdal;
 
 namespace {
 
-cv::Scalar randomColor( cv::RNG& rng )
+inline cv::Scalar randomColor( cv::RNG& rng )
 {
     int icolor = (unsigned) rng;
     return cv::Scalar( icolor&255, (icolor>>8)&255, (icolor>>16)&255 );
 }
+
+inline cv::Point2d transformToCV(const dxf::DXFMap::Point &min,
+                                 const double resolution,
+                                 const dxf::DXFMap::Point &p)
+{
+    cv::Point2d cvp(p.x(), p.y());
+    cvp.x -= min.x();
+    cvp.y -= min.y();
+    cvp.x /= resolution;
+    cvp.y /= resolution;
+    return cvp;
+}
+
+inline dxf::DXFMap::Point transfomrToDXF(const dxf::DXFMap::Point &min,
+                                         const double resolution,
+                                         const cv::Point2d &p)
+{
+    dxf::DXFMap::Point dp(p.x, p.y);
+    dp.x(dp.x() * resolution + min.x());
+    dp.y(dp.y() * resolution + min.y());
+    return dp;
+}
+
+static bool mouseTrackMove = false;
+
+inline void mouseEvent( int event, int x, int y, int, void* param)
+{
+
+    if(event == cv::EVENT_LBUTTONDOWN || mouseTrackMove) {
+        cv::Point2d *pos = (cv::Point2d*) param;
+        pos->x = x;
+        pos->y = y;
+        mouseTrackMove = true;
+    }
+    if(event == cv::EVENT_LBUTTONUP) {
+        mouseTrackMove = false;
+    }
+}
+
 
 void run(const std::string &map,
          const double resolution)
@@ -47,7 +87,7 @@ void run(const std::string &map,
         std::cout << "[" << i << "] " << layers.at(i) << std::endl;
     std::cout << std::endl;
 
-    cv::Mat mat_poly = mat.clone();
+    cv::Mat mat_polygons = mat.clone();
 
     for(unsigned int i = 0 ; i < layers.size() ; ++i) {
         cv::Scalar color = randomColor(rng);
@@ -60,29 +100,13 @@ void run(const std::string &map,
             it != vectors.end() ;
             ++it) {
             dxf::DXFMap::Vector &v = *it;
-            cv::Point start(v.first.x()  / resolution,
-                            v.first.y()  / resolution);
-
-            cv::Point   end(v.second.x() / resolution,
-                            v.second.y() / resolution);
-
-            start.x -= min.x() / resolution;
-            start.y -= min.y() / resolution;
-            end.x   -= min.x() / resolution;
-            end.y   -= min.y() / resolution;
-
+            cv::Point2d start = transformToCV(min, resolution, v.first);
+            cv::Point2d end   = transformToCV(min, resolution, v.second);
             cv::line(mat, start, end, color, 1, CV_AA);
         }
 
 
     }
-
-    dxf::DXFMap::Polygons polies;
-    dxf_map.getPolygons(polies, dxf::DXFMap::getLayerAttribFilter("valid_area"));
-
-    dxf::DXFMap::Polygon poly;
-    dxf_map.getPolygon(poly, dxf::DXFMap::getLayerAttribFilter("valid_area"));
-    std::cout << poly.outer().size() << std::endl;
 
     cv::flip(mat, mat, 0);
     while(true) {
@@ -92,45 +116,70 @@ void run(const std::string &map,
             break;
     }
 
-    std::cout << "diffs all " << poly.inners().size() << std::endl;
-    for(unsigned int i = 0 ; i <  poly.inners().size() ; ++i) {
-        std::cout << "diff number " << i << std::endl;
-        cv::Mat tmp = mat_poly.clone();
-        cv::Scalar color = randomColor(rng);
-        dxf::DXFMap::Polygon::ring_type &ring = poly.inners().at(i);
-        unsigned int first   = 0;
-        unsigned int second  = 1;
-        for(unsigned int i = 0; i < ring.size() ; ++i) {
-            cv::Point p1;
-            cv::Point p2;
-            p1.x = ring.at(first).x() / resolution;
-            p1.y = ring.at(first).y() / resolution;
-            p2.x = ring.at(second).x()/ resolution;
-            p2.y = ring.at(second).y()/ resolution;
+    std::cout << "Render polygons only if available!" << std::endl;
+    /// simply an access test
+    dxf::DXFMap::Polygons polygons;
+    dxf_map.getPolygons(polygons, dxf::DXFMap::getLayerAttribFilter("valid_area"));
 
-            p1.x -= min.x() / resolution;
-            p1.y -= min.y() / resolution;
-            p2.x -= min.x() / resolution;
-            p2.y -= min.y() / resolution;
+    /// now we get the validity polygon
+    dxf::DXFMap::Polygon polygon;
+    dxf_map.getPolygon(polygon, dxf::DXFMap::getLayerAttribFilter("valid_area"));
+    std::cout << polygon.outer().size() << std::endl;
+
+    /// outer ring
+    cv::Scalar color = randomColor(rng);
+    unsigned int outer_size = polygon.outer().size();
+    for(unsigned int i = 0 ; i < outer_size ; ++i) {
+        dxf::DXFMap::Point start = polygon.outer().at(i % outer_size);
+        dxf::DXFMap::Point end   = polygon.outer().at((i + 1) % outer_size);
+        cv::Point2d cstart = transformToCV(min, resolution, start);
+        cv::Point2d cend   = transformToCV(min, resolution, end);
+        cv::line(mat_polygons, cstart, cend, color, 1, CV_AA);
+    }
+
+    /// inner rings
+    color = randomColor(rng);
+    for(unsigned int i = 0 ; i < polygon.inners().size() ; ++i) {
+        dxf::DXFMap::Polygon::ring_type &ring = polygon.inners().at(i);
+        unsigned int ring_size = ring.size();
+        for(unsigned int j = 0 ; j < ring_size ; ++j) {
+            dxf::DXFMap::Point start = ring.at(j % ring_size);
+            dxf::DXFMap::Point end   = ring.at((j + 1) % ring_size);
+            cv::Point2d cstart = transformToCV(min, resolution, start);
+            cv::Point2d cend   = transformToCV(min, resolution, end);
+            cv::line(mat_polygons, cstart, cend, color, 1, CV_AA);
+        }
+    }
+
+    cv::Point2d pos(-1.0, -1.0);
+    cv::setMouseCallback("map", mouseEvent, &pos);
 
 
-            cv::line(tmp, p1, p2, color, 1, CV_AA);
-            ++first;
-            ++second;
-            first  %= ring.size();
-            second %= ring.size();
+    cv::Mat mat_polygons_buff = mat_polygons.clone();
+    cv::flip(mat_polygons_buff, mat_polygons_buff, 0);
+    while(true) {
+        if(pos.x > 0.0 && pos.y > 0.0) {
+            pos.y = mat_polygons_buff.rows - pos.y;
+
+            mat_polygons_buff = mat_polygons.clone();
+            dxf::DXFMap::Point dp = transfomrToDXF(min, resolution, pos);
+            cv::Scalar color(0, 0, 255);
+            if(boost::geometry::within(dp, polygon)) {
+                color = cv::Scalar(0, 255, 0);
+            }
+
+            cv::circle(mat_polygons_buff, pos, 2, color, CV_FILLED, CV_AA);
+            pos.x = -1.0;
+            pos.y = -1.0;
+            cv::flip(mat_polygons_buff, mat_polygons_buff, 0);
         }
 
-        cv::flip(tmp, tmp, 0);
-        cv::imshow("map", tmp);
-        int key = cv::waitKey(0) & 0xFF;
-        while(key != 10 && key != 27) {
-            key = cv::waitKey(0) & 0xFF;
-        }
+        cv::imshow("map", mat_polygons_buff);
+        int key = cv::waitKey(19) & 0xFF;
         if(key == 27)
             break;
-
     }
+
     std::cout << "Have a nice day!" << std::endl;
 }
 }
