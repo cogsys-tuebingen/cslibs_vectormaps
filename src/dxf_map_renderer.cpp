@@ -163,14 +163,14 @@ void run(const std::string &map,
         while(true) {
             if(pos.x > 0.0 && pos.y > 0.0) {
                 pos.y = mat_polygons_buff.rows - pos.y;
-                cv::Point2d bmin(pos.x - 0.5 / resolution, pos.y - 0.5 / resolution);
-                cv::Point2d bmax(pos.x + 0.5 / resolution, pos.y + 0.5 / resolution);
+                cv::Point2d bmin(pos.x - 2.0 / resolution, pos.y - 2.0 / resolution);
+                cv::Point2d bmax(pos.x + 2.0 / resolution, pos.y + 2.0 / resolution);
 
                 mat_polygons_buff = mat_polygons.clone();
                 dxf::DXFMap::Point dp = transfomrToDXF(min, resolution, pos);
 
-                const static double dx[] = {-0.5, 0.5, -0.5, 0.5};
-                const static double dy[] = {-0.5, -0.5, 0.5, 0,5};
+                const static double dx[] = {-2.0, 2.0, -2.0, 2.0};
+                const static double dy[] = {-2.0, -2.0, 2.0, 2.0};
 
                 dxf::DXFMap::Polygon db;
                 for(unsigned int i = 0 ; i < 4 ; ++i) {
