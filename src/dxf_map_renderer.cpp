@@ -184,8 +184,7 @@ void run(const std::string &map,
                 }
 
                 /// example for checking for coverage
-                if(boost::geometry::intersects(db, polygon) ||
-                        utils_boost_geometry::algorithms::within<dxf::DXFMap::Point>(db, polygon)) {
+                if(utils_boost_geometry::algorithms::covered_by<dxf::DXFMap::Point>(db, polygon)) {
                     bcolor = cv::Scalar(0, 255, 0);
                 }
 
