@@ -4,7 +4,7 @@
 #include <opencv2/opencv.hpp>
 #include <utils_gdal/dxf_map.h>
 #include <boost/geometry/geometry.hpp>
-#include <utils_boost_geometry/algorithms.h>
+#include <utils_boost_geometry/algorithms.hpp>
 
 using namespace utils_gdal;
 
