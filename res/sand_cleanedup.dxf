@@ -101,7 +101,7 @@ Standard
   9
 $CLAYER
   8
-doors
+stairs
   9
 $CELTYPE
   6
@@ -501,19 +501,19 @@ $TDUCREATE
   9
 $TDUPDATE
  40
-2457486.594977616
+2457486.632571828
   9
 $TDUUPDATE
  40
-2457486.511644283
+2457486.549238495
   9
 $TDINDWG
  40
-0.1120971412
+0.1496914583
   9
 $TDUSRTIMER
  40
-0.1120964583
+0.1496907755
   9
 $USRTIMER
  70
@@ -553,7 +553,7 @@ $SPLINESEGS
   9
 $HANDSEED
   5
-209BC
+20D21
   9
 $SURFTAB1
  70
@@ -937,7 +937,7 @@ $FINGERPRINTGUID
   9
 $VERSIONGUID
   2
-{6F2880DB-B86F-4A05-89CA-5252F281E3FC}
+{5F666EE3-7F92-44F2-AAF7-C5C0335013A5}
   9
 $EXTNAMES
 290
@@ -1231,7 +1231,7 @@ ObjectDBX Classes
  90
      1152
  91
-        1
+       60
 280
      0
 281
@@ -1357,9 +1357,9 @@ AcDbViewportTableRecord
  21
 1.0
  12
--0.6004747591899147
+-24.94742564641653
  22
-4.335435208103326
+18.89770032313292
  13
 0.0
  23
@@ -1385,7 +1385,7 @@ AcDbViewportTableRecord
  37
 0.0
  40
-48.88501601104545
+29.53045784604595
  41
 2.285543608124253
  42
@@ -1475,7 +1475,7 @@ LTYPE
 100
 AcDbSymbolTable
  70
-    20
+    21
   0
 LTYPE
   5
@@ -2275,7 +2275,7 @@ LAYER
 100
 AcDbSymbolTable
  70
-     6
+     8
   0
 LAYER
   5
@@ -2289,7 +2289,7 @@ AcDbLayerTableRecord
   2
 0
  70
-     4
+     0
  62
      7
   6
@@ -2341,7 +2341,7 @@ AcDbLayerTableRecord
   2
 valid_area
  70
-     4
+     0
  62
      5
   6
@@ -2379,7 +2379,7 @@ AcDbLayerTableRecord
   2
 objects
  70
-     4
+     0
  62
      1
   6
@@ -2448,6 +2448,78 @@ doors_marker
 Continuous
 370
     -3
+390
+20003
+347
+20015
+348
+0
+1001
+AcAecLayerStandard
+1000
+
+1000
+
+1001
+AcCmTransparency
+1071
+        0
+  0
+LAYER
+  5
+20B5F
+330
+2
+100
+AcDbSymbolTableRecord
+100
+AcDbLayerTableRecord
+  2
+windows
+ 70
+     0
+ 62
+     6
+  6
+Continuous
+370
+    -3
+390
+20003
+347
+20015
+348
+0
+1001
+AcAecLayerStandard
+1000
+
+1000
+
+1001
+AcCmTransparency
+1071
+        0
+  0
+LAYER
+  5
+20C5D
+330
+2
+100
+AcDbSymbolTableRecord
+100
+AcDbLayerTableRecord
+  2
+stairs
+ 70
+     0
+ 62
+     7
+  6
+Continuous
+370
+    15
 390
 20003
 347
@@ -2547,7 +2619,7 @@ VIEW
 100
 AcDbSymbolTable
  70
-     1
+    61
   0
 ENDTAB
   0
@@ -2687,7 +2759,7 @@ A
 100
 AcDbSymbolTable
  70
-     6
+     7
 100
 AcDbDimStyleTable
  71
@@ -2999,7 +3071,7 @@ BLOCK_RECORD
 100
 AcDbSymbolTable
  70
-    17
+    18
   0
 BLOCK_RECORD
   5
@@ -6117,7 +6189,7 @@ C3
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbLine
  10
@@ -6165,7 +6237,7 @@ C5
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbLine
  10
@@ -6189,7 +6261,7 @@ C6
 100
 AcDbEntity
   8
-walls
+windows
   6
 Continuous
 100
@@ -6215,7 +6287,7 @@ C7
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbLine
  10
@@ -6265,7 +6337,7 @@ C9
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbLine
  10
@@ -6427,37 +6499,13 @@ AcDbLine
   0
 LINE
   5
-D6
-330
-1F
-100
-AcDbEntity
-  8
-walls
-100
-AcDbLine
- 10
-4.41
- 20
-15.53
- 30
-0.0
- 11
-5.169999999999999
- 21
-15.5300130687
- 31
-0.0
-  0
-LINE
-  5
 D7
 330
 1F
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbLine
  10
@@ -6470,212 +6518,6 @@ AcDbLine
 4.176
  21
 13.7897637313
- 31
-0.0
-  0
-LINE
-  5
-D8
-330
-1F
-100
-AcDbEntity
-  8
-walls
-100
-AcDbLine
- 10
-6.278087134969997
- 20
-15.53
- 30
-0.0
- 11
-7.54
- 21
-15.53
- 31
-0.0
-  0
-LINE
-  5
-D9
-330
-1F
-100
-AcDbEntity
-  8
-walls
-100
-AcDbLine
- 10
-6.2
- 20
-15.2500130687
- 30
-0.0
- 11
-7.62
- 21
-15.249987991
- 31
-0.0
-  0
-ARC
-  5
-DA
-330
-1F
-100
-AcDbEntity
-  8
-walls
-  6
-Continuous
-100
-AcDbCircle
- 10
-6.28
- 20
-15.3900130687
- 30
-0.0
- 40
-0.14
-100
-AcDbArc
- 50
-90.0
- 51
-180.0
-  0
-LINE
-  5
-DB
-330
-1F
-100
-AcDbEntity
-  8
-walls
-  6
-Continuous
-100
-AcDbLine
- 10
-6.139999999999997
- 20
-15.3900130687
- 30
-0.0
- 11
-6.2
- 21
-15.3900130687
- 31
-0.0
-  0
-LINE
-  5
-DC
-330
-1F
-100
-AcDbEntity
-  8
-walls
-  6
-Continuous
-100
-AcDbLine
- 10
-6.2
- 20
-15.2500130687
- 30
-0.0
- 11
-6.2
- 21
-15.3900130687
- 31
-0.0
-  0
-ARC
-  5
-DD
-330
-1F
-100
-AcDbEntity
-  8
-walls
-  6
-Continuous
-100
-AcDbCircle
- 10
-5.169999999999999
- 20
-15.3900130687
- 30
-0.0
- 40
-0.14
-100
-AcDbArc
- 50
-360.0
- 51
-90.0
-  0
-LINE
-  5
-DE
-330
-1F
-100
-AcDbEntity
-  8
-walls
-  6
-Continuous
-100
-AcDbLine
- 10
-5.309999999999996
- 20
-15.3900130687
- 30
-0.0
- 11
-5.25
- 21
-15.3900130687
- 31
-0.0
-  0
-LINE
-  5
-DF
-330
-1F
-100
-AcDbEntity
-  8
-walls
-100
-AcDbLine
- 10
-5.25
- 20
-15.2500130687
- 30
-0.0
- 11
-5.25
- 21
-15.3900130687
  31
 0.0
   0
@@ -8917,7 +8759,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+stairs
   6
 Continuous
 100
@@ -8943,7 +8785,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+stairs
   6
 Continuous
 100
@@ -8969,7 +8811,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+stairs
   6
 Continuous
 100
@@ -8995,7 +8837,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+stairs
   6
 Continuous
 100
@@ -9021,7 +8863,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+stairs
   6
 Continuous
 100
@@ -9086,32 +8928,6 @@ AcDbLine
 10.92
  21
 32.25
- 31
-0.0
-  0
-LINE
-  5
-15B
-330
-1F
-100
-AcDbEntity
-  8
-walls
-  6
-Continuous
-100
-AcDbLine
- 10
-10.4775
- 20
-31.4200248307
- 30
-0.0
- 11
-10.4775
- 21
-31.4200248307
  31
 0.0
   0
@@ -9197,7 +9013,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+stairs
   6
 Continuous
 100
@@ -9223,7 +9039,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+stairs
   6
 Continuous
 100
@@ -9249,7 +9065,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+stairs
   6
 Continuous
 100
@@ -9275,7 +9091,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+stairs
   6
 Continuous
 100
@@ -9301,7 +9117,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+stairs
   6
 Continuous
 100
@@ -9327,7 +9143,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+stairs
   6
 Continuous
 100
@@ -9377,7 +9193,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbLine
  10
@@ -9401,7 +9217,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbLine
  10
@@ -9497,7 +9313,7 @@ INSERT
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbBlockReference
   2
@@ -9541,7 +9357,7 @@ INSERT
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbBlockReference
   2
@@ -10357,30 +10173,6 @@ AcDbLine
  31
 0.0
   0
-LINE
-  5
-18E
-330
-1F
-100
-AcDbEntity
-  8
-walls
-100
-AcDbLine
- 10
-39.3885965049
- 20
-18.1398879163
- 30
-0.0
- 11
-39.96
- 21
-18.14
- 31
-0.0
-  0
 INSERT
   5
 18F
@@ -10389,7 +10181,7 @@ INSERT
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbBlockReference
   2
@@ -10631,7 +10423,7 @@ INSERT
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbBlockReference
   2
@@ -10663,7 +10455,7 @@ AcDbLine
  11
 41.515
  21
-18.55
+18.41
  31
 0.0
   0
@@ -12805,7 +12597,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbLine
  10
@@ -12829,7 +12621,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbLine
  10
@@ -12853,7 +12645,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbLine
  10
@@ -12877,7 +12669,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbLine
  10
@@ -13853,7 +13645,7 @@ INSERT
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbBlockReference
   2
@@ -14149,7 +13941,7 @@ INSERT
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbBlockReference
   2
@@ -14547,7 +14339,7 @@ INSERT
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbBlockReference
   2
@@ -14591,7 +14383,7 @@ INSERT
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbBlockReference
   2
@@ -14683,7 +14475,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbLine
  10
@@ -14707,7 +14499,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbLine
  10
@@ -14731,7 +14523,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbLine
  10
@@ -14755,7 +14547,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbLine
  10
@@ -14779,7 +14571,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbLine
  10
@@ -14803,7 +14595,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
   6
 Continuous
 100
@@ -14829,7 +14621,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
   6
 Continuous
 100
@@ -16039,7 +15831,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbLine
  10
@@ -16087,7 +15879,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
   6
 Continuous
 100
@@ -16137,7 +15929,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
   6
 Continuous
 100
@@ -16319,7 +16111,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
   6
 Continuous
 100
@@ -16345,7 +16137,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
   6
 Continuous
 100
@@ -16371,7 +16163,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbLine
  10
@@ -16499,7 +16291,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbLine
  10
@@ -16523,7 +16315,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbLine
  10
@@ -16547,7 +16339,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbLine
  10
@@ -16571,7 +16363,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbLine
  10
@@ -17203,7 +16995,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+stairs
 100
 AcDbLine
  10
@@ -17227,7 +17019,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+stairs
 100
 AcDbLine
  10
@@ -17251,7 +17043,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+stairs
 100
 AcDbLine
  10
@@ -17275,7 +17067,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+stairs
 100
 AcDbLine
  10
@@ -17299,7 +17091,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+stairs
   6
 Continuous
 100
@@ -17325,7 +17117,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+stairs
   6
 Continuous
 100
@@ -17351,7 +17143,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+stairs
   6
 Continuous
 100
@@ -17377,7 +17169,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+stairs
   6
 Continuous
 100
@@ -17403,7 +17195,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+stairs
   6
 Continuous
 100
@@ -17589,7 +17381,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+stairs
 100
 AcDbLine
  10
@@ -17613,7 +17405,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+stairs
 100
 AcDbLine
  10
@@ -17637,7 +17429,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+stairs
   6
 Continuous
 100
@@ -17663,7 +17455,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+stairs
   6
 Continuous
 100
@@ -17793,7 +17585,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+stairs
 100
 AcDbLine
  10
@@ -17869,7 +17661,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+stairs
 100
 AcDbLine
  10
@@ -17893,7 +17685,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+stairs
 100
 AcDbLine
  10
@@ -17917,7 +17709,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+stairs
 100
 AcDbLine
  10
@@ -17941,7 +17733,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+stairs
   6
 Continuous
 100
@@ -17967,7 +17759,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+stairs
   6
 Continuous
 100
@@ -17993,7 +17785,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+stairs
   6
 Continuous
 100
@@ -18067,7 +17859,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+stairs
 100
 AcDbLine
  10
@@ -18091,7 +17883,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+stairs
 100
 AcDbLine
  10
@@ -18115,7 +17907,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+stairs
 100
 AcDbLine
  10
@@ -18139,7 +17931,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+stairs
 100
 AcDbLine
  10
@@ -18163,7 +17955,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+stairs
 100
 AcDbLine
  10
@@ -18295,7 +18087,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+stairs
   6
 Continuous
 100
@@ -18373,7 +18165,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+stairs
   6
 Continuous
 100
@@ -18399,7 +18191,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+stairs
   6
 Continuous
 100
@@ -18425,7 +18217,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+stairs
   6
 Continuous
 100
@@ -18451,7 +18243,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+stairs
   6
 Continuous
 100
@@ -18477,7 +18269,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+stairs
   6
 Continuous
 100
@@ -18503,7 +18295,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+stairs
   6
 Continuous
 100
@@ -18529,7 +18321,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+stairs
   6
 Continuous
 100
@@ -18555,7 +18347,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+stairs
   6
 Continuous
 100
@@ -18581,7 +18373,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+stairs
   6
 Continuous
 100
@@ -18607,7 +18399,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+stairs
   6
 Continuous
 100
@@ -18633,7 +18425,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+stairs
   6
 Continuous
 100
@@ -18755,7 +18547,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+stairs
   6
 Continuous
 100
@@ -18885,7 +18677,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+stairs
   6
 Continuous
 100
@@ -18911,7 +18703,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+stairs
   6
 Continuous
 100
@@ -18937,7 +18729,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+stairs
   6
 Continuous
 100
@@ -18963,7 +18755,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+stairs
   6
 Continuous
 100
@@ -18989,7 +18781,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+stairs
   6
 Continuous
 100
@@ -19015,7 +18807,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+stairs
   6
 Continuous
 100
@@ -19041,7 +18833,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+stairs
   6
 Continuous
 100
@@ -19067,7 +18859,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+stairs
   6
 Continuous
 100
@@ -19093,7 +18885,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+stairs
   6
 Continuous
 100
@@ -19119,7 +18911,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+stairs
   6
 Continuous
 100
@@ -19134,32 +18926,6 @@ AcDbLine
 40.3975
  21
 34.11
- 31
-0.0
-  0
-LINE
-  5
-33C
-330
-1F
-100
-AcDbEntity
-  8
-walls
-  6
-Continuous
-100
-AcDbLine
- 10
-39.1975
- 20
-35.1425
- 30
-0.0
- 11
-39.1975
- 21
-34.41
  31
 0.0
   0
@@ -19223,7 +18989,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+stairs
 100
 AcDbLine
  10
@@ -19247,7 +19013,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+stairs
 100
 AcDbLine
  10
@@ -19271,7 +19037,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+stairs
   6
 Continuous
 100
@@ -19283,7 +19049,7 @@ AcDbLine
  30
 0.0
  11
-10.0889203633
+10.04
  21
 31.79
  31
@@ -19297,11 +19063,11 @@ LINE
 100
 AcDbEntity
   8
-walls
+stairs
 100
 AcDbLine
  10
-10.4866666667
+10.92
  20
 31.49
  30
@@ -19321,7 +19087,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+stairs
 100
 AcDbLine
  10
@@ -19345,7 +19111,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+stairs
 100
 AcDbLine
  10
@@ -19369,7 +19135,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+stairs
   6
 Continuous
 100
@@ -19384,56 +19150,6 @@ AcDbLine
 10.04
  21
 32.09
- 31
-0.0
-  0
-LINE
-  5
-346
-330
-1F
-100
-AcDbEntity
-  8
-walls
-  6
-Continuous
-100
-AcDbLine
- 10
-10.92
- 20
-31.49
- 30
-0.0
- 11
-10.6089203633
- 21
-31.49
- 31
-0.0
-  0
-LINE
-  5
-347
-330
-1F
-100
-AcDbEntity
-  8
-walls
-100
-AcDbLine
- 10
-39.18
- 20
-18.55
- 30
-0.0
- 11
-40.17
- 21
-18.55
  31
 0.0
   0
@@ -19637,7 +19353,7 @@ INSERT
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbBlockReference
   2
@@ -19659,7 +19375,7 @@ INSERT
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbBlockReference
   2
@@ -19681,7 +19397,7 @@ INSERT
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbBlockReference
   2
@@ -19703,7 +19419,7 @@ INSERT
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbBlockReference
   2
@@ -19725,7 +19441,7 @@ INSERT
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbBlockReference
   2
@@ -19795,7 +19511,7 @@ INSERT
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbBlockReference
   2
@@ -19815,7 +19531,7 @@ INSERT
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbBlockReference
   2
@@ -19835,7 +19551,7 @@ INSERT
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbBlockReference
   2
@@ -19855,7 +19571,7 @@ INSERT
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbBlockReference
   2
@@ -19923,7 +19639,7 @@ INSERT
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbBlockReference
   2
@@ -19945,7 +19661,7 @@ INSERT
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbBlockReference
   2
@@ -19967,7 +19683,7 @@ INSERT
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbBlockReference
   2
@@ -19989,7 +19705,7 @@ INSERT
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbBlockReference
   2
@@ -20011,7 +19727,7 @@ INSERT
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbBlockReference
   2
@@ -20233,7 +19949,7 @@ INSERT
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbBlockReference
   2
@@ -20255,7 +19971,7 @@ INSERT
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbBlockReference
   2
@@ -20277,7 +19993,7 @@ INSERT
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbBlockReference
   2
@@ -20299,7 +20015,7 @@ INSERT
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbBlockReference
   2
@@ -20321,7 +20037,7 @@ INSERT
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbBlockReference
   2
@@ -20343,7 +20059,7 @@ INSERT
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbBlockReference
   2
@@ -20989,7 +20705,7 @@ INSERT
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbBlockReference
   2
@@ -21133,7 +20849,7 @@ INSERT
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbBlockReference
   2
@@ -21155,7 +20871,7 @@ INSERT
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbBlockReference
   2
@@ -21177,7 +20893,7 @@ INSERT
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbBlockReference
   2
@@ -21199,7 +20915,7 @@ INSERT
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbBlockReference
   2
@@ -21583,7 +21299,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbLine
  10
@@ -21607,7 +21323,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbLine
  10
@@ -21631,7 +21347,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbLine
  10
@@ -21655,7 +21371,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbLine
  10
@@ -21679,7 +21395,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbLine
  10
@@ -21703,7 +21419,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbLine
  10
@@ -21727,7 +21443,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbLine
  10
@@ -21751,7 +21467,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbLine
  10
@@ -21775,7 +21491,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbLine
  10
@@ -21799,7 +21515,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbLine
  10
@@ -21823,7 +21539,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbLine
  10
@@ -21847,7 +21563,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbLine
  10
@@ -21871,7 +21587,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbLine
  10
@@ -21895,7 +21611,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbLine
  10
@@ -21919,7 +21635,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbLine
  10
@@ -21943,7 +21659,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbLine
  10
@@ -21967,7 +21683,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbLine
  10
@@ -21991,7 +21707,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbLine
  10
@@ -22015,7 +21731,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbLine
  10
@@ -22039,7 +21755,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbLine
  10
@@ -22063,7 +21779,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbLine
  10
@@ -22087,7 +21803,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbLine
  10
@@ -22111,7 +21827,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbLine
  10
@@ -22135,7 +21851,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbLine
  10
@@ -22159,7 +21875,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbLine
  10
@@ -22183,7 +21899,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbLine
  10
@@ -22207,7 +21923,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbLine
  10
@@ -22231,7 +21947,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbLine
  10
@@ -22255,7 +21971,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbLine
  10
@@ -22279,7 +21995,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbLine
  10
@@ -22303,7 +22019,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbLine
  10
@@ -22327,7 +22043,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbLine
  10
@@ -22351,7 +22067,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbLine
  10
@@ -22375,7 +22091,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbLine
  10
@@ -22399,7 +22115,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbLine
  10
@@ -22423,7 +22139,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbLine
  10
@@ -22447,7 +22163,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbLine
  10
@@ -22471,7 +22187,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbLine
  10
@@ -22495,7 +22211,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbLine
  10
@@ -22519,7 +22235,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbLine
  10
@@ -22543,7 +22259,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbLine
  10
@@ -22591,7 +22307,7 @@ INSERT
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbBlockReference
   2
@@ -22659,7 +22375,7 @@ INSERT
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbBlockReference
   2
@@ -22679,7 +22395,7 @@ INSERT
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbBlockReference
   2
@@ -22699,7 +22415,7 @@ INSERT
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbBlockReference
   2
@@ -22719,7 +22435,7 @@ INSERT
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbBlockReference
   2
@@ -22739,7 +22455,7 @@ INSERT
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbBlockReference
   2
@@ -22759,7 +22475,7 @@ INSERT
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbBlockReference
   2
@@ -22779,7 +22495,7 @@ INSERT
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbBlockReference
   2
@@ -22799,7 +22515,7 @@ INSERT
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbBlockReference
   2
@@ -22819,7 +22535,7 @@ INSERT
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbBlockReference
   2
@@ -22839,7 +22555,7 @@ INSERT
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbBlockReference
   2
@@ -22859,7 +22575,7 @@ INSERT
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbBlockReference
   2
@@ -22879,7 +22595,7 @@ INSERT
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbBlockReference
   2
@@ -22899,7 +22615,7 @@ INSERT
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbBlockReference
   2
@@ -22919,7 +22635,7 @@ INSERT
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbBlockReference
   2
@@ -22939,7 +22655,7 @@ INSERT
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbBlockReference
   2
@@ -22959,7 +22675,7 @@ INSERT
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbBlockReference
   2
@@ -22979,7 +22695,7 @@ INSERT
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbBlockReference
   2
@@ -22999,7 +22715,7 @@ INSERT
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbBlockReference
   2
@@ -23019,7 +22735,7 @@ INSERT
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbBlockReference
   2
@@ -23039,7 +22755,7 @@ INSERT
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbBlockReference
   2
@@ -23059,7 +22775,7 @@ INSERT
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbBlockReference
   2
@@ -23891,30 +23607,6 @@ AcDbLine
   0
 LINE
   5
-414
-330
-1F
-100
-AcDbEntity
-  8
-walls
-100
-AcDbLine
- 10
-4.41
- 20
-15.25
- 30
-0.0
- 11
-5.25
- 21
-15.25
- 31
-0.0
-  0
-LINE
-  5
 415
 330
 1F
@@ -24385,7 +24077,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbLine
  10
@@ -24481,7 +24173,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbLine
  10
@@ -24505,7 +24197,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbLine
  10
@@ -24529,7 +24221,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbLine
  10
@@ -24745,7 +24437,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbLine
  10
@@ -24769,7 +24461,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbLine
  10
@@ -24793,7 +24485,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbLine
  10
@@ -24817,7 +24509,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbLine
  10
@@ -25649,7 +25341,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+stairs
 100
 AcDbLine
  10
@@ -25673,7 +25365,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+stairs
 100
 AcDbLine
  10
@@ -25697,7 +25389,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+stairs
 100
 AcDbLine
  10
@@ -25721,7 +25413,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+stairs
 100
 AcDbLine
  10
@@ -26015,7 +25707,7 @@ INSERT
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbBlockReference
   2
@@ -27109,65 +26801,13 @@ AcDbLine
   0
 LINE
   5
-4C5
-330
-1F
-100
-AcDbEntity
-  8
-walls
-  6
-Continuous
-100
-AcDbLine
- 10
-43.42999999999999
- 20
-31.7
- 30
-0.0
- 11
-43.18999999999999
- 21
-31.7
- 31
-0.0
-  0
-LINE
-  5
-4C6
-330
-1F
-100
-AcDbEntity
-  8
-walls
-  6
-Continuous
-100
-AcDbLine
- 10
-43.42999999999999
- 20
-30.3
- 30
-0.0
- 11
-43.18999999999999
- 21
-30.3
- 31
-0.0
-  0
-LINE
-  5
 4C9
 330
 1F
 100
 AcDbEntity
   8
-walls
+windows
   6
 Continuous
 100
@@ -27193,7 +26833,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
   6
 Continuous
 100
@@ -27398,60 +27038,6 @@ AcDbLine
 15.25
  31
 0.0
-  0
-ARC
-  5
-4D4
-330
-1F
-100
-AcDbEntity
-  8
-walls
-100
-AcDbCircle
- 10
-39.96
- 20
-18.41
- 30
-0.0
- 40
-0.27
-100
-AcDbArc
- 50
-270.0
- 51
-0.0
-  0
-ARC
-  5
-4D5
-330
-1F
-100
-AcDbEntity
-  8
-walls
-  6
-Continuous
-100
-AcDbCircle
- 10
-41.455
- 20
-18.41
- 30
-0.0
- 40
-0.27
-100
-AcDbArc
- 50
-180.0
- 51
-270.0
   0
 LINE
   5
@@ -28386,128 +27972,6 @@ AcDbLine
 33.345
  21
 15.39
- 31
-0.0
-  0
-LINE
-  5
-4FA
-330
-1F
-100
-AcDbEntity
-  8
-walls
-100
-AcDbLine
- 10
-40.17
- 20
-18.55
- 30
-0.0
- 11
-40.17
- 21
-18.4098842685
- 31
-0.0
-  0
-LINE
-  5
-4FB
-330
-1F
-100
-AcDbEntity
-  8
-walls
-100
-AcDbLine
- 10
-40.2300198529
- 20
-18.4098842685
- 30
-0.0
- 11
-40.17
- 21
-18.4098842685
- 31
-0.0
-  0
-LINE
-  5
-4FC
-330
-1F
-100
-AcDbEntity
-  8
-walls
-100
-AcDbLine
- 10
-41.245
- 20
-18.5501157315
- 30
-0.0
- 11
-41.245
- 21
-18.41
- 31
-0.0
-  0
-LINE
-  5
-4FD
-330
-1F
-100
-AcDbEntity
-  8
-walls
-  6
-Continuous
-100
-AcDbLine
- 10
-41.245
- 20
-18.41
- 30
-0.0
- 11
-41.185
- 21
-18.41
- 31
-0.0
-  0
-LINE
-  5
-506
-330
-1F
-100
-AcDbEntity
-  8
-walls
-100
-AcDbLine
- 10
-41.515
- 20
-18.55
- 30
-0.0
- 11
-41.245
- 21
-18.5501157315
  31
 0.0
   0
@@ -31079,7 +30543,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
   6
 Continuous
 100
@@ -31105,7 +30569,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
   6
 Continuous
 100
@@ -31131,7 +30595,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
   6
 Continuous
 100
@@ -31157,7 +30621,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
   6
 Continuous
 100
@@ -31183,7 +30647,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
   6
 Continuous
 100
@@ -31209,7 +30673,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
   6
 Continuous
 100
@@ -31235,7 +30699,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
   6
 Continuous
 100
@@ -31261,7 +30725,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
   6
 Continuous
 100
@@ -31287,7 +30751,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
   6
 Continuous
 100
@@ -31313,7 +30777,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
   6
 Continuous
 100
@@ -31339,7 +30803,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
   6
 Continuous
 100
@@ -31365,7 +30829,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
   6
 Continuous
 100
@@ -31391,7 +30855,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
   6
 Continuous
 100
@@ -31417,7 +30881,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
   6
 Continuous
 100
@@ -31563,7 +31027,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbLine
  10
@@ -31587,7 +31051,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbLine
  10
@@ -31611,7 +31075,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbLine
  10
@@ -31635,7 +31099,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbLine
  10
@@ -31659,7 +31123,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbLine
  10
@@ -31683,7 +31147,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbLine
  10
@@ -31707,7 +31171,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbLine
  10
@@ -31731,7 +31195,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbLine
  10
@@ -31755,7 +31219,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbLine
  10
@@ -31779,7 +31243,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbLine
  10
@@ -31803,7 +31267,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbLine
  10
@@ -31827,7 +31291,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
 100
 AcDbLine
  10
@@ -33941,56 +33405,6 @@ AcDbLine
  31
 0.0
   0
-LINE
-  5
-2054D
-330
-1F
-100
-AcDbEntity
-  8
-doors
-100
-AcDbLine
- 10
-40.22999999999999
- 20
-19.35999999172176
- 30
-0.0
- 11
-40.22999999999999
- 21
-18.41
- 31
-0.0
-  0
-ARC
-  5
-2054E
-330
-1F
-100
-AcDbEntity
-  8
-doors
-100
-AcDbCircle
- 10
-40.22987458550384
- 20
-18.41000000000001
- 30
-0.0
- 40
-0.95
-100
-AcDbArc
- 50
-0.0
- 51
-89.99243608280037
-  0
 ARC
   5
 2054F
@@ -34149,7 +33563,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
   6
 Continuous
 100
@@ -34175,7 +33589,7 @@ LINE
 100
 AcDbEntity
   8
-walls
+windows
   6
 Continuous
 100
@@ -34896,32 +34310,6 @@ AcDbLine
 39.12
  21
 18.4098842685
- 31
-0.0
-  0
-LINE
-  5
-20837
-330
-1F
-100
-AcDbEntity
-  8
-doors_marker
-  6
-Continuous
-100
-AcDbLine
- 10
-40.23
- 20
-18.41
- 30
-0.0
- 11
-41.185
- 21
-18.41
  31
 0.0
   0
@@ -35733,39 +35121,13 @@ AcDbLine
   0
 LINE
   5
-20857
-330
-1F
-100
-AcDbEntity
-  8
-doors_marker
-  6
-Continuous
-100
-AcDbLine
- 10
-5.309999999999998
- 20
-15.3900130687
- 30
-0.0
- 11
-6.139999999999997
- 21
-15.3900130687
- 31
-0.0
-  0
-LINE
-  5
 20894
 330
 1F
 100
 AcDbEntity
   8
-walls
+windows
   6
 Continuous
 100
@@ -36483,6 +35845,1560 @@ AcDbLine
  31
 0.0
   0
+LINE
+  5
+209EE
+330
+1F
+100
+AcDbEntity
+  8
+walls
+  6
+Continuous
+100
+AcDbLine
+ 10
+4.41
+ 20
+15.53
+ 30
+0.0
+ 11
+7.54
+ 21
+15.53
+ 31
+0.0
+  0
+LINE
+  5
+209EF
+330
+1F
+100
+AcDbEntity
+  8
+walls
+  6
+Continuous
+100
+AcDbLine
+ 10
+7.480036877399999
+ 20
+15.25
+ 30
+0.0
+ 11
+4.41
+ 21
+15.25
+ 31
+0.0
+  0
+LINE
+  5
+209F0
+330
+1F
+100
+AcDbEntity
+  8
+walls
+100
+AcDbLine
+ 10
+84.67999999999998
+ 20
+20.5118040218
+ 30
+0.0
+ 11
+84.67999999999998
+ 21
+18.67
+ 31
+0.0
+  0
+LINE
+  5
+209F2
+330
+1F
+100
+AcDbEntity
+  8
+walls
+100
+AcDbLine
+ 10
+84.62992205714757
+ 20
+20.5118040218
+ 30
+0.0
+ 11
+84.62992205714757
+ 21
+18.67
+ 31
+0.0
+  0
+LINE
+  5
+20A00
+330
+1F
+100
+AcDbEntity
+  8
+walls
+100
+AcDbLine
+ 10
+40.27
+ 20
+21.5
+ 30
+0.0
+ 11
+40.27
+ 21
+18.55
+ 31
+0.0
+  0
+LINE
+  5
+20A1B
+330
+1F
+100
+AcDbEntity
+  8
+walls
+  6
+Continuous
+100
+AcDbLine
+ 10
+39.18
+ 20
+18.55
+ 30
+0.0
+ 11
+40.44649999999999
+ 21
+18.55
+ 31
+0.0
+  0
+LINE
+  5
+20A2A
+330
+1F
+100
+AcDbEntity
+  8
+walls
+  6
+Continuous
+100
+AcDbLine
+ 10
+39.39
+ 20
+18.1398842685
+ 30
+0.0
+ 11
+40.5065
+ 21
+18.1398842685
+ 31
+0.0
+  0
+LINE
+  5
+20A2B
+330
+1F
+100
+AcDbEntity
+  8
+walls
+  6
+Continuous
+100
+AcDbLine
+ 10
+40.5065
+ 20
+18.1398842685
+ 30
+0.0
+ 11
+40.5065
+ 21
+18.4098842685
+ 31
+0.0
+  0
+LINE
+  5
+20A2D
+330
+1F
+100
+AcDbEntity
+  8
+walls
+  6
+Continuous
+100
+AcDbLine
+ 10
+40.5065
+ 20
+18.4098842685
+ 30
+0.0
+ 11
+40.44649999999999
+ 21
+18.4098842685
+ 31
+0.0
+  0
+LINE
+  5
+20A2E
+330
+1F
+100
+AcDbEntity
+  8
+walls
+  6
+Continuous
+100
+AcDbLine
+ 10
+40.44649999999999
+ 20
+18.4098842685
+ 30
+0.0
+ 11
+40.44649999999999
+ 21
+18.55
+ 31
+0.0
+  0
+LINE
+  5
+20A3C
+330
+1F
+100
+AcDbEntity
+  8
+walls
+  6
+Continuous
+100
+AcDbLine
+ 10
+41.455
+ 20
+18.14
+ 30
+0.0
+ 11
+41.455
+ 21
+18.41
+ 31
+0.0
+  0
+LINE
+  5
+20A3D
+330
+1F
+100
+AcDbEntity
+  8
+walls
+  6
+Continuous
+100
+AcDbLine
+ 10
+41.455
+ 20
+18.41
+ 30
+0.0
+ 11
+41.515
+ 21
+18.41
+ 31
+0.0
+  0
+LINE
+  5
+20A4B
+330
+1F
+100
+AcDbEntity
+  8
+walls
+100
+AcDbLine
+ 10
+40.36999999999999
+ 20
+21.5
+ 30
+0.0
+ 11
+40.36999999999999
+ 21
+18.55
+ 31
+0.0
+  0
+ARC
+  5
+20A66
+330
+1F
+100
+AcDbEntity
+  8
+doors
+  6
+Continuous
+100
+AcDbCircle
+ 10
+40.5065
+ 20
+18.4098842685
+ 30
+0.0
+ 40
+0.9485000070605018
+100
+AcDbArc
+ 50
+0.0069909609634465
+ 51
+90.0
+  0
+LINE
+  5
+20A67
+330
+1F
+100
+AcDbEntity
+  8
+doors
+  6
+Continuous
+100
+AcDbLine
+ 10
+40.5065
+ 20
+19.3583842755605
+ 30
+0.0
+ 11
+40.5065
+ 21
+18.4098842685
+ 31
+0.0
+  0
+LINE
+  5
+20A68
+330
+1F
+100
+AcDbEntity
+  8
+doors_marker
+  6
+Continuous
+100
+AcDbLine
+ 10
+40.5065
+ 20
+18.4098842685
+ 30
+0.0
+ 11
+41.455
+ 21
+18.4098842685
+ 31
+0.0
+  0
+LINE
+  5
+20A76
+330
+1F
+100
+AcDbEntity
+  8
+walls
+  6
+Continuous
+100
+AcDbLine
+ 10
+96.6504318313
+ 20
+20.2419212516
+ 30
+0.0
+ 11
+97.4387438239
+ 21
+14.1722551234
+ 31
+0.0
+  0
+LINE
+  5
+20A77
+330
+1F
+100
+AcDbEntity
+  8
+walls
+  6
+Continuous
+100
+AcDbLine
+ 10
+111.278034708
+ 20
+22.1417151657
+ 30
+0.0
+ 11
+112.0663467006
+ 21
+16.0720490375
+ 31
+0.0
+  0
+LINE
+  5
+20A78
+330
+1F
+100
+AcDbEntity
+  8
+walls
+  6
+Continuous
+100
+AcDbLine
+ 10
+111.1788675917616
+ 20
+22.12883560604254
+ 30
+0.0
+ 11
+111.9671795843616
+ 21
+16.05916947784254
+ 31
+0.0
+  0
+LINE
+  5
+20A94
+330
+1F
+100
+AcDbEntity
+  8
+walls
+  6
+Continuous
+100
+AcDbLine
+ 10
+108.848272123
+ 20
+21.8261441039
+ 30
+0.0
+ 11
+109.0010722742057
+ 21
+20.64964810883294
+ 31
+0.0
+  0
+LINE
+  5
+20A95
+330
+1F
+100
+AcDbEntity
+  8
+walls
+  6
+Continuous
+100
+AcDbLine
+ 10
+109.483783964403
+ 20
+16.93297397069924
+ 30
+0.0
+ 11
+109.6365841156088
+ 21
+15.75647797563218
+ 31
+0.0
+  0
+LINE
+  5
+20A96
+330
+1F
+100
+AcDbEntity
+  8
+walls
+  6
+Continuous
+100
+AcDbLine
+ 10
+108.6837375022432
+ 20
+20.60843351792764
+ 30
+0.0
+ 11
+109.1690922222265
+ 21
+16.89210264942905
+ 31
+0.0
+  0
+LINE
+  5
+20A97
+330
+1F
+100
+AcDbEntity
+  8
+walls
+100
+AcDbLine
+ 10
+109.483783964403
+ 20
+16.93297397069924
+ 30
+0.0
+ 11
+109.1664491924405
+ 21
+16.89175937979394
+ 31
+0.0
+  0
+LINE
+  5
+20A98
+330
+1F
+100
+AcDbEntity
+  8
+walls
+100
+AcDbLine
+ 10
+109.0010722742057
+ 20
+20.64964810883294
+ 30
+0.0
+ 11
+108.6837375022432
+ 21
+20.60843351792764
+ 31
+0.0
+  0
+LWPOLYLINE
+  5
+20B01
+330
+1F
+100
+AcDbEntity
+  8
+objects
+  6
+Continuous
+100
+AcDbPolyline
+ 90
+        4
+ 70
+     1
+ 43
+0.0
+ 10
+4.41
+ 20
+15.25
+ 10
+6.91
+ 20
+15.25
+ 10
+6.91
+ 20
+14.75
+ 10
+4.41
+ 20
+14.75
+  0
+LWPOLYLINE
+  5
+20B02
+330
+1F
+100
+AcDbEntity
+  8
+objects
+  6
+Continuous
+100
+AcDbPolyline
+ 90
+        4
+ 70
+     1
+ 43
+0.0
+ 10
+4.41
+ 20
+12.4
+ 10
+6.61
+ 20
+12.4
+ 10
+6.61
+ 20
+13.0
+ 10
+4.41
+ 20
+13.0
+  0
+LWPOLYLINE
+  5
+20B37
+330
+1F
+100
+AcDbEntity
+  8
+objects
+  6
+Continuous
+100
+AcDbPolyline
+ 90
+        4
+ 70
+     1
+ 43
+0.0
+ 10
+6.61
+ 20
+12.4
+ 10
+6.91
+ 20
+12.4
+ 10
+6.91
+ 20
+12.6
+ 10
+6.61
+ 20
+12.6
+  0
+LINE
+  5
+20B7A
+330
+1F
+100
+AcDbEntity
+  8
+windows
+  6
+Continuous
+100
+AcDbLine
+ 10
+7.240059711519999
+ 20
+35.94
+ 30
+0.0
+ 11
+9.56001137518
+ 21
+35.94
+ 31
+0.0
+  0
+LINE
+  5
+20B7B
+330
+1F
+100
+AcDbEntity
+  8
+windows
+  6
+Continuous
+100
+AcDbLine
+ 10
+9.499815352469999
+ 20
+36.35
+ 30
+0.0
+ 11
+7.29976933976
+ 21
+36.35
+ 31
+0.0
+  0
+LINE
+  5
+20B89
+330
+1F
+100
+AcDbEntity
+  8
+windows
+  6
+Continuous
+100
+AcDbLine
+ 10
+4.41
+ 20
+13.7897637313
+ 30
+0.0
+ 11
+4.41
+ 21
+12.8098362687
+ 31
+0.0
+  0
+LINE
+  5
+20B8A
+330
+1F
+100
+AcDbEntity
+  8
+windows
+  6
+Continuous
+100
+AcDbLine
+ 10
+4.0
+ 20
+12.8698362687
+ 30
+0.0
+ 11
+4.0
+ 21
+13.7297637313
+ 31
+0.0
+  0
+LINE
+  5
+20B98
+330
+1F
+100
+AcDbEntity
+  8
+windows
+  6
+Continuous
+100
+AcDbLine
+ 10
+10.905
+ 20
+10.16
+ 30
+0.0
+ 11
+11.885
+ 21
+10.16
+ 31
+0.0
+  0
+LINE
+  5
+20B99
+330
+1F
+100
+AcDbEntity
+  8
+windows
+  6
+Continuous
+100
+AcDbLine
+ 10
+11.8252662725
+ 20
+9.75
+ 30
+0.0
+ 11
+10.9652662725
+ 21
+9.75
+ 31
+0.0
+  0
+LINE
+  5
+20BA7
+330
+1F
+100
+AcDbEntity
+  8
+windows
+  6
+Continuous
+100
+AcDbLine
+ 10
+38.1000700665
+ 20
+36.35
+ 30
+0.0
+ 11
+40.2999513689
+ 21
+36.35
+ 31
+0.0
+  0
+LINE
+  5
+20BA8
+330
+1F
+100
+AcDbEntity
+  8
+stairs
+  6
+Continuous
+100
+AcDbLine
+ 10
+40.36010963239998
+ 20
+35.94
+ 30
+0.0
+ 11
+38.0408001515
+ 21
+35.94
+ 31
+0.0
+  0
+LINE
+  5
+20BC3
+330
+1F
+100
+AcDbEntity
+  8
+windows
+  6
+Continuous
+100
+AcDbLine
+ 10
+94.95618070799999
+ 20
+29.2379920019
+ 30
+0.0
+ 11
+95.47136309429999
+ 21
+25.2713073524
+ 31
+0.0
+  0
+LINE
+  5
+20BC4
+330
+1F
+100
+AcDbEntity
+  8
+windows
+  6
+Continuous
+100
+AcDbLine
+ 10
+95.88567600659999
+ 20
+25.2646132772
+ 30
+0.0
+ 11
+95.35503814870001
+ 21
+29.3502984663
+ 31
+0.0
+  0
+LINE
+  5
+20BC5
+330
+1F
+100
+AcDbEntity
+  8
+windows
+  6
+Continuous
+100
+AcDbLine
+ 10
+103.732470495
+ 20
+30.3778330316
+ 30
+0.0
+ 11
+104.247652881
+ 21
+26.4111483821
+ 31
+0.0
+  0
+LINE
+  5
+20BC6
+330
+1F
+100
+AcDbEntity
+  8
+windows
+  6
+Continuous
+100
+AcDbLine
+ 10
+103.848795441
+ 20
+26.2988419178
+ 30
+0.0
+ 11
+103.318157583
+ 21
+30.3845271068
+ 31
+0.0
+  0
+LINE
+  5
+20BEE
+330
+1F
+100
+AcDbEntity
+  8
+windows
+  6
+Continuous
+100
+AcDbLine
+ 10
+108.616840086
+ 20
+25.6172683568
+ 30
+0.0
+ 11
+110.104346829
+ 21
+25.8104617517
+ 31
+0.0
+  0
+LINE
+  5
+20BEF
+330
+1F
+100
+AcDbEntity
+  8
+windows
+  6
+Continuous
+100
+AcDbLine
+ 10
+110.212573097
+ 20
+25.4413263496
+ 30
+0.0
+ 11
+108.606156178
+ 21
+25.2326892194
+ 31
+0.0
+  0
+LINE
+  5
+20C0A
+330
+1F
+100
+AcDbEntity
+  8
+windows
+  6
+Continuous
+100
+AcDbLine
+ 10
+91.2398129398
+ 20
+13.3671545703
+ 30
+0.0
+ 11
+92.33087771139999
+ 21
+13.5088591428
+ 31
+0.0
+  0
+LINE
+  5
+20C0B
+330
+1F
+100
+AcDbEntity
+  8
+windows
+  6
+Continuous
+100
+AcDbLine
+ 10
+92.3246391352
+ 20
+13.0952628996
+ 30
+0.0
+ 11
+91.38861603219998
+ 21
+12.9736947241
+ 31
+0.0
+  0
+LINE
+  5
+20C0C
+330
+1F
+100
+AcDbEntity
+  8
+windows
+  6
+Continuous
+100
+AcDbLine
+ 10
+93.61982372949999
+ 20
+13.6762640021
+ 30
+0.0
+ 11
+94.71088850109998
+ 21
+13.8179685746
+ 31
+0.0
+  0
+LINE
+  5
+20C0D
+330
+1F
+100
+AcDbEntity
+  8
+windows
+  6
+Continuous
+100
+AcDbLine
+ 10
+94.70464992489999
+ 20
+13.4043723314
+ 30
+0.0
+ 11
+93.76862682189999
+ 21
+13.2828041559
+ 31
+0.0
+  0
+LINE
+  5
+20C0E
+330
+1F
+100
+AcDbEntity
+  8
+windows
+  6
+Continuous
+100
+AcDbLine
+ 10
+95.99983451919998
+ 20
+13.9853734339
+ 30
+0.0
+ 11
+97.09089929079999
+ 21
+14.1270780064
+ 31
+0.0
+  0
+LINE
+  5
+20C0F
+330
+1F
+100
+AcDbEntity
+  8
+windows
+  6
+Continuous
+100
+AcDbLine
+ 10
+97.0846607146
+ 20
+13.7134817632
+ 30
+0.0
+ 11
+96.14863761159998
+ 21
+13.5919135877
+ 31
+0.0
+  0
+LINE
+  5
+20C10
+330
+1F
+100
+AcDbEntity
+  8
+windows
+  6
+Continuous
+100
+AcDbLine
+ 10
+98.37984530889999
+ 20
+14.2944828657
+ 30
+0.0
+ 11
+99.4709100805
+ 21
+14.4361874382
+ 31
+0.0
+  0
+LINE
+  5
+20C11
+330
+1F
+100
+AcDbEntity
+  8
+windows
+  6
+Continuous
+100
+AcDbLine
+ 10
+99.46467150430001
+ 20
+14.022591195
+ 30
+0.0
+ 11
+98.52864840129999
+ 21
+13.9010230195
+ 31
+0.0
+  0
+LINE
+  5
+20C12
+330
+1F
+100
+AcDbEntity
+  8
+windows
+  6
+Continuous
+100
+AcDbLine
+ 10
+100.7598560986
+ 20
+14.6035922975
+ 30
+0.0
+ 11
+101.8509208702
+ 21
+14.74529687
+ 31
+0.0
+  0
+LINE
+  5
+20C13
+330
+1F
+100
+AcDbEntity
+  8
+windows
+  6
+Continuous
+100
+AcDbLine
+ 10
+101.844682294
+ 20
+14.3317006268
+ 30
+0.0
+ 11
+100.908659191
+ 21
+14.2101324513
+ 31
+0.0
+  0
+LINE
+  5
+20C14
+330
+1F
+100
+AcDbEntity
+  8
+windows
+  6
+Continuous
+100
+AcDbLine
+ 10
+103.1398668885999
+ 20
+14.9127017292
+ 30
+0.0
+ 11
+104.2309316602
+ 21
+15.0544063017
+ 31
+0.0
+  0
+LINE
+  5
+20C15
+330
+1F
+100
+AcDbEntity
+  8
+windows
+  6
+Continuous
+100
+AcDbLine
+ 10
+104.224693084
+ 20
+14.6408100585
+ 30
+0.0
+ 11
+103.288669981
+ 21
+14.519241883
+ 31
+0.0
+  0
+LINE
+  5
+20C16
+330
+1F
+100
+AcDbEntity
+  8
+windows
+  6
+Continuous
+100
+AcDbLine
+ 10
+105.5198776776
+ 20
+15.221811161
+ 30
+0.0
+ 11
+106.6109424491999
+ 21
+15.3635157335
+ 31
+0.0
+  0
+LINE
+  5
+20C17
+330
+1F
+100
+AcDbEntity
+  8
+windows
+  6
+Continuous
+100
+AcDbLine
+ 10
+106.604703873
+ 20
+14.9499194903
+ 30
+0.0
+ 11
+105.66868077
+ 21
+14.8283513148
+ 31
+0.0
+  0
+LINE
+  5
+20C18
+330
+1F
+100
+AcDbEntity
+  8
+windows
+  6
+Continuous
+100
+AcDbLine
+ 10
+107.8998884676
+ 20
+15.5309205928
+ 30
+0.0
+ 11
+108.9909532392
+ 21
+15.6726251653
+ 31
+0.0
+  0
+LINE
+  5
+20C19
+330
+1F
+100
+AcDbEntity
+  8
+windows
+  6
+Continuous
+100
+AcDbLine
+ 10
+108.984714663
+ 20
+15.2590289221
+ 30
+0.0
+ 11
+108.04869156
+ 21
+15.1374607466
+ 31
+0.0
+  0
+LINE
+  5
+20C1A
+330
+1F
+100
+AcDbEntity
+  8
+windows
+  6
+Continuous
+100
+AcDbLine
+ 10
+110.2798992576
+ 20
+15.8400300246
+ 30
+0.0
+ 11
+111.3709640292
+ 21
+15.9817345971
+ 31
+0.0
+  0
+LINE
+  5
+20C1B
+330
+1F
+100
+AcDbEntity
+  8
+windows
+  6
+Continuous
+100
+AcDbLine
+ 10
+111.364725453
+ 20
+15.5681383539
+ 30
+0.0
+ 11
+110.4287023499999
+ 21
+15.4465701784
+ 31
+0.0
+  0
 VIEWPORT
   5
 20230
@@ -36513,9 +37429,9 @@ AcDbViewport
  30
 0.0
  40
-13.34189403512942
+13.34233292315695
  41
-5.837514536018467
+5.83770656386951
  68
      1
  69
@@ -36555,7 +37471,7 @@ AcDbViewport
  44
 0.0
  45
-5.837514536018467
+5.83770656386951
  50
 0.0
  51
@@ -36821,7 +37737,7 @@ ACAD_VISUALSTYLE
   3
 ACDB_RECOMPOSE_DATA
 350
-209BB
+20D20
   3
 AcDbVariableDictionary
 350
@@ -37429,7 +38345,7 @@ X-Ray
   0
 XRECORD
   5
-209BB
+20D20
 102
 {ACAD_REACTORS
 330
@@ -46993,7 +47909,7 @@ AcDbDictionary
   3
 ACAD_XREC_ROUNDTRIP
 360
-209B8
+20D1D
   0
 DICTIONARY
   5
@@ -47009,7 +47925,7 @@ AcDbDictionary
   3
 ACAD_XREC_ROUNDTRIP
 360
-209BA
+20D1F
   0
 DICTIONARY
   5
@@ -47133,7 +48049,7 @@ AcDbDictionary
   3
 ACAD_XREC_ROUNDTRIP
 360
-209B7
+20D1C
   0
 DICTIONARY
   5
@@ -47149,7 +48065,7 @@ AcDbDictionary
   3
 ACAD_XREC_ROUNDTRIP
 360
-209B9
+20D1E
   0
 DICTIONARY
   5
@@ -47165,11 +48081,11 @@ AcDbDictionary
   3
 ACAD_ROUNDTRIP_2008_TABLESTYLE_CELLSTYLEMAP
 360
-209B6
+20D1B
   0
 XRECORD
   5
-209B8
+20D1D
 102
 {ACAD_REACTORS
 330
@@ -47193,7 +48109,7 @@ FLAGS
   0
 XRECORD
   5
-209BA
+20D1F
 102
 {ACAD_REACTORS
 330
@@ -47577,7 +48493,7 @@ AcDbXrecord
   0
 XRECORD
   5
-209B7
+20D1C
 102
 {ACAD_REACTORS
 330
@@ -47601,7 +48517,7 @@ FLAGS
   0
 XRECORD
   5
-209B9
+20D1E
 102
 {ACAD_REACTORS
 330
@@ -47625,7 +48541,7 @@ FLAGS
   0
 CELLSTYLEMAP
   5
-209B6
+20D1B
 102
 {ACAD_REACTORS
 330
@@ -48403,63 +49319,13 @@ AcDbDs::ID
 280
     10
 320
-2005B
-  2
-Thumbnail_Data
-280
-    15
- 94
-     2084
-310
-89504E470D0A1A0A0000000D4948445200000100000000C508030000008CFEDCE700000300504C5445FFFFFF000000C8C8C80000000000000000000000000000000000000000000000000000330000660000990000CC0000FF0033000033330033660033990033CC0033FF0066000066330066660066990066CC0066FF0099
-310
-000099330099660099990099CC0099FF00CC0000CC3300CC6600CC9900CCCC00CCFF00FF0000FF3300FF6600FF9900FFCC00FFFF3300003300333300663300993300CC3300FF3333003333333333663333993333CC3333FF3366003366333366663366993366CC3366FF3399003399333399663399993399CC3399FF33CC00
-310
-33CC3333CC6633CC9933CCCC33CCFF33FF0033FF3333FF6633FF9933FFCC33FFFF6600006600336600666600996600CC6600FF6633006633336633666633996633CC6633FF6666006666336666666666996666CC6666FF6699006699336699666699996699CC6699FF66CC0066CC3366CC6666CC9966CCCC66CCFF66FF0066
-310
-FF3366FF6666FF9966FFCC66FFFF9900009900339900669900999900CC9900FF9933009933339933669933999933CC9933FF9966009966339966669966999966CC9966FF9999009999339999669999999999CC9999FF99CC0099CC3399CC6699CC9999CCCC99CCFF99FF0099FF3399FF6699FF9999FFCC99FFFFCC0000CC00
-310
-33CC0066CC0099CC00CCCC00FFCC3300CC3333CC3366CC3399CC33CCCC33FFCC6600CC6633CC6666CC6699CC66CCCC66FFCC9900CC9933CC9966CC9999CC99CCCC99FFCCCC00CCCC33CCCC66CCCC99CCCCCCCCCCFFCCFF00CCFF33CCFF66CCFF99CCFFCCCCFFFFFF0000FF0033FF0066FF0099FF00CCFF00FFFF3300FF3333
-310
-FF3366FF3399FF33CCFF33FFFF6600FF6633FF6666FF6699FF66CCFF66FFFF9900FF9933FF9966FF9999FF99CCFF99FFFFCC00FFCC33FFCC66FFCC99FFCCCCFFCCFFFFFF00FFFF33FFFF66FFFF99FFFFCCFFFFFF0000000D0D0D1A1A1A2828283535354343435050505D5D5D6B6B6B787878868686939393A1A1A1AEAEAEBB
-310
-BBBBC9C9C9D6D6D6E4E4E4F1F1F1FFFFFF000000000000000000000000000000000000000000000000000000000000B0E2D235000004DF4944415478DAED9C5BA2AB200C45339CCC8BE976087CE5FB0EE22A627888152CB67AD8F9E8C3E32B4BD81B628FF46FF0A09103000000000060FD2C538CF49A0190D1AEBD00000000
-310
-005C0000D0050000000000220800E802000000000017D889D7E3E34317783DFD1ABF3ED4000000804100D068000800D0050000000000220800E80200000000001104007401000000B8005C002E000D000000800BC005E002D000000000B8005C002E000D000000800BC005E002D000003801C014632400D50B1FE102ED97F3
-310
-19005A5C40D238CAC66CB690070090D100B46880C49B5502500844F42500E5BED91380CBE77E002261BA1AC0FA00967B0088125F0FF301003A06C00D00785EFD22002171215A612F6766CE8BE04300683F5F52A654A23F0170EC02D636B8809D83B9BB0B44ED5D0200BFE8520D60DB6683D3BBD563F505A0C9EBF3A0BE0160
-310
-4EA70D8058E90FC037018992FF1A00D7E9AC5382BA1620570120C94F78691074A90BB843F04D01503B003A056016B71B00A04400A23E70950B2C22B8C8DA0D34A00680FA65470D983B4003804B5C20F4815D00D9B8B81B80FA518DB600E6AF0388E7439D01A8F8FC56030E6C20F96E3ACF051E02201BAF759C0BDC0340E803
-310
-051F8C46ABD408409E07206B02CBCC63B3E6B334C0D44409C0943A6F73303F0570661C60282B2596CFDDCF4DE365D310B5DC587ED8024E8C03CC5C490893BD37310DC979AD537802FAF11400AAAA0A5F3D0EA802B0A66DD9A73C575FDC48D57D8B5A8EF9B50B3497C58D2BA564A94A18EA24E100BBCA8B1ECB6F7C0680DC05
-310
-4056E85A8ECA0500BE462DC9BA192BF338174801AC6D3ABDAE0E476CF9B95C7E01C0914F7D0620CACDA59E9EE1EC78D69781E55D729D017004E0301400531D336527A2CAE6A47E29463325035DCBF9D8FF7300EF45507C95BB1100AF9A5E3FCE9B2FAD029876E020880EF25ED98D9ADD81C221006AB3C120AF5217E46AE389
-310
-A63784DF4C77A03D217938DC3B004AA08F0B48D3131743AF75D7B32116FD0BDDCDEF201CBE1640E8039DEF0ED7A561CF4E740E37AC031008FC0A009F05C0DC00A0A209740270F45CC6DD16D81AD2D4024AAB0BA5A322D3C5055EB308AD7AE6EEFAB92FF39B7365674BD1DFFDABABA1E7C2E6826D2A90F1DFF4B3F57B4F96EC
-310
-019074E0790CE0CC5C40A75F76F16AEB07658B68B19E13EB24CD6F914CDB9649CCB4139E16B0A5F86FA29F5D37E25517383F05059025BEED033DE702EF00B0AD07A03BE1207B3900B2FA410A0064B76E107E32E1969B9E22C8D90824C9CE866F928C9BF3F5D79C6D41F7A5E024F97DE0286F2914937436225F0620D5004A5B
-310
-6F01C83E80DDC4F3E958B79AA06AD20D00BC4B3CBB27D204A0BA20720700C7BF3D368AA97B45E81600AA6AE70BA6BE152159CB30E16DB3A0F4469B953755BFE22C2BD95A273935B5056D237D0B2237086ABCC9D2014041817E1542F45B0077B8FE1701A047B480F6FC7B54846200E60E7109804A0D30F4B4E83712DCFB31EE
-310
-00004EF73F007810001A0D40B50BDCE4FF1F2F07807F9D050000181B008D068000005D0000000000208200802E00000000001041004017000000800BC005E002D000000000B8005C002E000D000000800BC005E002D000000000B8005C002E000D0080D7E3E343007F366A5DE08F0700A00B0000000000441000D005000000
-310
-E0027001B80034606C00D1A39AC67885060000000000003800FF068FE101FC07275FDB299C4341A60000000049454E44AE426082
-  0
-ACDSRECORD
- 90
-        0
-  2
-AcDbDs::ID
-280
-    10
-320
 2005A
   2
 Thumbnail_Data
 280
     15
  94
-     2078
+     2348
 310
 89504E470D0A1A0A0000000D4948445200000100000000700803000000C6F95E2100000300504C5445212830000000C8C8C80000000000000000000000000000000000000000000000000000330000660000990000CC0000FF0033000033330033660033990033CC0033FF0066000066330066660066990066CC0066FF0099
 310
@@ -48473,27 +49339,81 @@ FF3366FF6666FF9966FFCC66FFFF9900009900339900669900999900CC9900FF9933009933339933
 310
 FF3366FF3399FF33CCFF33FFFF6600FF6633FF6666FF6699FF66CCFF66FFFF9900FF9933FF9966FF9999FF99CCFF99FFFFCC00FFCC33FFCC66FFCC99FFCCCCFFCCFFFFFF00FFFF33FFFF66FFFF99FFFFCCFFFFFF0000000D0D0D1A1A1A2828283535354343435050505D5D5D6B6B6B787878868686939393A1A1A1AEAEAEBB
 310
-BBBBC9C9C9D6D6D6E4E4E4F1F1F1FFFFFF000000000000000000000000000000000000000000000000000000000000B21171F6000004D94944415478DAED9C5B8283200C45B301F6911576B56C23FF531F4008C84B3AD69AFB31631519384212821D00954AA552A9546332453D01C0F0C56F7B86CF05901FCB0F0240525D4D
+BBBBC9C9C9D6D6D6E4E4E4F1F1F1FFFFFF000000000000000000000000000000000000000000000000000000000000B21171F6000002FB4944415478DAED9C6DD68220108567076D63F6BF05B7C136F8FF5AA90D889AE7301F6FDC7BFA9159410F1798419208822008822008822008822008822008822008822008823AEB71
 310
-37D92AF66A14C0ED4C1A2D9D1901C029803F65BE6B823F11003769A66526FC0880C4962FCDA902709D1803208CC82500323E8C801A01E0190078ED08C8FAEEFD41C0FE706AADC173007021780580A4E3AE01EE81F8DF87AD592F5B6BCFB8416B7905FFE9068DB7DE5BDFFD13882675B14F53E2003600AE00E0EC0E1F830E80
+5BBF0640FD0300D0C394C33B40AF3FFEEF2EF0AB00B2D4B4AA78B53F00C332AF01C883AD328D777405D02A735229F30B0017AD41CA0E68C918C061E728CEF70550E3A78FEFFB960900000000B7011473D190000A0E9A0076A3FF6800A8F9FB8700C0557F8BD405381B0C82FF0380A603F8858003026036EA02CF473C0073CD
 310
-E7636A2E004E0178CB2E3381E3FF0F1B60A2E1CEE74064098AAD41B49300C05500821BCF39B78D40A935762D792E0E785B02820B4740E8AD8CEDEA0096A63B82383E02E8320010BC7D7E08D400B8FBEDB301BC6DC11E0FDC0880F303AC1F6746C0E2CEEF0B00680CC0E2057653783F23589B03C10D983488F4046CF8793737
+4C00A445217201A97DA59492A197FF298703A05A99FD34383F4DCB70D072A50980320F5FE76391212B00906526E27D9D0C01888588B929D2066065B09D5703C0C78D620C606E8AD4708036008A038038AD91E0169AEA03C88100903D80563AEE0660CD806572A20E204702F0698D39567B79937FDE01B202E2F93C37A777A8
 310
-58370239005B001DCEBCE300C409002E08846223D00080AD1E4CAEE88929708D0DE80120574E662A004842D00B0014AC60DCF95C037F1C40B2FEFB4500505C0D242BC6DF00E0D743C540402EF87F0E4029184E56FB0704BE0380E9570D00AEE99A4210F15D0006C7C191112022169F7C12C0A438C01C64E96AFD7FF773CD4B
+AA1D07B4007885C2D201FC1C1099C605F01C9E990606B02506E30060664EBBF0441D400EE400260700291000DA1CC066009AA130F924439FDA082B782443936328FC1CFB8AC1C02019E24000F66BF4EA91606341C41180E886560072A474180000603C0007FB03542E52B42341E7380000DC01E4C101100000802F80CB69D0
 310
-66921D08FF02605B4B4C01803D007CA977249A0580ADE3ED34009C06803BEBFCDE6B3A48D66C0E5F90215FE9407E1E98FC96CEE06A70CA5AC0ECFB0C1D005897DD43400700DD5A77272006D44C00F38CA0D8A6602D8E52DEF9F426BADE2E13C29BA668EFE3535360CEBE80611B54BCCE6600EBF0D9B76A40CC12C1F39E00B0
+0180F2A5B16207BC4B1C7031084EDA00DC03A18B69D006C092F20D0C208803521EDB01AD25313300140200DBCF024B25380788039A3B44C806002D577EDA5B83AC0221873D420F590977000ED9E00A20A5C32E3006809C4300B0DF270800B1009C24487E8150B65F141500B42F8C00C0BB94E1014C27C9101CD000D041D11D
 310
-0420CA0F1F843F8704BE670A4800B01B4608035966B5A44FC8CCF79B03703338BB05B298CD66CFD904A02B0C9D0F207A92912B88D21CE03785AC0B821AA2A6140056D26A8D3512AF8BC6C2FA15E95E1FEE3FB68EADC70980380E686C3F2F331700C600464514FCB603801E00C623800A8FB765082C8B251486A35FAE2656D9
+C067007AEA6B004A3A00C0E100A86A29649B73E79FCF6771404FD57100D3E542A90100F206C0B600AA6C90ABB05454A6B8B94275B385FADE0BDF9E96A130F1F25AF91FB2C32FBD7B9C0F8F3389BF89BE3645B616443E1DB3B8CF45757CEF7461F794DEBBF453E25CBBF4F44BEF1E37EE0FF269E13A33D9252B17B4BF3E3DD5
 310
-49B93EEFD541A81AB9717BBD08BA09C436420408E30068B553E99B12E30AAF5D2C07EE83E56B9E210071199219B3916568B047276BE3DBB971FBFC34277E750280B3B293F33B7DF50D028089048AABCD8FD7F7150010E702C08F03880ABD5EB11D90538DFD1607ECD55A7254A50D2069120878D14C314AEE2319F8B0F3DD00
+0ED84AD9A7467D1C7058C793644873EC217795FBC2A6696C009335801400805C89B607C0FE049208FA1C1CC001009027007F02694D7CFE0035AB69B3D935BA5F0000000049454E44AE426082E00701D493350006C0001800E500D667AD59B0CDB1F47674AE0CE585EBF8654275684727DFE6D3A198A00860B111672B313C72
 310
-D24872B5A9CC765BB4ABBBD97F0553EC4E84035968F924BC002B1B9D11C5AC2C17BD77C72FF292EF3229803C0192913289941273DF8BEF5DB24BEB29BB2FAC791951961DB8BB787F93B8604B5C89F3F2737C623BDE5EE66217209B0323CA26CC62979D1A011666BAC40A3A93843E1405BF2EF3A1AFBB6B3DC070313A1F9DC2
+669FAEF9C9AB6FE59F6C4E2EBF7A058487EFF147917654E66F543B9A0EC9AD6A52FE3DF780DF530A8B6B070006A03EF2BE5AF7044555AD00036000E6CCC797EA3A00EA57805E434815806D53580D00C194D0B505B6AC291D004ED5300006C0001800036000BE15C0656E95C96432994C2693C964329906D01F31D5C87F5875
 310
-50599AC06237B21981DC4320655B5DD809C9AC9E6A00DC5FF50733005817DDAEE36A7B27A70660BBC701A00A00AA2694F705DCF1EB44E9622B3E608D26B12C3988D11980C4D7DB6A9062730FF7F07943B1E3EC9B030424B652B111006B52378052AD4700A80AA09206C8BC496E207DB112DB01D0170280B69EC749175E8315
+E5310000000049454E44AE426082ED00E8DE1E708BFD6B00EA76D1BD3EE07BBFF63EA826F82701DC3A0401E07600BFF2DF5F100441100441100441100441100441100441100441100441100441D01FD53F649CCB344E9B12480000000049454E44AE426082C46A7B8BEC6EB00600CFB458F6706A8317F4F772A124A5A4EB91
 310
-9B2A7702501AEC4DDB2161F2DC1C40C7571E4D2D3CBC1D80CE2FBF9A1C8A7B03E8CF3C42F6B5A19B02E84EBF1AD97B1079D8B095126FACC44799A2C7771F54563A45D4F08786004066C6D04D3506E0D379A2FF11958CBA02E80770CFE1FFE41130B5FFDBF76BEFA98900E0C17A2A80C8A4280078B814800278609F9FF6EFCF
+5672F552DB0000BAE4E020D3221E74C8388120F74C3C87F62FD15663F602AED58227B601832C008CDBFA2C96C8268F51ED04102C7B38009001B0562481072400366494ED62CC8FF24C76F0C69500247B821D6218F78AB622F92B220055036012BB0468FC519EBF05B606C0AE1B0562AB660016738F8E7271B5EF72905BAC04
 310
-542A954AA552A9542A954AA552A9542A954AA552A954AA67EA0F7E8C4A65AE809A610000000049454E44AE426082
+526F18DB28997C843F05C08D7216975325CA67F1FA2000F936550056B1C36CF85864EB41EA790880DEA51D006C03C0F536F2515ED3E57237A39282A3BA1900DC0B803EE731948FF294729F80F000D559004C1F6AD3282F51E04CE0AC1630774CD98C562E9CCB14EF7D2A0BE8A03C2BF3443EA08BF2C6048E06A0F72BCFEA3C
+310
+278076C2733AF5F900E83E7FE94727D7C9A702A0FA141DA8DF10663B0040B767F3740323BB3480E5CE7B46D8E501ECF52F0700E8F9746A95F820A92159DC869DB61A58BC26CCAB94FE76FA691E6C9F76E16B387F4D9209B365C24B4BABA042A809627EA70130F5EA9A1D352CFD3CB80EA79DCF2EF156F26DFCE7084FA7FF30
+310
+CEFB4254B703F038FD2F80F302C083CAC30DE0E92EF0057062FDFA1745BDE52D6F79CB5BDEF29613947F9D9F8D9CCC4289A10000000049454E44AE426082
+  0
+ACDSRECORD
+ 90
+        0
+  2
+AcDbDs::ID
+280
+    10
+320
+2005B
+  2
+Thumbnail_Data
+280
+    15
+ 94
+     2095
+310
+89504E470D0A1A0A0000000D4948445200000100000000C508030000008CFEDCE700000300504C5445FFFFFF000000C8C8C80000000000000000000000000000000000000000000000000000330000660000990000CC0000FF0033000033330033660033990033CC0033FF0066000066330066660066990066CC0066FF0099
+310
+000099330099660099990099CC0099FF00CC0000CC3300CC6600CC9900CCCC00CCFF00FF0000FF3300FF6600FF9900FFCC00FFFF3300003300333300663300993300CC3300FF3333003333333333663333993333CC3333FF3366003366333366663366993366CC3366FF3399003399333399663399993399CC3399FF33CC00
+310
+33CC3333CC6633CC9933CCCC33CCFF33FF0033FF3333FF6633FF9933FFCC33FFFF6600006600336600666600996600CC6600FF6633006633336633666633996633CC6633FF6666006666336666666666996666CC6666FF6699006699336699666699996699CC6699FF66CC0066CC3366CC6666CC9966CCCC66CCFF66FF0066
+310
+FF3366FF6666FF9966FFCC66FFFF9900009900339900669900999900CC9900FF9933009933339933669933999933CC9933FF9966009966339966669966999966CC9966FF9999009999339999669999999999CC9999FF99CC0099CC3399CC6699CC9999CCCC99CCFF99FF0099FF3399FF6699FF9999FFCC99FFFFCC0000CC00
+310
+33CC0066CC0099CC00CCCC00FFCC3300CC3333CC3366CC3399CC33CCCC33FFCC6600CC6633CC6666CC6699CC66CCCC66FFCC9900CC9933CC9966CC9999CC99CCCC99FFCCCC00CCCC33CCCC66CCCC99CCCCCCCCCCFFCCFF00CCFF33CCFF66CCFF99CCFFCCCCFFFFFF0000FF0033FF0066FF0099FF00CCFF00FFFF3300FF3333
+310
+FF3366FF3399FF33CCFF33FFFF6600FF6633FF6666FF6699FF66CCFF66FFFF9900FF9933FF9966FF9999FF99CCFF99FFFFCC00FFCC33FFCC66FFCC99FFCCCCFFCCFFFFFF00FFFF33FFFF66FFFF99FFFFCCFFFFFF0000000D0D0D1A1A1A2828283535354343435050505D5D5D6B6B6B787878868686939393A1A1A1AEAEAEBB
+310
+BBBBC9C9C9D6D6D6E4E4E4F1F1F1FFFFFF000000000000000000000000000000000000000000000000000000000000B0E2D235000004EA4944415478DAED9C5DB6AB200C85339CCC8BE976083CE5F576105741032256B058F5B05967F5C76A954FB277883DD2BF9EDBFBFDA69E1B0000000000C0FC5A86D6D36302407A3BF7
+310
+0200000000700100400800000000004410001002000000000017D868AFC7B72F5DE0F5F473FCFA52030000003A0140BD012000400800000000004410001002000000000011040084000000005C002E00178006000000C005E002700168000000005C002E00178006000000C005E00270016800001C0060B2AD2700C50B1FE1
+310
+02F5A7F319006A5C40966DAF3766B5853C0080F406A0460324DEAC10804220A21F01C8C7664B00AE3FF7031009D3D900E61BB0DC0340D4F179375F00A07D005C0180C7D54F02103A2E44336C7F64E6B8083E0480C6B9EF322D25FA1B00FB2E606D850BD8B13137778168BC4B00302D3A5503D8D6D9E0F06C755F6D0168E7F5
+310
+7E50BF003076A70E8058690F601A021275FE67005CD059A704652340CE0240921EB01F1074AA0BB85DF04D01503D003A046014B71B00A08500443170960B7811F4B276030D2801A07ED95003C600A800708A0B8418D80490E4C5CD009467353A02987F0E209E0F3506A0E273AD06ECD8C0E2BD693C17780880245F6B3817B8
+310
+07801003191F8CB255AA0420CF03900C013FF358ADF92C0D30252D0760E83AAFFB602E0570240F30949412F3C73ECD4DE365438A9A1F2C178E80037980192B0961B2F7A10D2939CF758A8980BE3C04808AAAC267E7014500E66E5B9EBA3C565F5CA6EADE4523C75CED02D56571E34A29495725A43A8BE600BBCA8BEE6BDAF8
+310
+0800B90B80A4D0E5F7CA1900538D5A16EB26ACCCE52E20474430CABCFD985E9E578723B6FC542E7F0060CFA7BE0310F5CD75DDEF3ABA3A31D6E768DB27CE01C01180DD16007019336527A2CAE6A4DE17A35901F850E734F7FF1EC0671194A9CA5D0980DD9F48C5BDFAC653AB00C6AD4700A249DE2BB950B39927EC02A03A1B
+310
+0CF22A658D5C261415D3ABDAB4BBE1D1BFD24858DC1C4EA880401B1790AA3B2E06FFAABD4DE314EE1A6E7E4044BB2F051062A0F1D5E1B26ED8A3139DDD0D8B47C0C500F82800E60A009F44A02D80BDFB326E8E403A12025F01105A6645A6DD5C60CE5187B364D95DF71B9EDC223F1367D6CFA7B5C735830846970AFD9B8DCF
+310
+74B15FC8367C3A7CB405409689E73E802373019D7E59EFD5764ACABC68B11E13EB248D393E509EC7B9FF121E16B0A5F833D1D72E8C78D6054E0F4101241D5F0D42D3722EF00900DB7200FA251C642F0540565F4806806CD60DC24F26DC72D3520439C940247E63C33B59E4CDE9FA739F6D46F725E324E975E0A8DF922926E9
+310
+6C447E0C408A01E4B65E03906D009B1D4FA763CD6A822A4E3700F0A9E3C935912A00C505913B00D8FFEDB1514CCD2B42B70050543BF798DA5684642EC384A7D582DC13AD565E55FDB2B3ACC5D63AC929A92DE818695B10B941A3CA8B2C0D006414E8AA2644D702B8C3F93F09003D6204D4F7BF4545280660EED04E0150A801
+310
+869ED6DA65825B3FC6ED00C0E1F803800701A0DE0014BBC04DFEFFF17400F8D759000080BE01506F0008001002000000000011040084000000000040040100210000000017800BC005A0010000007001B8005C001A0000000017800BC005A0010000007001B8005C001A0000AFC7B72F01FCD956EA027FBC01004200000000
+310
+002082008010000000800BC005E002D080BE0144B76AEAE3111A000000000000E000FCEBB98D00DE9DB7FF7399D29FB92B2E5F0000000049454E44AE426082
   0
 ENDSEC
   0
