@@ -23,6 +23,7 @@ public:
 
 public slots:
     void load();
+    void buildVoronoi();
 
 private:
     Ui::voronoi    *ui;

@@ -10,6 +10,8 @@
 #include <QGraphicsView>
 #include <QWheelEvent>
 
+#include "voronoi.hpp"
+
 using namespace utils_gdal;
 
 
@@ -26,12 +28,12 @@ struct QInteractiveGraphicsView : public QGraphicsView
     {
         if(event->delta() > 0) {
             scale(scale_factor_inv, scale_factor_inv);
-            scale_factor    += scale_factor_increment;
+            scale_factor    *= scale_factor_increment;
             scale_factor_inv = 1.0 / scale_factor;
             scale(scale_factor, scale_factor);
         } else {
             scale(scale_factor_inv, scale_factor_inv);
-            scale_factor = std::max(0.1, scale_factor - scale_factor_increment);
+            scale_factor = std::max(0.1, scale_factor / scale_factor_increment);
             scale_factor_inv = 1.0 / scale_factor;
             scale(scale_factor, scale_factor);
         }
@@ -40,7 +42,7 @@ struct QInteractiveGraphicsView : public QGraphicsView
 
     double scale_factor_inv = 1.0;
     double scale_factor  = 1.0;
-    double scale_factor_increment = 0.1;
+    double scale_factor_increment = 1.5;
 
 
 };
@@ -52,6 +54,7 @@ Voronoi::Voronoi(QWidget *parent) :
 {
     ui->setupUi(this);
     connect(ui->actionLoad, SIGNAL(triggered()), this, SLOT(load()));
+    connect(ui->actionBuild_Voronoi, SIGNAL(triggered()), this, SLOT(buildVoronoi()));
 
     view = new QInteractiveGraphicsView;
     ui->verticalLayout->addWidget(view);
@@ -93,8 +96,23 @@ void Voronoi::renderMap()
         scene->addLine(v.first.x(), v.first.y(), v.second.x(), v.second.y(), pen_vectors);
     }
 
-    view->fitInView(scene->sceneRect());
     view->show();
+}
+
+
+void Voronoi::buildVoronoi()
+{
+    dxf::DXFMap::Vectors vectors;
+    dxf_map.getVectors(vectors);
+
+    if(vectors.empty())
+        return;
+
+    boost::polygon::voronoi_diagram<double> voronoi;
+    boost::polygon::construct_voronoi(vectors.begin(), vectors.end(), &voronoi);
+
+    std::cout << "Built" << std::endl;
+
 }
 
 int main(int argc, char *argv[])

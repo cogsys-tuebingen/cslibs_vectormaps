@@ -72,6 +72,7 @@ if(${Qt5_FOUND} AND ${OPENGL_FOUND})
 
     add_executable(gdal_voronoi
         src/voronoi.cpp
+        src/voronoi.hpp
     )
 
     target_link_libraries(gdal_voronoi

@@ -31,12 +31,24 @@
     </property>
     <addaction name="actionLoad"/>
    </widget>
+   <widget class="QMenu" name="menuBuild">
+    <property name="title">
+     <string>Build</string>
+    </property>
+    <addaction name="actionBuild_Voronoi"/>
+   </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuBuild"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionLoad">
    <property name="text">
     <string>Load</string>
+   </property>
+  </action>
+  <action name="actionBuild_Voronoi">
+   <property name="text">
+    <string>Build Voronoi</string>
    </property>
   </action>
  </widget>
