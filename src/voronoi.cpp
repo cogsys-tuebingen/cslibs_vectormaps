@@ -66,6 +66,9 @@ Voronoi::Voronoi(QWidget *parent) :
     pen_vectors.setWidth(1);
     pen_vectors.setCosmetic(true);
 
+    pen_voronoi_primary = pen_vectors;
+    pen_voronoi_primary.setColor(QColor(255, 0, 0));
+
 }
 
 Voronoi::~Voronoi()
@@ -108,11 +111,25 @@ void Voronoi::buildVoronoi()
     if(vectors.empty())
         return;
 
-    boost::polygon::voronoi_diagram<double> voronoi;
+    /// build it
+    VoronoiType voronoi;
     boost::polygon::construct_voronoi(vectors.begin(), vectors.end(), &voronoi);
 
-    std::cout << "Built" << std::endl;
+    /// get the edges
+    for(const VoronoiType::edge_type &e : voronoi.edges())
+    {
+        if(e.is_finite()) {
+            scene->addLine(e.vertex0()->x(), e.vertex0()->y(),
+                           e.vertex1()->x(), e.vertex1()->y(),
+                           pen_voronoi_primary);
+        } else {
+            // clip the edge
+            // sample curved ones ?
+            // remove uneeded ones
+        }
+    }
 
+    view->show();
 }
 
 int main(int argc, char *argv[])

@@ -8,7 +8,6 @@ namespace boost {
 namespace polygon {
 using PointType = utils_gdal::dxf::DXFMap::Point;
 using SegmentType = utils_gdal::dxf::DXFMap::Vector;
-
 template<>
 struct geometry_concept<PointType> {
     typedef point_concept type;
@@ -40,6 +39,7 @@ struct segment_traits<SegmentType> {
 }
 }
 
+typedef boost::polygon::voronoi_diagram<double> VoronoiType;
 
 
 

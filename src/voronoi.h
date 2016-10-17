@@ -30,6 +30,7 @@ private:
     QGraphicsView  *view;
     QGraphicsScene *scene;
     QPen            pen_vectors;
+    QPen            pen_voronoi_primary;
 
 
     dxf::DXFMap     dxf_map;
