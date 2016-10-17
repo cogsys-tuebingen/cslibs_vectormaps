@@ -6,12 +6,6 @@ find_package(catkin REQUIRED utils_boost_geometry)
 find_package(GDAL   REQUIRED)
 find_package(Boost  REQUIRED system filesystem)
 
-find_package(OpenCV QUIET)
-find_package(roscpp QUIET)
-find_package(gazebo QUIET)
-find_package(xacro  QUIET)
-
-
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES utils_gdal
@@ -19,29 +13,23 @@ catkin_package(
   DEPENDS Boost
 )
 
-## Enforce that we use C++11
-include(CheckCXXCompilerFlag)
-CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
-CHECK_CXX_COMPILER_FLAG("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
-if(COMPILER_SUPPORTS_CXX11)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-elseif(COMPILER_SUPPORTS_CXX0X)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
-else()
-        message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
-endif()
-
+include(cmake/c++11.cmake)
+include(cmake/optional_dependencies.cmake)
 
 include_directories(
     include
     ${catkin_INCLUDE_DIRS}
     ${GDAL_INCLUDE_DIRS}
     ${Boost_INCLUDE_DIRS}
+    ${GAZEBO_INCLUDE_DIRS}
+    ${Eigen3_INCLUDE_DIRS}
+    ${OPENGL_INCLUDE_DIR}
+    ${Qt5Core_INCLUDE_DIRS} ${Qt5Gui_INCLUDE_DIRS} ${Qt5Widgets_INCLUDE_DIRS} ${Qt5OpenGL_INCLUDE_DIRS}
 )
 
 add_library(utils_gdal
    src/dxf_map.cpp
- )
+)
 
 target_link_libraries(utils_gdal
     ${catkin_LIBRARIES}
@@ -52,35 +40,50 @@ target_link_libraries(utils_gdal
 if(${OpenCV_FOUND} AND ${roscpp_FOUND})
 include_directories(${OpenCV_INCLUDE_DIRS})
 include_directories(${roscpp_INCLUDE_DIRS})
-add_executable(dxf_map_top_occupancy
+add_executable(gdal_dxf_map_to_occupancy
     src/dxf_to_occupancy.cpp
 )
 
-target_link_libraries(dxf_map_top_occupancy
+target_link_libraries(gdal_dxf_map_to_occupancy
     ${catkin_LIBRARIES}
     ${OpenCV_LIBRARIES}
     ${roscpp_LIBRARIES}
     utils_gdal
 )
 
-add_executable(dxf_map_renderer
+add_executable(gdal_dxf_map_renderer
     src/dxf_map_renderer.cpp
 )
 
-target_link_libraries(dxf_map_renderer
+target_link_libraries(gdal_dxf_map_renderer
     ${OpenCV_LIBRARIES}
     utils_gdal
 )
 
 endif()
 
-if(${gazebo_FOUND} AND ${xacro_FOUND})
-    find_package(Eigen3 REQUIRED)
-    include_directories(
-        ${GAZEBO_INCLUDE_DIRS}
-        ${EIGEN_INCLUDE_DIRS}
+if(${Qt5_FOUND} AND ${OPENGL_FOUND})
+    set(CMAKE_AUTOMOC ON)
+    set(CMAKE_AUTOUIC ON)
+    set(CMAKE_INCLUDE_CURRENT_DIR ON)
+
+    add_definitions(${Qt5Widgets_DEFINITIONS})
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
+
+    add_executable(gdal_voronoi
+        src/voronoi.cpp
     )
 
+    target_link_libraries(gdal_voronoi
+        utils_gdal
+        Qt5::Core Qt5::Gui Qt5::Widgets Qt5::OpenGL
+        ${OPENGL_LIBRARIES}
+    )
+
+    qt5_generate_moc(voronoi.cpp voronoi.moc)
+
+endif()
+if(${gazebo_FOUND} AND ${xacro_FOUND} AND ${EIGEN3_FOUND})
     add_library(gazebo_dxf_map_plugin
         src/dxf_map_gazebo.cpp
         src/mesh.cpp
@@ -105,14 +108,3 @@ if(${gazebo_FOUND} AND ${xacro_FOUND})
     )
 
 endif()
-## Declare a cpp executable
-# add_executable(utils_gdal_node src/utils_gdal_node.cpp)
-
-## Add cmake target dependencies of the executable/library
-## as an example, message headers may need to be generated before nodes
-# add_dependencies(utils_gdal_node utils_gdal_generate_messages_cpp)
-
-## Specify libraries to link a library or executable target against
-# target_link_libraries(utils_gdal_node
-#   ${catkin_LIBRARIES}
-# )
