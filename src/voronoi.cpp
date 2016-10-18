@@ -9,6 +9,8 @@
 #include <QGraphicsScene>
 #include <QGraphicsView>
 #include <QWheelEvent>
+#include <QGraphicsPathItem>
+#include <QGraphicsEllipseItem>
 
 #include "voronoi.hpp"
 
@@ -44,8 +46,8 @@ struct QInteractiveGraphicsView : public QGraphicsView
     double scale_factor  = 1.0;
     double scale_factor_increment = 1.5;
 
-
 };
+
 
 
 Voronoi::Voronoi(QWidget *parent) :
@@ -60,7 +62,9 @@ Voronoi::Voronoi(QWidget *parent) :
     ui->verticalLayout->addWidget(view);
 
     scene = new QGraphicsScene(view);
+    scene->setSceneRect(-500, -500, 1000, 1000);
     view->setScene(scene);
+    view->setOptimizationFlags(QGraphicsView::DontSavePainterState);
 
     pen_vectors.setColor(QColor(0,0,0));
     pen_vectors.setWidth(1);
@@ -68,7 +72,6 @@ Voronoi::Voronoi(QWidget *parent) :
 
     pen_voronoi_primary = pen_vectors;
     pen_voronoi_primary.setColor(QColor(255, 0, 0));
-
 }
 
 Voronoi::~Voronoi()
@@ -95,11 +98,36 @@ void Voronoi::renderMap()
     dxf::DXFMap::Vectors vectors;
     dxf_map.getVectors(vectors);
 
+    path_map = QPainterPath();
+
     for(dxf::DXFMap::Vector &v : vectors) {
-        scene->addLine(v.first.x(), v.first.y(), v.second.x(), v.second.y(), pen_vectors);
+        path_map.moveTo(v.first.x(), v.first.y());
+        path_map.lineTo(v.second.x(), v.second.y());
+
     }
+    path_item_map =
+            scene->addPath(path_map, pen_vectors);
+    auto p = path_item_map->scenePos();
+
 
     view->show();
+}
+
+void Voronoi::centerItem(QGraphicsItem *item)
+{
+    qreal   width  = item->boundingRect().width();
+    qreal   height = item->boundingRect().height();
+
+    item->setPos(QPointF());
+    item->moveBy(-width/2, -height/2);
+}
+
+void Voronoi::addCenterPoint(QGraphicsItem *item)
+{
+    QPointF p = item->boundingRect().bottomLeft();
+    qreal x = item->boundingRect().width()  / 2;
+    qreal y = item->boundingRect().height() / 2;
+    scene->addEllipse(p.x() + x, p.y() + y, 2, 2);
 }
 
 
@@ -115,20 +143,33 @@ void Voronoi::buildVoronoi()
     VoronoiType voronoi;
     boost::polygon::construct_voronoi(vectors.begin(), vectors.end(), &voronoi);
 
+    path_primary_edges = QPainterPath();
+
     /// get the edges
     for(const VoronoiType::edge_type &e : voronoi.edges())
     {
-        if(e.is_finite()) {
-            scene->addLine(e.vertex0()->x(), e.vertex0()->y(),
-                           e.vertex1()->x(), e.vertex1()->y(),
-                           pen_voronoi_primary);
-        } else {
-            // clip the edge
-            // sample curved ones ?
-            // remove uneeded ones
+        if(e.is_primary()) {
+            if(e.is_finite()) {
+                path_primary_edges.moveTo(e.vertex0()->x(), e.vertex0()->y());
+                path_primary_edges.lineTo(e.vertex1()->x(), e.vertex1()->y());
+            } else {
+                ///
+            }
         }
+//        if(e.is_finite()) {
+//            scene->addLine(e.vertex0()->x(), e.vertex0()->y(),
+//                           e.vertex1()->x(), e.vertex1()->y(),
+//                           );
+//        } else {
+//            // clip the edge
+//            // sample curved ones ?
+//            // remove uneeded ones
+//        }
     }
 
+
+    path_item_primary_edges =
+            scene->addPath(path_primary_edges, pen_voronoi_primary);
     view->show();
 }
 
