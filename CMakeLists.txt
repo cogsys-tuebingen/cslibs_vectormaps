@@ -63,16 +63,21 @@ target_link_libraries(gdal_dxf_map_renderer
 endif()
 
 if(${Qt5_FOUND} AND ${OPENGL_FOUND})
-    set(CMAKE_AUTOMOC ON)
-    set(CMAKE_AUTOUIC ON)
-    set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
     add_definitions(${Qt5Widgets_DEFINITIONS})
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
+    set(CMAKE_AUTOMOC True)
+
+    include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
+    include_directories(${CMAKE_CURRENT_BINARY_DIR})
+
+    qt5_wrap_ui(QT_UI
+                src/voronoi.ui)
 
     add_executable(gdal_voronoi
         src/voronoi.cpp
         src/voronoi.hpp
+        ${QT_UI}
     )
 
     target_link_libraries(gdal_voronoi
@@ -81,7 +86,7 @@ if(${Qt5_FOUND} AND ${OPENGL_FOUND})
         ${OPENGL_LIBRARIES}
     )
 
-    qt5_generate_moc(voronoi.cpp voronoi.moc)
+
 
 endif()
 if(${gazebo_FOUND} AND ${xacro_FOUND} AND ${EIGEN3_FOUND})

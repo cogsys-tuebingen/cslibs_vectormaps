@@ -1,5 +1,5 @@
 #include "voronoi.h"
-#include "ui_voronoi.h"
+#include <ui_voronoi.h>
 
 #include <iostream>
 
