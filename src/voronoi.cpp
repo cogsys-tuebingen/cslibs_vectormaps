@@ -62,7 +62,6 @@ Voronoi::Voronoi(QWidget *parent) :
     ui->verticalLayout->addWidget(view);
 
     scene = new QGraphicsScene(view);
-    scene->setSceneRect(-500, -500, 1000, 1000);
     view->setScene(scene);
     view->setOptimizationFlags(QGraphicsView::DontSavePainterState);
 
@@ -103,7 +102,6 @@ void Voronoi::renderMap()
     for(dxf::DXFMap::Vector &v : vectors) {
         path_map.moveTo(v.first.x(), v.first.y());
         path_map.lineTo(v.second.x(), v.second.y());
-
     }
     path_item_map =
             scene->addPath(path_map, pen_vectors);
@@ -139,6 +137,14 @@ void Voronoi::buildVoronoi()
     if(vectors.empty())
         return;
 
+    for(auto &v : vectors) {
+        v.first.x(v.first.x() * 100);
+        v.first.y(v.first.y() * 100);
+        v.second.x(v.second.x() * 100);
+        v.second.y(v.second.y() * 100);
+    }
+
+
     /// build it
     VoronoiType voronoi;
     boost::polygon::construct_voronoi(vectors.begin(), vectors.end(), &voronoi);
@@ -150,8 +156,16 @@ void Voronoi::buildVoronoi()
     {
         if(e.is_primary()) {
             if(e.is_finite()) {
-                path_primary_edges.moveTo(e.vertex0()->x(), e.vertex0()->y());
-                path_primary_edges.lineTo(e.vertex1()->x(), e.vertex1()->y());
+                qreal x1 = e.vertex0()->x() / 100;
+                qreal y1 = e.vertex0()->y() / 100;
+                qreal x2 = e.vertex1()->x() / 100;
+                qreal y2 = e.vertex1()->y() / 100;
+
+                if(hypot(x1 - x2, y1 - y2) > 500)
+                    continue;
+
+                path_primary_edges.moveTo(x1, y1);
+                path_primary_edges.lineTo(x2, y2);
             } else {
                 ///
             }
