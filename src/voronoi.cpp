@@ -13,6 +13,8 @@
 #include <QGraphicsEllipseItem>
 
 #include "voronoi.hpp"
+#include <utils_boost_geometry/algorithms.h>
+#include <boost/geometry/algorithms/within.hpp>
 
 using namespace utils_gdal;
 
@@ -52,7 +54,10 @@ struct QInteractiveGraphicsView : public QGraphicsView
 
 Voronoi::Voronoi(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::voronoi)
+    discretization_scale(100),
+    ui(new Ui::voronoi),
+    min(std::numeric_limits<double>::max(), std::numeric_limits<double>::max()),
+    max(std::numeric_limits<double>::min(), std::numeric_limits<double>::min())
 {
     ui->setupUi(this);
     connect(ui->actionLoad, SIGNAL(triggered()), this, SLOT(load()));
@@ -71,6 +76,10 @@ Voronoi::Voronoi(QWidget *parent) :
 
     pen_voronoi_primary = pen_vectors;
     pen_voronoi_primary.setColor(QColor(255, 0, 0));
+
+    pen_voronoi_secondary = pen_vectors;
+    pen_voronoi_secondary.setColor(QColor(0, 255, 0));
+
 }
 
 Voronoi::~Voronoi()
@@ -99,7 +108,31 @@ void Voronoi::renderMap()
 
     path_map = QPainterPath();
 
+    auto minimize = [](const dxf::DXFMap::Point &a, dxf::DXFMap::Point &b)
+    {
+        if(b.x() > a.x()) {
+            b.x(a.x());
+        }
+        if(b.y() > a.y()) {
+            b.y(a.y());
+        }
+    };
+    auto maximize = [](const dxf::DXFMap::Point &a, dxf::DXFMap::Point &b)
+    {
+        if(b.x() < a.x()) {
+            b.x(a.x());
+        }
+        if(b.y() < a.y()) {
+            b.y(a.y());
+        }
+    };
+
+
     for(dxf::DXFMap::Vector &v : vectors) {
+        minimize(v.first, min);
+        minimize(v.second, min);
+        maximize(v.first, max);
+        maximize(v.second, max);
         path_map.moveTo(v.first.x(), v.first.y());
         path_map.lineTo(v.second.x(), v.second.y());
     }
@@ -138,10 +171,10 @@ void Voronoi::buildVoronoi()
         return;
 
     for(auto &v : vectors) {
-        v.first.x(v.first.x() * 100);
-        v.first.y(v.first.y() * 100);
-        v.second.x(v.second.x() * 100);
-        v.second.y(v.second.y() * 100);
+        v.first.x(v.first.x() * discretization_scale);
+        v.first.y(v.first.y() * discretization_scale);
+        v.second.x(v.second.x() * discretization_scale);
+        v.second.y(v.second.y() * discretization_scale);
     }
 
 
@@ -151,39 +184,82 @@ void Voronoi::buildVoronoi()
 
     path_primary_edges = QPainterPath();
 
+    dxf::DXFMap::BoundingBox bb(min, max);
+    utils_boost_geometry::types::Polygon2d bp =
+            utils_boost_geometry::algorithms::toPolygon<dxf::DXFMap::Point>(bb);
+
     /// get the edges
     for(const VoronoiType::edge_type &e : voronoi.edges())
     {
         if(e.is_primary()) {
-            if(e.is_finite()) {
-                qreal x1 = e.vertex0()->x() / 100;
-                qreal y1 = e.vertex0()->y() / 100;
-                qreal x2 = e.vertex1()->x() / 100;
-                qreal y2 = e.vertex1()->y() / 100;
-
-                if(hypot(x1 - x2, y1 - y2) > 500)
-                    continue;
-
-                path_primary_edges.moveTo(x1, y1);
-                path_primary_edges.lineTo(x2, y2);
+            if(e.is_finite() && !e.is_curved()) {
+                dxf::DXFMap::Vector v;
+                v.first = dxf::DXFMap::Point(e.vertex0()->x() / discretization_scale,
+                                             e.vertex0()->y() / discretization_scale);
+                v.second= dxf::DXFMap::Point(e.vertex1()->x() / discretization_scale,
+                                             e.vertex1()->y() / discretization_scale);
+                dxf::DXFMap::Points i;
+                utils_boost_geometry::algorithms::intersection<dxf::DXFMap::Point>(v, bp, i);
+                switch(i.size()) {
+                case 1:
+                    if(utils_boost_geometry::algorithms::withinIncl<dxf::DXFMap::Point>(v.first, bb)) {
+                        path_primary_edges.moveTo(v.first.x(), v.first.y());
+                        path_primary_edges.lineTo(i.front().x(), i.front().y());
+                    } else {
+                        path_primary_edges.moveTo(v.second.x(), v.second.y());
+                        path_primary_edges.lineTo(i.front().x(), i.front().y());
+                    }
+                    break;
+                case 2:
+                    path_primary_edges.moveTo(i.front().x(), i.front().y());
+                    path_primary_edges.lineTo(i.back().x(), i.back().y());
+                    break;
+                default:
+                    if(utils_boost_geometry::algorithms::withinIncl<dxf::DXFMap::Point>(v, bb)) {
+                        path_primary_edges.moveTo(v.first.x(), v.first.y());
+                        path_primary_edges.lineTo(v.second.x(), v.second.y());
+                    };
+                }
             } else {
-                ///
+                if(e.is_finite()) {
+                    dxf::DXFMap::Vector v;
+                    v.first = dxf::DXFMap::Point(e.vertex0()->x() / discretization_scale,
+                                                 e.vertex0()->y() / discretization_scale);
+                    v.second= dxf::DXFMap::Point(e.vertex1()->x() / discretization_scale,
+                                                 e.vertex1()->y() / discretization_scale);
+                    dxf::DXFMap::Points i;
+                    utils_boost_geometry::algorithms::intersection<dxf::DXFMap::Point>(v, bp, i);
+                    switch(i.size()) {
+                    case 1:
+                        if(utils_boost_geometry::algorithms::withinIncl<dxf::DXFMap::Point>(v.first, bb)) {
+                            path_seondary_edges.moveTo(v.first.x(), v.first.y());
+                            path_seondary_edges.lineTo(i.front().x(), i.front().y());
+                        } else {
+                            path_seondary_edges.moveTo(v.second.x(), v.second.y());
+                            path_seondary_edges.lineTo(i.front().x(), i.front().y());
+                        }
+                        break;
+                    case 2:
+                        path_seondary_edges.moveTo(i.front().x(), i.front().y());
+                        path_seondary_edges.lineTo(i.back().x(), i.back().y());
+                        break;
+                    default:
+                        if(utils_boost_geometry::algorithms::withinIncl<dxf::DXFMap::Point>(v, bb)) {
+                            path_seondary_edges.moveTo(v.first.x(), v.first.y());
+                            path_seondary_edges.lineTo(v.second.x(), v.second.y());
+                        };
+                    }
+                }
             }
         }
-//        if(e.is_finite()) {
-//            scene->addLine(e.vertex0()->x(), e.vertex0()->y(),
-//                           e.vertex1()->x(), e.vertex1()->y(),
-//                           );
-//        } else {
-//            // clip the edge
-//            // sample curved ones ?
-//            // remove uneeded ones
-//        }
     }
-
 
     path_item_primary_edges =
             scene->addPath(path_primary_edges, pen_voronoi_primary);
+
+    path_item_seondary_edges =
+            scene->addPath(path_seondary_edges, pen_voronoi_secondary);
+
     view->show();
 }
 
