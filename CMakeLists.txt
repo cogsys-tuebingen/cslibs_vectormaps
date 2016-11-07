@@ -15,6 +15,7 @@ catkin_package(
 
 include(cmake/c++11.cmake)
 include(cmake/optional_dependencies.cmake)
+include(cmake/show_headers.cmake)
 
 include_directories(
     include
@@ -76,7 +77,6 @@ if(${Qt5_FOUND} AND ${OPENGL_FOUND})
 
     add_executable(gdal_voronoi
         src/voronoi.cpp
-        src/voronoi.hpp
         ${QT_UI}
     )
 
