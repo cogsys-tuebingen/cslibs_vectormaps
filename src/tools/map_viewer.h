@@ -5,7 +5,7 @@
 #include <utils_gdal/dxf_map.h>
 
 namespace Ui {
-class voronoi;
+class map_viewer;
 }
 
 class QGraphicsScene;
@@ -14,13 +14,13 @@ class QGraphicsPathItem;
 class QGraphicsItem;
 
 namespace utils_gdal {
-class Voronoi : public QMainWindow
+class MapViewer : public QMainWindow
 {
     Q_OBJECT
 
 public:
-    explicit Voronoi(QWidget *parent = 0);
-    virtual ~Voronoi();
+    explicit MapViewer(QWidget *parent = 0);
+    virtual ~MapViewer();
 
 
 public slots:
@@ -29,7 +29,7 @@ public slots:
 
 private:
     const double      discretization_scale;
-    Ui::voronoi      *ui;
+    Ui::map_viewer   *ui;
     QGraphicsView    *view;
     QGraphicsScene   *scene;
 

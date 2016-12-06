@@ -1,5 +1,5 @@
-#include "voronoi.h"
-#include <ui_voronoi.h>
+#include "map_viewer.h"
+#include <ui_map_viewer.h>
 
 #include <iostream>
 
@@ -52,10 +52,10 @@ struct QInteractiveGraphicsView : public QGraphicsView
 
 
 
-Voronoi::Voronoi(QWidget *parent) :
+MapViewer::MapViewer(QWidget *parent) :
     QMainWindow(parent),
     discretization_scale(100),
-    ui(new Ui::voronoi),
+    ui(new Ui::map_viewer),
     min(std::numeric_limits<double>::max(), std::numeric_limits<double>::max()),
     max(std::numeric_limits<double>::min(), std::numeric_limits<double>::min())
 {
@@ -82,12 +82,12 @@ Voronoi::Voronoi(QWidget *parent) :
 
 }
 
-Voronoi::~Voronoi()
+MapViewer::~MapViewer()
 {
     delete ui;
 }
 
-void Voronoi::load()
+void MapViewer::load()
 {
     QString file_name = QFileDialog::getOpenFileName(this, "Open DXF File", "", "*.dxf");
     if(!dxf_map.open(file_name.toStdString())) {
@@ -99,7 +99,7 @@ void Voronoi::load()
     renderMap();
 }
 
-void Voronoi::renderMap()
+void MapViewer::renderMap()
 {
     scene->clear();
 
@@ -144,7 +144,7 @@ void Voronoi::renderMap()
     view->show();
 }
 
-void Voronoi::centerItem(QGraphicsItem *item)
+void MapViewer::centerItem(QGraphicsItem *item)
 {
     qreal   width  = item->boundingRect().width();
     qreal   height = item->boundingRect().height();
@@ -153,7 +153,7 @@ void Voronoi::centerItem(QGraphicsItem *item)
     item->moveBy(-width/2, -height/2);
 }
 
-void Voronoi::addCenterPoint(QGraphicsItem *item)
+void MapViewer::addCenterPoint(QGraphicsItem *item)
 {
     QPointF p = item->boundingRect().bottomLeft();
     qreal x = item->boundingRect().width()  / 2;
@@ -162,7 +162,7 @@ void Voronoi::addCenterPoint(QGraphicsItem *item)
 }
 
 
-void Voronoi::buildVoronoi()
+void MapViewer::buildVoronoi()
 {
     dxf::DXFMap::Vectors vectors;
     dxf_map.getVectors(vectors);
@@ -266,7 +266,7 @@ void Voronoi::buildVoronoi()
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    Voronoi v;
+    MapViewer v;
     v.show();
 
     return a.exec();

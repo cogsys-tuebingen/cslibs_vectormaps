@@ -29,7 +29,7 @@ include_directories(
 )
 
 add_library(utils_gdal
-   src/dxf_map.cpp
+   src/map/dxf_map.cpp
 )
 
 target_link_libraries(utils_gdal
@@ -42,7 +42,7 @@ if(${OpenCV_FOUND} AND ${roscpp_FOUND})
 include_directories(${OpenCV_INCLUDE_DIRS})
 include_directories(${roscpp_INCLUDE_DIRS})
 add_executable(gdal_dxf_map_to_occupancy
-    src/dxf_to_occupancy.cpp
+    src/tools/dxf_to_occupancy.cpp
 )
 
 target_link_libraries(gdal_dxf_map_to_occupancy
@@ -53,7 +53,7 @@ target_link_libraries(gdal_dxf_map_to_occupancy
 )
 
 add_executable(gdal_dxf_map_renderer
-    src/dxf_map_renderer.cpp
+    src/tools/dxf_map_renderer.cpp
 )
 
 target_link_libraries(gdal_dxf_map_renderer
@@ -73,14 +73,14 @@ if(${Qt5_FOUND} AND ${OPENGL_FOUND})
     include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
     qt5_wrap_ui(QT_UI
-                src/voronoi.ui)
+                src/tools/map_viewer.ui)
 
-    add_executable(gdal_voronoi
-        src/voronoi.cpp
+    add_executable(gdal_map_viewer
+        src/tools/map_viewer.cpp
         ${QT_UI}
     )
 
-    target_link_libraries(gdal_voronoi
+    target_link_libraries(gdal_map_viewer
         utils_gdal
         Qt5::Core Qt5::Gui Qt5::Widgets Qt5::OpenGL
         ${OPENGL_LIBRARIES}
@@ -91,8 +91,8 @@ if(${Qt5_FOUND} AND ${OPENGL_FOUND})
 endif()
 if(${gazebo_FOUND} AND ${xacro_FOUND} AND ${EIGEN3_FOUND})
     add_library(gazebo_dxf_map_plugin
-        src/dxf_map_gazebo.cpp
-        src/mesh.cpp
+        src/gazebo/dxf_map_gazebo.cpp
+        src/gazebo/mesh.cpp
     )
     target_link_libraries(gazebo_dxf_map_plugin
         ${GAZEBO_LIBRARIES}
@@ -104,8 +104,8 @@ if(${gazebo_FOUND} AND ${xacro_FOUND} AND ${EIGEN3_FOUND})
     add_custom_target(world ALL DEPENDS "gazebo/launch/empty.world")
 
     add_executable(dxf_to_world
-        src/dxf_to_world.cpp
-        src/mesh.cpp
+        src/gazebo/dxf_to_world.cpp
+        src/gazebo/mesh.cpp
     )
     target_link_libraries(dxf_to_world
         ${GAZEBO_LIBRARIES}
