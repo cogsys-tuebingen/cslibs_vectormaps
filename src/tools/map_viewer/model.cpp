@@ -19,7 +19,8 @@ void Model::setup(Control * control)
 void Model::load(const QString &path)
 {
     if(!map_.open(path.toStdString())) {
-        load(path);
+        QString message("Could not load '" + path + "'!");
+        notification(message);
     } else {
         map_.getBounding(min_, max_);
         updated();

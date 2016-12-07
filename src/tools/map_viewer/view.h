@@ -24,14 +24,21 @@ public:
 
     void setup(Model *model);
 
+signals:
+    void loadFile(const QString &path);
+
 public slots:
     void update();
-    void notification();
+    void notification(const QString &message);
+
+private slots:
+    void actionLoad();
 
 private:
     Ui::map_viewer   *ui_;
     QGraphicsView    *view_;
     QGraphicsScene   *scene_;
+
     Model            *model_;
 
 

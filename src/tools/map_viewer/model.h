@@ -34,7 +34,7 @@ public:
 
 signals:
     void updated();
-    void failed(QString path);
+    void notification(QString message);
 
 private:
     dxf::DXFMap::Point min_;

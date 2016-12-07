@@ -10,6 +10,8 @@ class View;
 
 class Control : public QObject
 {
+    Q_OBJECT
+
 public:
     Control();
     virtual ~Control();
@@ -17,9 +19,11 @@ public:
     void setup(Model * model,
                View  * view);
 
+public slots:
+    void loadFile(const QString &path);
 
 private:
-
+    Model *model_;
 };
 }
 
