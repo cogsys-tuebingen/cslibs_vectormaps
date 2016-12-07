@@ -24,7 +24,7 @@ public:
 
     void load(const QString &path);
 
-    void getLayerNames(std::vector<QString> &layers);
+    void getLayerNames(QStringList &layers);
 
     void getLayerLines(std::vector<QLineF> &lines,
                        const QString &layer_name = "");
@@ -37,6 +37,7 @@ signals:
     void notification(QString message);
 
 private:
+
     dxf::DXFMap::Point min_;
     dxf::DXFMap::Point max_;
     dxf::DXFMap        map_;

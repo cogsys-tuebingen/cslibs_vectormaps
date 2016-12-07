@@ -1,6 +1,8 @@
 #include "model.h"
 #include "control.h"
 
+#include <QStringList>
+
 using namespace utils_gdal;
 
 Model::Model()
@@ -27,12 +29,12 @@ void Model::load(const QString &path)
     }
 }
 
-void Model::getLayerNames(std::vector<QString> &layers)
+void Model::getLayerNames(QStringList &layers)
 {
     std::vector<std::string> names;
     map_.getLayerNames(names);
     for(const auto &n : names)
-        layers.emplace_back(QString(n.c_str()));
+        layers.append(QString(n.c_str()));
 }
 
 void Model::getLayerLines(std::vector<QLineF> &lines,
