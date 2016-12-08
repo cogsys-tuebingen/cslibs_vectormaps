@@ -23,6 +23,7 @@ void Control::setup(Map *map, View *view)
 void Control::runCornerDetection()
 {
     /// get all layers that are visible
+    /// create a new layer model with points of corners
 }
 
 void Control::openDXF(const QString &path)

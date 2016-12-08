@@ -78,8 +78,8 @@ void View::update()
         i->setModel(l);
         ui_->layerListLayout->addWidget(i);
         connect(i,SIGNAL(hasChanged(QString)), this, SLOT(updateLayer(QString)));
-        renderLayer(l->getName());
-        layer_items_[l->getName()].reset(i);
+        renderLayer(l->getName<QString>());
+        layer_items_[l->getName<QString>()].reset(i);
     }
 
     QRectF sr = scene_->sceneRect();

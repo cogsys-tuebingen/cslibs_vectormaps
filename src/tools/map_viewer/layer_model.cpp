@@ -59,11 +59,6 @@ void LayerModel::getName(QString &name) const
     name = QString(name_.c_str());
 }
 
-QString LayerModel::getName() const
-{
-    return QString(name_.c_str());
-}
-
 void LayerModel::setVectors(const QLineFList &vectors)
 {
     using ptype = dxf::DXFMap::Point;

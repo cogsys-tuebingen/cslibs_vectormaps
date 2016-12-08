@@ -38,7 +38,7 @@ public:
     {
         model_ = model;
         ui_->checkBox->setChecked(model_->getVisibility());
-        ui_->label->setText(model_->getName());
+        ui_->label->setText(model_->getName<QString>());
         updateColorSelection(model_->getColor());
     }
 
@@ -61,14 +61,14 @@ private slots:
     void setVisibility()
     {
         model_->setVisible(ui_->checkBox->isChecked());
-        hasChanged(model_->getName());
+        hasChanged(model_->getName<QString>());
     }
 
     void setColor()
     {
         model_->setColor(QColorDialog::getColor());
         updateColorSelection(model_->getColor());
-        hasChanged(model_->getName());
+        hasChanged(model_->getName<QString>());
     }
 };
 

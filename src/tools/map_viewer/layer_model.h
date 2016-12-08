@@ -42,7 +42,11 @@ public:
 
     void getName(QString &name) const;
 
-    QString getName() const;
+    template<typename StringT>
+    StringT getName() const
+    {
+        return StringT(name_.c_str());
+    }
 
     void setVectors(const QLineFList &vectors);
 

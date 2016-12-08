@@ -35,6 +35,13 @@ void Map::getLayers(std::vector<LayerModel::Ptr> &layers)
     }
 }
 
+void Map::addLayer(LayerModel::Ptr &layer)
+{
+    if(layers_.find(layer->getName<std::string>()) != layers_.end())
+        throw std::runtime_error("Layers cannot be overwritten with this method!");
+    layers_[layer->getName<std::string>()] = layer;
+}
+
 QPointF Map::getMin() const
 {
     std::unique_lock<std::mutex> l(layers_mutex_);
