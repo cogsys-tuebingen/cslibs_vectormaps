@@ -49,7 +49,7 @@ void View::setup(Map *model)
 {
     map_ = model;
 
-    connect(map_, SIGNAL(updated()), this, SLOT(update()));
+    connect(map_, SIGNAL(updated()), this, SLOT(update()), Qt::QueuedConnection);
     connect(map_, SIGNAL(notification(QString)), this, SLOT(notification(QString)));
 }
 

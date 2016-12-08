@@ -10,6 +10,7 @@
 #include <QString>
 #include <QObject>
 
+#include <thread>
 #include <mutex>
 
 namespace utils_gdal {
@@ -47,11 +48,13 @@ private:
     mutable std::mutex                     layers_mutex_;
     std::map<std::string, LayerModel::Ptr> layers_;
 
-    void load(std::unique_lock<std::mutex> &l);
+    void load();
 
     dxf::DXFMap::Point min_;
     dxf::DXFMap::Point max_;
     dxf::DXFMap        map_;
+
+    std::thread worker_thread_;
 };
 }
 

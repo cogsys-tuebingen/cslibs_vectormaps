@@ -3,7 +3,7 @@
 
 #include <QStringList>
 #include <thread>
-
+#include <functional>
 
 using namespace utils_gdal;
 
@@ -13,6 +13,7 @@ Map::Map()
 
 Map::~Map()
 {
+    worker_thread_.join();
 }
 
 void Map::setup(View * view)
@@ -59,11 +60,12 @@ void Map::open(const QString &path)
         QString message("Could not load '" + path + "'!");
         notification(message);
     } else {
-        load(l);
+        auto execution = [this,&l](){load();};
+        worker_thread_ = std::thread(execution);
     }
 }
 
-void Map::load(std::unique_lock<std::mutex> &l)
+void Map::load()
 {
     layers_.clear();
 
@@ -81,7 +83,5 @@ void Map::load(std::unique_lock<std::mutex> &l)
 
         layers_[n] = layer;
     }
-
-    l.unlock();
     updated();
 }
