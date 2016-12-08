@@ -2,7 +2,9 @@
 
 using namespace utils_gdal;
 
-LayerModel::LayerModel()
+LayerModel::LayerModel() :
+    visible_(true),
+    color_(Qt::black)
 {
 
 }
