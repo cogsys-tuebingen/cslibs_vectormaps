@@ -27,6 +27,10 @@ struct RNGColor {
     inline QColor operator ()()
     {
         /// quadratic bezier curve
+        QVector3D c = bezier(distribution_(random_engine_));
+        return QColor(std::floor(c.x() + 0.5),
+                      std::floor(c.y() + 0.5),
+                      std::floor(c.z() + 0.5));
 
     }
 
@@ -47,9 +51,6 @@ struct RNGColor {
     {
         return bezier(t, 0, points_.size() - 1);
     }
-
-
-
 
     const std::array<QVector3D, 3> points_;
 

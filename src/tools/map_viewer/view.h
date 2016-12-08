@@ -16,7 +16,7 @@ class map_viewer_list_item;
 }
 
 namespace utils_gdal {
-class Model;
+class Map;
 
 class View : public QMainWindow
 {
@@ -27,7 +27,7 @@ public:
     View();
     virtual ~View();
 
-    void setup(Model *model);
+    void setup(Map *model);
 
 signals:
     void loadFile(const QString &path);
@@ -38,20 +38,21 @@ public slots:
     void hideLayerList();
 
 private slots:
-    void actionLoad();
+    void actionOpen();
+    void updateLayer(const QString &name);
 
 private:
     Ui::map_viewer                    *ui_;
     QGraphicsView                     *view_;
     QGraphicsScene                    *scene_;
 
-    std::map<QString, QLayerListItem*> layers_;
-    QGraphicsPathItem                 *path_map_item_;
-    QPen                               pen_map_;
+    std::map<QString, QLayerListItem*>    layers_;
+    std::map<QString, QGraphicsPathItem*> paths_;
+    QPen                                  pen_map_;
 
-    Model                             *model_;
+    Map                             *model_;
 
-
+    void renderLayer(const QString &name);
 
 };
 }

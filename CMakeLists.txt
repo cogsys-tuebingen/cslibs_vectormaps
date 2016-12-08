@@ -73,17 +73,20 @@ if(${Qt5_FOUND} AND ${OPENGL_FOUND})
     include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
     qt5_wrap_ui(QT_UI
-                src/tools/map_viewer/map_viewer.ui
-                src/tools/map_viewer/map_viewer_list_item.ui)
+                src/tools/map_viewer/ui/map_viewer.ui
+                src/tools/map_viewer/ui/map_viewer_list_item.ui)
 
     add_executable(gdal_map_viewer
         src/tools/map_viewer/map_viewer.cpp
         src/tools/map_viewer/view.cpp
-        src/tools/map_viewer/control.cpp
-        src/tools/map_viewer/model.cpp
+        src/tools/map_viewer/map.cpp
 
-        src/tools/map_viewer/QInteractiveGraphicsView.hpp
-        src/tools/map_viewer/QLayerListItem.hpp
+        src/tools/map_viewer/layer_model.cpp
+
+        src/tools/map_viewer/qt/QInteractiveGraphicsView.hpp
+        src/tools/map_viewer/qt/QLayerListItem.hpp
+
+        src/tools/map_viewer/util/rng_color.hpp
 
         ${QT_UI}
     )

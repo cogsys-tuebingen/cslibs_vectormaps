@@ -9,20 +9,19 @@
 #include <QObject>
 
 namespace utils_gdal {
-class Control;
+class View;
 
-class Model : public QObject
+class Map : public QObject
 {
 
     Q_OBJECT
 
 public:
-    Model();
-    virtual ~Model();
+    Map();
+    virtual ~Map();
 
-    void setup(Control *control);
+    void setup(utils_gdal::View *view);
 
-    void load(const QString &path);
 
     void getLayerNames(QStringList &layers);
 
@@ -31,6 +30,9 @@ public:
 
     QPointF getMin() const;
     QPointF getMax() const;
+
+public slots:
+    void open(const QString &path);
 
 signals:
     void updated();

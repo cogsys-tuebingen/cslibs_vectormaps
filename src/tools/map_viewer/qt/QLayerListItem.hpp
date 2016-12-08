@@ -1,10 +1,12 @@
 #ifndef LAYERLISTITEM_HPP
 #define LAYERLISTITEM_HPP
 
-#include <QWidget>
+#include <QCheckBox>
 #include <QColorDialog>
-#include <ui_map_viewer_list_item.h>
+#include <QPushButton>
+#include <QWidget>
 
+#include <ui_map_viewer_list_item.h>
 
 class QLayerListItem : public QWidget
 {
@@ -18,10 +20,10 @@ public:
     {
         ui_->setupUi(this);
 
-        palette_.setColor(QPalette::Button, color_);
-        ui_->colorSelect->setPalette(palette_);
+        updateColorSelection();
 
-        connect(ui_->colorSelect, SIGNAL(clicked(bool)), this, SLOT(getColor()));
+        connect(ui_->colorSelect, SIGNAL(clicked(bool)), this, SLOT(chooseColor()));
+        connect(ui_->checkBox, SIGNAL(clicked(bool)), this, SLOT(changeVisibility()));
     }
 
     virtual ~QLayerListItem()
@@ -37,8 +39,7 @@ public:
     void setColor(const QColor &color)
     {
         color_ = color;
-        palette_.setColor(QPalette::Button, color_);
-        ui_->colorSelect->setPalette(palette_);
+        updateColorSelection();
     }
 
 
@@ -52,31 +53,39 @@ public:
         return color_;
     }
 
-    inline bool isVisible() const
+    inline bool getVisibility() const
     {
         return ui_->checkBox->isChecked();
     }
 
+signals:
+    void hasChanged(QString name);
+
 private:
     Ui::map_viewer_list_item *ui_;
 
-    QPalette palette_;
     QColor   color_;
     QString  name_;
 
+    void updateColorSelection()
+    {
+        QString s = "background-color: ";
+        ui_->colorSelect->setStyleSheet(s + color_.name());
+    }
+
 
 private slots:
-    void getColor()
+    void changeVisibility()
     {
-        QColorDialog d;
-        d.open(this, SLOT(colorSelected(QColor)));
+        hasChanged(name_);
     }
 
-    void colorSelected(const QColor &color)
+    void chooseColor()
     {
-        color_ = color;
+        color_ = QColorDialog::getColor();
+        updateColorSelection();
+        hasChanged(name_);
     }
-
 };
 
 
