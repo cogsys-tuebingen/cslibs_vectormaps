@@ -171,6 +171,7 @@
     </property>
     <addaction name="actionRun_corner_detection"/>
     <addaction name="actionFind_doors"/>
+    <addaction name="actionBuild_topology"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuTools"/>
@@ -197,6 +198,14 @@
    </property>
    <property name="text">
     <string>Find doors ...</string>
+   </property>
+  </action>
+  <action name="actionBuild_topology">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Build topology ...</string>
    </property>
   </action>
  </widget>
