@@ -72,3 +72,13 @@ void LayerModel::getVectors(QLineFList &vectors) const
         vectors.emplace_back(QLineF(p1.x(), p1.y(), p2.x(), p2.y()));
     }
 }
+
+void LayerModel::setColor(const QColor &color)
+{
+    color_ = color;
+}
+
+QColor LayerModel::getColor() const
+{
+    return color_;
+}

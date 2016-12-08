@@ -7,6 +7,7 @@
 
 #include <QLine>
 #include <QString>
+#include <QColor>
 
 namespace utils_gdal {
 class LayerModel
@@ -39,12 +40,16 @@ public:
 
     void getVectors(QLineFList &vectors) const;
 
+    /// visualization specific
+    void setColor(const QColor &color);
+
+    QColor getColor() const;
 
 private:
     bool                 visible_;
     std::string          name_;
     dxf::DXFMap::Vectors vectors_;
-
+    QColor               color_;
 };
 }
 
