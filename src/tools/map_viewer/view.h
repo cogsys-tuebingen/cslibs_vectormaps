@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QPen>
 #include <QStringListModel>
+#include "layer_model.h"
 
 class QGraphicsScene;
 class QGraphicsView;
@@ -46,11 +47,11 @@ private:
     QGraphicsView                     *view_;
     QGraphicsScene                    *scene_;
 
-    std::map<QString, QLayerListItem*>    layers_;
+    std::map<QString, QLayerListItem>     layer_items_;
     std::map<QString, QGraphicsPathItem*> paths_;
     QPen                                  pen_map_;
 
-    Map                             *model_;
+    Map                             *map_;
 
     void renderLayer(const QString &name);
 

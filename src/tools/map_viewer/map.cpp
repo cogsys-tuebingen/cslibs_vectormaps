@@ -20,37 +20,16 @@ void Map::setup(View * view)
     connect(view, SIGNAL(loadFile(QString)), this, SLOT(open(QString)));
 }
 
-void Map::getLayerNames(QStringList &layers)
-{
-    std::vector<std::string> names;
-    map_.getLayerNames(names);
-    for(const auto &n : names)
-        layers.append(QString(n.c_str()));
-}
-
-void Map::getLayerLines(std::vector<QLineF> &lines,
-                          const QString &layer_name)
-{
-    dxf::DXFMap::Vectors v;
-    map_.getVectors(v, dxf::DXFMap::getLayerAttribFilter(layer_name.toStdString()));
-
-    for(const auto &l : v) {
-        lines.emplace_back(QLineF(l.first.x(), l.first.y(),
-                                  l.second.x(), l.second.y()));
-    }
-}
-
-void Map::getLayer(LayerModel::Ptr &layer, const QString &name)
+LayerModel::Ptr Map::getLayer(const QString &name)
 {
     std::unique_lock<std::mutex> l(layers_mutex_);
-    layer = layers_[name.toStdString()];
+    return layers_[name.toStdString()];
 }
 
-void Map::getLayer(LayerModel::Ptr &layer,
-                   const std::string &name)
+LayerModel::Ptr Map::getLayer(const std::string &name)
 {
     std::unique_lock<std::mutex> l(layers_mutex_);
-    layer = layers_[name];
+    return layers_[name];
 }
 
 void Map::getLayers(std::vector<LayerModel::Ptr> &layers)

@@ -26,17 +26,9 @@ public:
 
     void setup(utils_gdal::View *view);
 
+    LayerModel::Ptr getLayer(const QString &name);
 
-    void getLayerNames(QStringList &layers);
-
-    void getLayerLines(std::vector<QLineF> &lines,
-                       const QString &layer_name = "");
-
-
-
-    void getLayer(LayerModel::Ptr &layer, const QString &name);
-
-    void getLayer(LayerModel::Ptr &layer, const std::string &name);
+    LayerModel::Ptr getLayer(const std::string &name);
 
     void getLayers(std::vector<LayerModel::Ptr> &layers);
 

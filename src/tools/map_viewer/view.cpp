@@ -47,40 +47,25 @@ View::~View()
 
 void View::setup(Map *model)
 {
-    model_ = model;
+    map_ = model;
 
-    connect(model_, SIGNAL(updated()), this, SLOT(update()));
-    connect(model_, SIGNAL(notification(QString)), this, SLOT(notification(QString)));
+    connect(map_, SIGNAL(updated()), this, SLOT(update()));
+    connect(map_, SIGNAL(notification(QString)), this, SLOT(notification(QString)));
 }
 
 void View::update()
 {
     scene_->clear();
 
-    QStringList layers;
-    model_->getLayerNames(layers);
+    std::vector<LayerModel::Ptr> layers;
+    map_->getLayers(layers);
 
-    if(layers_.size() > 0) {
-        for(auto &l : layers_) {
-            disconnect(l.second,SIGNAL(hasChanged(QString)), this, SLOT(updateLayer(QString)));
-            ui_->layerListLayout->removeWidget(l.second);
-            delete l.second;
-        }
-    }
-    layers_.clear();
-
-    RNGColor rng;
     for(auto &l : layers) {
         QLayerListItem *i = new QLayerListItem;
-        i->setName(l);
-        i->setColor(rng());
+        i->setModel(l);
         ui_->layerListLayout->addWidget(i);
-        i->show();
-        layers_[l] = i;
-
         connect(i,SIGNAL(hasChanged(QString)), this, SLOT(updateLayer(QString)));
-
-        renderLayer(l);
+        renderLayer(l->getName());
     }
 
     QRectF sr = scene_->sceneRect();
@@ -114,21 +99,22 @@ void View::actionOpen()
 
 void View::updateLayer(const QString &name)
 {
-    QLayerListItem *i = layers_[name];
+    LayerModel::Ptr l = map_->getLayer(name);
     QGraphicsPathItem *p = paths_[name];
 
     QPen pen = pen_map_;
-    pen.setColor(i->getColor());
+    pen.setColor(l->getColor());
     p->setPen(pen);
-    p->setVisible(i->getVisibility());
+    p->setVisible(l->getVisibility());
     view_->update();
 }
 
 void View::renderLayer(const QString &name)
 {
-    QLayerListItem *i = layers_[name];
+    LayerModel::Ptr l = map_->getLayer(name);
+
     std::vector<QLineF> lines;
-    model_->getLayerLines(lines, name);
+    l->getVectors(lines);
 
     QPainterPath painter;
     for(const QLineF &l : lines) {
@@ -137,9 +123,9 @@ void View::renderLayer(const QString &name)
     }
 
     QPen p = pen_map_;
-    p.setColor(i->getColor());
+    p.setColor(l->getColor());
     QGraphicsPathItem *path = scene_->addPath(painter, p);
     paths_[name] = path;
-    path->setVisible(i->getVisibility());
+    path->setVisible(l->getVisibility());
 
 }

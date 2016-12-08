@@ -8,6 +8,7 @@
 #include <QLine>
 #include <QString>
 #include <QColor>
+#include <QObject>
 
 namespace utils_gdal {
 class LayerModel
@@ -20,7 +21,7 @@ public:
 
     void setVisible(const bool visbile);
 
-    bool getVisible() const;
+    bool getVisibility() const;
 
     //// std types
     void setName(const std::string &setName);
@@ -35,6 +36,8 @@ public:
     void setName(const QString &name);
 
     void getName(QString &name) const;
+
+    QString getName() const;
 
     void setVectors(const QLineFList &vectors);
 

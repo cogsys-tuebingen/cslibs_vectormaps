@@ -14,7 +14,7 @@ void LayerModel::setVisible(const bool visbile)
     visible_ = visbile;
 }
 
-bool LayerModel::getVisible() const
+bool LayerModel::getVisibility() const
 {
     return visible_;
 }
@@ -47,6 +47,11 @@ void LayerModel::setName(const QString &name)
 void LayerModel::getName(QString &name) const
 {
     name = QString(name_.c_str());
+}
+
+QString LayerModel::getName() const
+{
+    return QString(name_.c_str());
 }
 
 void LayerModel::setVectors(const QLineFList &vectors)

@@ -5,8 +5,10 @@
 #include <QColorDialog>
 #include <QPushButton>
 #include <QWidget>
+#include <QLabel>
 
 #include <ui_map_viewer_list_item.h>
+#include "../layer_model.h"
 
 class QLayerListItem : public QWidget
 {
@@ -15,76 +17,53 @@ class QLayerListItem : public QWidget
 public:
     QLayerListItem(QWidget * parent = 0) :
         QWidget(parent),
-        ui_(new Ui::map_viewer_list_item),
-        color_(Qt::black)
+        ui_(new Ui::map_viewer_list_item)
     {
         ui_->setupUi(this);
-
-        updateColorSelection();
-
-        connect(ui_->colorSelect, SIGNAL(clicked(bool)), this, SLOT(chooseColor()));
-        connect(ui_->checkBox, SIGNAL(clicked(bool)), this, SLOT(changeVisibility()));
+        connect(ui_->colorSelect, SIGNAL(clicked(bool)), this, SLOT(setColor()));
+        connect(ui_->checkBox, SIGNAL(clicked(bool)), this, SLOT(setVisibility()));
     }
 
     virtual ~QLayerListItem()
     {
+        delete ui_;
     }
 
-    void setName(const QString &name)
+    void setModel(const utils_gdal::LayerModel::Ptr &model)
     {
-        ui_->label->setText(name);
-        name_ = name;
+        model_ = model;
+        ui_->checkBox->setChecked(model_->getVisibility());
+        ui_->label->setText(model_->getName());
+        updateColorSelection(model_->getColor());
     }
 
-    void setColor(const QColor &color)
-    {
-        color_ = color;
-        updateColorSelection();
-    }
-
-
-    inline QString getName() const
-    {
-        return name_;
-    }
-
-    inline QColor getColor() const
-    {
-        return color_;
-    }
-
-    inline bool getVisibility() const
-    {
-        return ui_->checkBox->isChecked();
-    }
 
 signals:
     void hasChanged(QString name);
 
 private:
-    Ui::map_viewer_list_item *ui_;
+    Ui::map_viewer_list_item    *ui_;
+    utils_gdal::LayerModel::Ptr  model_;
 
-    QColor   color_;
-    QString  name_;
-
-    void updateColorSelection()
+    void updateColorSelection(const QColor &color)
     {
         QString s = "background-color: ";
-        ui_->colorSelect->setStyleSheet(s + color_.name());
+        ui_->colorSelect->setStyleSheet(s + color.name());
     }
 
 
 private slots:
-    void changeVisibility()
+    void setVisibility()
     {
-        hasChanged(name_);
+        model_->setVisible(ui_->checkBox->isChecked());
+        hasChanged(model_->getName());
     }
 
-    void chooseColor()
+    void setColor()
     {
-        color_ = QColorDialog::getColor();
-        updateColorSelection();
-        hasChanged(name_);
+        model_->setColor(QColorDialog::getColor());
+        updateColorSelection(model_->getColor());
+        hasChanged(model_->getName());
     }
 };
 
