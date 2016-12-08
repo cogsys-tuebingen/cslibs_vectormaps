@@ -39,6 +39,16 @@ void LayerModel::getVectors(dxf::DXFMap::Vectors &v) const
     v = vectors_;
 }
 
+void LayerModel::setPoints(const dxf::DXFMap::Points &p)
+{
+    points_ = p;
+}
+
+void LayerModel::getPoints(dxf::DXFMap::Points &p)
+{
+    p = points_;
+}
+
 void LayerModel::setName(const QString &name)
 {
     name_ = name.toStdString();
@@ -78,6 +88,21 @@ void LayerModel::getVectors(QLineFList &vectors) const
         const auto &p2 = v.second;
         vectors.emplace_back(QLineF(p1.x(), p1.y(), p2.x(), p2.y()));
     }
+}
+
+void LayerModel::setPoints(const QPointFList &points)
+{
+    using ptype = dxf::DXFMap::Point;
+
+    points_.clear();
+    for(auto &p : points)
+        points_.emplace_back(ptype(p.x(), p.y()));
+}
+
+void LayerModel::getPoints(QPointFList &points) const
+{
+    for(const auto &p : points_)
+        points.emplace_back(QPointF(p.x(), p.y()));
 }
 
 void LayerModel::setColor(const QColor &color)

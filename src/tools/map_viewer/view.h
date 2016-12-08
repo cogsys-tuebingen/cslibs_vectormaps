@@ -18,6 +18,7 @@ class map_viewer_list_item;
 
 namespace utils_gdal {
 class Map;
+class Control;
 
 class View : public QMainWindow
 {
@@ -28,10 +29,12 @@ public:
     View();
     virtual ~View();
 
-    void setup(Map *model);
+    void setup(Map *model,
+               Control *control);
 
 signals:
     void openFile(const QString &path);
+    void runCornerDetection();
 
 public slots:
     void update();
@@ -40,6 +43,8 @@ public slots:
 
 private slots:
     void actionOpen();
+    void actionRun_corner_detection();
+
     void updateLayer(const QString &name);
 
 private:

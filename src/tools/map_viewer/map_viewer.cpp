@@ -12,7 +12,7 @@ int main(int argc, char *argv[])
     utils_gdal::View    v;
     utils_gdal::Control c;
 
-    v.setup(&m);
+    v.setup(&m, &c);
     c.setup(&m, &v);
 
     v.show();

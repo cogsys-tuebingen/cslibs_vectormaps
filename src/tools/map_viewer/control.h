@@ -3,6 +3,9 @@
 
 #include <QObject>
 
+#include <thread>
+#include <mutex>
+
 namespace utils_gdal {
 class Map;
 class View;
@@ -22,9 +25,16 @@ signals:
 
 public slots:
     void openDXF(const QString &path);
+    /**
+     * @brief Excecute corner detection on line elements of all
+     *        visible layers.
+     */
+    void runCornerDetection();
 
 private:
     Map *map_;
+
+    std::thread worker_thread_; /// used to applied algorithms
 
 };
 }

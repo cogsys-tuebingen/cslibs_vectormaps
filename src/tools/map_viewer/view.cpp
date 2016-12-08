@@ -1,9 +1,12 @@
 #include "view.h"
+
 #include "map.h"
+#include "control.h"
 
 #include "qt/QInteractiveGraphicsView.hpp"
 #include "qt/QLayerListItem.hpp"
 #include "util/rng_color.hpp"
+
 
 #include <ui_map_viewer.h>
 #include <ui_map_viewer_list_item.h>
@@ -38,6 +41,7 @@ View::View() :
 
     connect(ui_->actionOpen, SIGNAL(triggered()), this, SLOT(actionOpen()));
     connect(ui_->buttonHideLayerList, SIGNAL(clicked(bool)), this, SLOT(hideLayerList()));
+    connect(ui_->actionRun_corner_detection, SIGNAL(triggered()), this, SLOT(actionRun_corner_detection()));
 }
 
 View::~View()
@@ -46,12 +50,13 @@ View::~View()
     delete ui_;
 }
 
-void View::setup(Map *model)
+void View::setup(Map *model, Control *control)
 {
     map_ = model;
 
-    connect(map_, SIGNAL(updated()), this, SLOT(update()), Qt::QueuedConnection);
-    connect(map_, SIGNAL(notification(QString)), this, SLOT(notification(QString)));
+    connect(map_,     SIGNAL(updated()), this, SLOT(update()), Qt::QueuedConnection);
+    connect(map_,     SIGNAL(notification(QString)), this, SLOT(notification(QString)));
+    connect(control,  SIGNAL(notification(QString)), this, SLOT(notification(QString)));
 }
 
 void View::update()
@@ -105,6 +110,12 @@ void View::actionOpen()
     QString file_name = QFileDialog::getOpenFileName(this, "Open DXF File", "", "*.dxf");
     openFile(file_name);
 }
+
+void View::actionRun_corner_detection()
+{
+    runCornerDetection();
+}
+
 
 void View::updateLayer(const QString &name)
 {

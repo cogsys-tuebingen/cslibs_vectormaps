@@ -16,6 +16,7 @@ class LayerModel
 public:
     typedef std::shared_ptr<LayerModel> Ptr;
     typedef std::vector<QLineF>         QLineFList;
+    typedef std::vector<QPointF>        QPointFList;
 
     LayerModel();
 
@@ -32,6 +33,10 @@ public:
 
     void getVectors(dxf::DXFMap::Vectors &v) const;
 
+    void setPoints(const dxf::DXFMap::Points &p);
+
+    void getPoints(dxf::DXFMap::Points &p);
+
     //// qt types
     void setName(const QString &name);
 
@@ -43,6 +48,10 @@ public:
 
     void getVectors(QLineFList &vectors) const;
 
+    void setPoints(const QPointFList &points);
+
+    void getPoints(QPointFList &points) const;
+
     /// visualization specific
     void setColor(const QColor &color);
 
@@ -51,7 +60,8 @@ public:
 private:
     bool                 visible_;
     std::string          name_;
-    dxf::DXFMap::Vectors vectors_;
+    dxf::DXFMap::Vectors vectors_;      /// <<< this has to be exchanged by a generic
+    dxf::DXFMap::Points  points_;       ///     geometry wrapper
     QColor               color_;
 };
 }
