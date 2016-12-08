@@ -4,7 +4,7 @@
 #include <QMainWindow>
 #include <QPen>
 #include <QStringListModel>
-#include "layer_model.h"
+#include <memory>
 
 class QGraphicsScene;
 class QGraphicsView;
@@ -31,7 +31,7 @@ public:
     void setup(Map *model);
 
 signals:
-    void loadFile(const QString &path);
+    void openFile(const QString &path);
 
 public slots:
     void update();
@@ -47,7 +47,7 @@ private:
     QGraphicsView                     *view_;
     QGraphicsScene                    *scene_;
 
-    using QLayerListItemPtr     = std::shared_ptr<QLayerListItem>;
+    using QLayerListItemPtr = std::shared_ptr<QLayerListItem>;
 
     std::map<QString, QLayerListItemPtr>    layer_items_;
     std::map<QString, QGraphicsPathItem*>   paths_;

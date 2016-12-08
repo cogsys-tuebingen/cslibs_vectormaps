@@ -15,11 +15,6 @@ Map::~Map()
 {
 }
 
-void Map::setup(View * view)
-{
-    connect(view, SIGNAL(loadFile(QString)), this, SLOT(open(QString)));
-}
-
 LayerModel::Ptr Map::getLayer(const QString &name)
 {
     std::unique_lock<std::mutex> l(layers_mutex_);
@@ -43,39 +38,39 @@ void Map::getLayers(std::vector<LayerModel::Ptr> &layers)
 QPointF Map::getMin() const
 {
     std::unique_lock<std::mutex> l(layers_mutex_);
-    return QPointF(min_.x(), min_.y());
+    return min_;
 }
 
 QPointF Map::getMax() const
 {
     std::unique_lock<std::mutex> l(layers_mutex_);
-    return QPointF(max_.x(), max_.y());
+    return max_;
 }
 
-void Map::open(const QString &path)
+void Map::load(const dxf::DXFMap::Ptr &map)
 {
     std::unique_lock<std::mutex> l(layers_mutex_);
-    if(!map_.open(path.toStdString())) {
-        QString message("Could not load '" + path + "'!");
-        notification(message);
-    } else {
-        auto execution = [this,&l](){load();};
-        worker_thread_ = std::thread(execution);
-        worker_thread_.detach();
-    }
+    auto execution = [this,&l,map](){doLoad(map);};
+    worker_thread_ = std::thread(execution);
+    worker_thread_.detach();
+
 }
 
-void Map::load()
+void Map::doLoad(const dxf::DXFMap::Ptr &map)
 {
     layers_.clear();
 
-    map_.getBounding(min_, max_);
+    dxf::DXFMap::Point min, max;
+    map->getBounding(min, max);
+    min_ = QPointF(min.x(), min.y());
+    max_ = QPointF(max.x(), max.y());
+
     std::vector<std::string> names;
-    map_.getLayerNames(names);
+    map->getLayerNames(names);
 
     for(const auto &n : names) {
         dxf::DXFMap::Vectors v;
-        map_.getVectors(v, dxf::DXFMap::getLayerAttribFilter(n));
+        map->getVectors(v, dxf::DXFMap::getLayerAttribFilter(n));
 
         LayerModel::Ptr layer(new LayerModel);
         layer->setName(n);

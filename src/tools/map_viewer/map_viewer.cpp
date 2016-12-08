@@ -2,6 +2,7 @@
 
 #include "map.h"
 #include "view.h"
+#include "control.h"
 
 int main(int argc, char *argv[])
 {
@@ -9,9 +10,10 @@ int main(int argc, char *argv[])
 
     utils_gdal::Map     m;
     utils_gdal::View    v;
+    utils_gdal::Control c;
 
     v.setup(&m);
-    m.setup(&v);
+    c.setup(&m, &v);
 
     v.show();
 

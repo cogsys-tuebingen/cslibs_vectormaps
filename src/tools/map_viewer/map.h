@@ -25,8 +25,6 @@ public:
     Map();
     virtual ~Map();
 
-    void setup(utils_gdal::View *view);
-
     LayerModel::Ptr getLayer(const QString &name);
 
     LayerModel::Ptr getLayer(const std::string &name);
@@ -37,8 +35,7 @@ public:
 
     QPointF getMax() const;
 
-public slots:
-    void open(const QString &path);
+    void load(const dxf::DXFMap::Ptr &map);
 
 signals:
     void updated();
@@ -48,11 +45,10 @@ private:
     mutable std::mutex                     layers_mutex_;
     std::map<std::string, LayerModel::Ptr> layers_;
 
-    void load();
+    void doLoad(const dxf::DXFMap::Ptr &map);
 
-    dxf::DXFMap::Point min_;
-    dxf::DXFMap::Point max_;
-    dxf::DXFMap        map_;
+    QPointF min_;
+    QPointF max_;
 
     std::thread worker_thread_;
 };

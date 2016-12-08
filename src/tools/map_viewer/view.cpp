@@ -103,7 +103,7 @@ void View::hideLayerList()
 void View::actionOpen()
 {
     QString file_name = QFileDialog::getOpenFileName(this, "Open DXF File", "", "*.dxf");
-    loadFile(file_name);
+    openFile(file_name);
 }
 
 void View::updateLayer(const QString &name)
