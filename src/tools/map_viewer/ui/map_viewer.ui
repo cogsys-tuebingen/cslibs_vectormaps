@@ -170,6 +170,7 @@
      <string>Tools</string>
     </property>
     <addaction name="actionRun_corner_detection"/>
+    <addaction name="actionFind_doors"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuTools"/>
@@ -188,6 +189,14 @@
   <action name="actionRun_corner_detection">
    <property name="text">
     <string>Run corner detection...</string>
+   </property>
+  </action>
+  <action name="actionFind_doors">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Find doors ...</string>
    </property>
   </action>
  </widget>
