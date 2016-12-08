@@ -8,13 +8,18 @@
 #include <QLabel>
 
 #include <ui_map_viewer_list_item.h>
-#include "../layer_model.h"
+
+namespace utils_gdal {
+class LayerModel;
+}
 
 class QLayerListItem : public QWidget
 {
     Q_OBJECT
 
 public:
+    using ModelPtr = typename std::shared_ptr<utils_gdal::LayerModel>;
+
     QLayerListItem(QWidget * parent = 0) :
         QWidget(parent),
         ui_(new Ui::map_viewer_list_item)
@@ -29,7 +34,7 @@ public:
         delete ui_;
     }
 
-    void setModel(const utils_gdal::LayerModel::Ptr &model)
+    void setModel(const ModelPtr &model)
     {
         model_ = model;
         ui_->checkBox->setChecked(model_->getVisibility());
@@ -43,7 +48,7 @@ signals:
 
 private:
     Ui::map_viewer_list_item    *ui_;
-    utils_gdal::LayerModel::Ptr  model_;
+    ModelPtr                     model_;
 
     void updateColorSelection(const QColor &color)
     {

@@ -47,11 +47,13 @@ private:
     QGraphicsView                     *view_;
     QGraphicsScene                    *scene_;
 
-    std::map<QString, QLayerListItem>     layer_items_;
-    std::map<QString, QGraphicsPathItem*> paths_;
-    QPen                                  pen_map_;
+    using QLayerListItemPtr     = std::shared_ptr<QLayerListItem>;
 
-    Map                             *map_;
+    std::map<QString, QLayerListItemPtr>    layer_items_;
+    std::map<QString, QGraphicsPathItem*>   paths_;
+    QPen                                    pen_map_;
+
+    Map                                    *map_;
 
     void renderLayer(const QString &name);
 

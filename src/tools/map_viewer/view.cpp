@@ -15,7 +15,7 @@
 #include <QGraphicsPathItem>
 #include <QColorDialog>
 #include <QListWidgetItem>
-
+#include <QHBoxLayout>
 
 using namespace utils_gdal;
 
@@ -30,11 +30,11 @@ View::View() :
     view_->setScene(scene_);
     view_->setOptimizationFlags(QGraphicsView::DontSavePainterState);
 
+
     /// styles
     pen_map_.setColor(Qt::black);
     pen_map_.setWidth(1);
     pen_map_.setCosmetic(true);
-
 
     connect(ui_->actionOpen, SIGNAL(triggered()), this, SLOT(actionOpen()));
     connect(ui_->buttonHideLayerList, SIGNAL(clicked(bool)), this, SLOT(hideLayerList()));
@@ -42,6 +42,7 @@ View::View() :
 
 View::~View()
 {
+    delete view_;
     delete ui_;
 }
 
@@ -60,12 +61,20 @@ void View::update()
     std::vector<LayerModel::Ptr> layers;
     map_->getLayers(layers);
 
+    /// clear the layout
+    for(auto &l : layer_items_) {
+        ui_->layerListLayout->removeWidget(l.second.get());
+    }
+    layer_items_.clear();
+
+    /// create new items
     for(auto &l : layers) {
         QLayerListItem *i = new QLayerListItem;
         i->setModel(l);
         ui_->layerListLayout->addWidget(i);
         connect(i,SIGNAL(hasChanged(QString)), this, SLOT(updateLayer(QString)));
         renderLayer(l->getName());
+        layer_items_[l->getName()].reset(i);
     }
 
     QRectF sr = scene_->sceneRect();

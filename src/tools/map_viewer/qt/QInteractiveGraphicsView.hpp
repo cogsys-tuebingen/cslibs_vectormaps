@@ -10,6 +10,7 @@ struct QInteractiveGraphicsView : public QGraphicsView
         QGraphicsView()
     {
         setDragMode(ScrollHandDrag);
+        scale(1, -1);
     }
 
 

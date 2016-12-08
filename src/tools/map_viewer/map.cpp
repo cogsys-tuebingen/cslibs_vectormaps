@@ -13,7 +13,6 @@ Map::Map()
 
 Map::~Map()
 {
-    worker_thread_.join();
 }
 
 void Map::setup(View * view)
@@ -62,6 +61,7 @@ void Map::open(const QString &path)
     } else {
         auto execution = [this,&l](){load();};
         worker_thread_ = std::thread(execution);
+        worker_thread_.detach();
     }
 }
 
