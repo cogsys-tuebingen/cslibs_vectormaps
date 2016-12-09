@@ -19,6 +19,7 @@ class map_viewer_list_item;
 namespace utils_gdal {
 class Map;
 class Control;
+class CornerDetection;
 
 class View : public QMainWindow
 {
@@ -29,12 +30,14 @@ public:
     View();
     virtual ~View();
 
-    void setup(Map *model,
+    void setup(Map    *model,
+               CornerDetection *corner_detection,
                Control *control);
 
 signals:
-    void openFile(const QString &path);
-    void runCornerDetection();
+    void openFile          (const QString &path);
+    void runCornerDetection(const double min_distance,
+                            const double max_distance);
 
 public slots:
     void update();
@@ -44,10 +47,15 @@ public slots:
 private slots:
     void actionOpen();
     void actionRun_corner_detection();
+    void actionBuild_topology();
+    void actionFind_doors();
+
+    void enableAction_run_corner_detection();
 
     void updateLayer(const QString &name);
 
 private:
+    //// qt
     Ui::map_viewer                    *ui_;
     QGraphicsView                     *view_;
     QGraphicsScene                    *scene_;
@@ -58,7 +66,9 @@ private:
     std::map<QString, QGraphicsPathItem*>   paths_;
     QPen                                    pen_map_;
 
+    //// models
     Map                                    *map_;
+    CornerDetection                        *corner_detection_;
 
     void renderLayer(const QString &name);
 

@@ -6,9 +6,12 @@
 #include <thread>
 #include <mutex>
 
+
+
 namespace utils_gdal {
 class Map;
 class View;
+class CornerDetection;
 
 class Control : public QObject
 {
@@ -18,7 +21,8 @@ public:
     Control();
 
     void setup(Map *map,
-               View *view);
+               View *view,
+               CornerDetection *corner_detection);
 
 signals:
     void notification(QString message);
@@ -29,10 +33,12 @@ public slots:
      * @brief Excecute corner detection on line elements of all
      *        visible layers.
      */
-    void runCornerDetection();
+    void runCornerDetection(const double min_distance,
+                            const double max_distance);
 
 private:
-    Map *map_;
+    Map             *map_;
+    CornerDetection *corner_detection_;
 
     std::thread worker_thread_; /// used to applied algorithms
 

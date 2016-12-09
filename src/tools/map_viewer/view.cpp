@@ -2,11 +2,11 @@
 
 #include "map.h"
 #include "control.h"
+#include "algorithms/corner_detection.h"
+#include "util/rng_color.hpp"
 
 #include "qt/QInteractiveGraphicsView.hpp"
 #include "qt/QLayerListItem.hpp"
-#include "util/rng_color.hpp"
-
 
 #include <ui_map_viewer.h>
 #include <ui_map_viewer_list_item.h>
@@ -19,6 +19,7 @@
 #include <QColorDialog>
 #include <QListWidgetItem>
 #include <QHBoxLayout>
+#include <QAction>
 
 using namespace utils_gdal;
 
@@ -42,6 +43,7 @@ View::View() :
     connect(ui_->actionOpen, SIGNAL(triggered()), this, SLOT(actionOpen()));
     connect(ui_->buttonHideLayerList, SIGNAL(clicked(bool)), this, SLOT(hideLayerList()));
     connect(ui_->actionRun_corner_detection, SIGNAL(triggered()), this, SLOT(actionRun_corner_detection()));
+
 }
 
 View::~View()
@@ -50,13 +52,17 @@ View::~View()
     delete ui_;
 }
 
-void View::setup(Map *model, Control *control)
+void View::setup(Map *model,
+                 CornerDetection *corner_detection,
+                 Control *control)
 {
     map_ = model;
+    corner_detection_ = corner_detection;
 
     connect(map_,     SIGNAL(updated()), this, SLOT(update()), Qt::QueuedConnection);
     connect(map_,     SIGNAL(notification(QString)), this, SLOT(notification(QString)));
     connect(control,  SIGNAL(notification(QString)), this, SLOT(notification(QString)));
+    connect(corner_detection_, SIGNAL(finished()), this, SLOT(enableAction_run_corner_detection()), Qt::QueuedConnection);
 }
 
 void View::update()
@@ -113,13 +119,34 @@ void View::actionOpen()
 
 void View::actionRun_corner_detection()
 {
-    runCornerDetection();
+    double min_distnace = corner_detection_->getMinDistance();
+    double max_distance = corner_detection_->getMaxDistance();
+    ui_->actionRun_corner_detection->setDisabled(true);
+
+    /// here we should spawn a dialog
+    /// and disable the action
+
+    runCornerDetection(0.0, 0.0);
 }
 
+void View::actionFind_doors()
+{
+
+}
+
+void View::actionBuild_topology()
+{
+
+}
+
+void View::enableAction_run_corner_detection()
+{
+    ui_->actionRun_corner_detection->setEnabled(true);
+}
 
 void View::updateLayer(const QString &name)
 {
-    LayerModel::Ptr l = map_->getLayer(name);
+    LayerModel::ConstPtr l = map_->getLayer(name);
     QGraphicsPathItem *p = paths_[name];
 
     QPen pen = pen_map_;
@@ -131,7 +158,7 @@ void View::updateLayer(const QString &name)
 
 void View::renderLayer(const QString &name)
 {
-    LayerModel::Ptr l = map_->getLayer(name);
+    LayerModel::ConstPtr l = map_->getLayer(name);
 
     std::vector<QLineF> lines;
     l->getVectors(lines);

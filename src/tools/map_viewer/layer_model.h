@@ -15,6 +15,7 @@ class LayerModel
 {
 public:
     typedef std::shared_ptr<LayerModel> Ptr;
+    typedef std::shared_ptr<LayerModel const> ConstPtr;
     typedef std::vector<QLineF>         QLineFList;
     typedef std::vector<QPointF>        QPointFList;
 
