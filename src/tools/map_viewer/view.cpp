@@ -91,6 +91,7 @@ void View::update()
     scene_->setSceneRect(sr.x() - ds, sr.y() - ds,
                          sr.width() + 2 * ds, sr.height() + 2 * ds);
 
+    ui_->actionRun_corner_detection->setEnabled(true);
     view_->show();
 }
 
@@ -117,7 +118,8 @@ void View::progressDialog()
 void View::actionOpen()
 {
     QString file_name = QFileDialog::getOpenFileName(this, "Open DXF File", "", "*.dxf");
-    openFile(file_name);
+    if(file_name != "")
+        openFile(file_name);
 }
 
 void View::actionRun_corner_detection()

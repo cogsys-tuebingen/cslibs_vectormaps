@@ -22,7 +22,7 @@ void Control::setup(Map *map, View *view)
     map_ = map;
 
     connect(view, SIGNAL(openFile(QString)), this, SLOT(openDXF(QString)));
-    connect(view, SIGNAL(runCornerDetection()), this, SLOT(runCornerDetection()));
+    connect(view, SIGNAL(runCornerDetection(double, double)), this, SLOT(runCornerDetection(double, double)));
 }
 
 void Control::runCornerDetection(const double max_point_distance,
@@ -32,7 +32,6 @@ void Control::runCornerDetection(const double max_point_distance,
         return;
 
 //    running_.store(true);
-    std::cout << "Wanna execute??" << std::endl;
     auto execution = [max_point_distance, min_line_angle, this] () {
         executeCornerDetection(max_point_distance, min_line_angle);
     };

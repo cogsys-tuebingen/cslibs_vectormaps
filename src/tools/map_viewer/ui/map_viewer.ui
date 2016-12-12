@@ -188,6 +188,9 @@
    </property>
   </action>
   <action name="actionRun_corner_detection">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Run corner detection...</string>
    </property>
