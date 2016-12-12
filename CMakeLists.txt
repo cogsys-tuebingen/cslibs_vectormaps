@@ -74,7 +74,8 @@ if(${Qt5_FOUND} AND ${OPENGL_FOUND})
 
     qt5_wrap_ui(QT_UI
                 src/tools/map_viewer/ui/map_viewer.ui
-                src/tools/map_viewer/ui/map_viewer_list_item.ui)
+                src/tools/map_viewer/ui/map_viewer_list_item.ui
+                src/tools/map_viewer/ui/map_viewer_corner_param_dialog.ui)
 
     add_executable(gdal_map_viewer
         src/tools/map_viewer/map_viewer.cpp
@@ -86,6 +87,7 @@ if(${Qt5_FOUND} AND ${OPENGL_FOUND})
 
         src/tools/map_viewer/qt/QInteractiveGraphicsView.hpp
         src/tools/map_viewer/qt/QLayerListItem.hpp
+        src/tools/map_viewer/qt/QCornerParamDialog.hpp
 
         src/tools/map_viewer/util/rng_color.hpp
 

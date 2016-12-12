@@ -19,6 +19,9 @@
 #include <QColorDialog>
 #include <QListWidgetItem>
 #include <QHBoxLayout>
+#include <QProgressDialog>
+
+#include "qt/QCornerParamDialog.hpp"
 
 using namespace utils_gdal;
 
@@ -53,6 +56,7 @@ View::~View()
 void View::setup(Map *model, Control *control)
 {
     map_ = model;
+    control_ = control;
 
     connect(map_,     SIGNAL(updated()), this, SLOT(update()), Qt::QueuedConnection);
     connect(map_,     SIGNAL(notification(QString)), this, SLOT(notification(QString)));
@@ -105,6 +109,11 @@ void View::hideLayerList()
         ui_->layers->hide();
 }
 
+void View::progressDialog()
+{
+    QProgressDialog progress;
+}
+
 void View::actionOpen()
 {
     QString file_name = QFileDialog::getOpenFileName(this, "Open DXF File", "", "*.dxf");
@@ -113,9 +122,12 @@ void View::actionOpen()
 
 void View::actionRun_corner_detection()
 {
-    runCornerDetection();
-}
+    QCornerParamDialog parameters;
+    parameters.exec();
 
+    runCornerDetection(parameters.getMaxPointDistance(),
+                       parameters.getMinLineAngle());
+}
 
 void View::updateLayer(const QString &name)
 {

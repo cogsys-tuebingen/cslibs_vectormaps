@@ -5,6 +5,7 @@
 
 #include <thread>
 #include <mutex>
+#include <atomic>
 
 namespace utils_gdal {
 class Map;
@@ -22,6 +23,7 @@ public:
 
 signals:
     void notification(QString message);
+    void status(const int status);
 
 public slots:
     void openDXF(const QString &path);
@@ -29,12 +31,17 @@ public slots:
      * @brief Excecute corner detection on line elements of all
      *        visible layers.
      */
-    void runCornerDetection();
+    void runCornerDetection(const double max_point_distance,
+                            const double min_line_angle);
 
 private:
     Map *map_;
 
+    std::atomic_bool  running_;
     std::thread worker_thread_; /// used to applied algorithms
+
+    void executeCornerDetection(const double max_point_distance,
+                                const double min_line_angle);
 
 };
 }

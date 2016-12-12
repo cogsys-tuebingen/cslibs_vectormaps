@@ -34,12 +34,14 @@ public:
 
 signals:
     void openFile(const QString &path);
-    void runCornerDetection();
+    void runCornerDetection(const double max_point_distance,
+                            const double min_line_angle);
 
 public slots:
     void update();
     void notification(const QString &message);
     void hideLayerList();
+    void progressDialog();
 
 private slots:
     void actionOpen();
@@ -59,6 +61,7 @@ private:
     QPen                                    pen_map_;
 
     Map                                    *map_;
+    Control                                *control_;
 
     void renderLayer(const QString &name);
 
