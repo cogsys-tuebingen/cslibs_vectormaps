@@ -60,6 +60,7 @@ private:
     Ui::map_viewer                    *ui_;
     QGraphicsView                     *view_;
     QGraphicsScene                    *scene_;
+    QRectF                             scene_rect_;
     QProgressDialog                   *progress_;
 
     using QLayerListItemPtr = std::shared_ptr<QLayerListItem>;

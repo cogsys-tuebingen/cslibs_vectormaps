@@ -6,6 +6,7 @@
 #include <functional>
 
 #include "models/vector_layer_model.h"
+#include "models/point_layer_model.h"
 
 using namespace utils_gdal;
 
@@ -86,15 +87,40 @@ void Map::doLoad(const dxf::DXFMap::Ptr &map)
     std::vector<std::string> names;
     map->getLayerNames(names);
 
+    auto less = [] (const dxf::DXFMap::Point &p1,
+                    const dxf::DXFMap::Point &p2) {
+        return p1.x() < p2.x() || p1.y() < p2.y();
+    };
+
+    std::set<dxf::DXFMap::Point, decltype(less)> corner_set(less);
     for(const auto &n : names) {
-        dxf::DXFMap::Vectors v;
-        map->getVectors(v, dxf::DXFMap::getLayerAttribFilter(n));
+        dxf::DXFMap::Vectors vectors;
+        map->getVectors(vectors, dxf::DXFMap::getLayerAttribFilter(n));
+
+        for(auto &v : vectors) {
+            corner_set.insert(v.first);
+            corner_set.insert(v.second);
+        }
 
         VectorLayerModel::Ptr layer(new VectorLayerModel);
         layer->setName(n);
-        layer->setVectors(v);
+        layer->setVectors(vectors);
 
         layers_[n] = VectorLayerModel::asBase(layer);
     }
+
+    PointLayerModel::Ptr corner_layer(new PointLayerModel);
+    std::string corner_layer_name = "corners";
+    corner_layer->setName(corner_layer_name);
+    corner_layer->setColor(Qt::blue);
+    dxf::DXFMap::Points corners;
+    corners.reserve(corner_set.size());
+    for(auto &c : corner_set) {
+        corners.emplace_back(c);
+    }
+    corner_layer->setPoints(corners);
+
+    layers_[corner_layer_name] = PointLayerModel::asBase(corner_layer);
+
     updated();
 }

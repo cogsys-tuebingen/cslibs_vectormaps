@@ -100,11 +100,6 @@ void View::update()
         layer_items_[l->getName<QString>()].reset(i);
     }
 
-    QRectF sr = scene_->sceneRect();
-    qreal  ds = std::max(sr.width(), sr.height()) / 2.0;
-    scene_->setSceneRect(sr.x() - ds, sr.y() - ds,
-                         sr.width() + 2 * ds, sr.height() + 2 * ds);
-
     ui_->actionRun_corner_detection->setEnabled(true);
     view_->show();
 }
@@ -207,6 +202,7 @@ void View::renderLayer(const QString &name)
         lp->getPoints(points);
 
     QPainterPath painter;
+    painter.setFillRule(Qt::WindingFill);
     for(const QLineF &l : lines) {
         painter.moveTo(l.p1());
         painter.lineTo(l.p2());
@@ -219,7 +215,7 @@ void View::renderLayer(const QString &name)
 
     QPen p = pen_map_;
     p.setColor(l->getColor());
-    QGraphicsPathItem *path = scene_->addPath(painter, p);
+    QGraphicsPathItem *path = scene_->addPath(painter, p, QBrush(l->getColor()));
     paths_[name] = path;
     path->setVisible(l->getVisibility());
 

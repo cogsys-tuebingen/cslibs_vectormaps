@@ -31,52 +31,51 @@ void CornerDetection::operator () (const Vectors &vectors,
         Point  closest2;
 
         for(const Vector &v2 : vectors) {
-            /// currently end to end point distance metric
-            {
-                const double d = hypot(v1.first.x() - v2.first.x(), v1.first.y() - v2.first.y());
-                if(d < min) {
-                    closest1 = v1.first;
-                    closest2 = v2.first;
-                    min = d;
+            double angle = utils_boost_geometry::algorithms::angle<double, Point>(v1, min_v);
+            if(fabs(angle) >= fabs(min_line_angle_)) {
+                /// currently end to end point distance metric
+                {
+                    const double d = hypot(v1.first.x() - v2.first.x(), v1.first.y() - v2.first.y());
+                    if(d < min) {
+                        closest1 = v1.first;
+                        closest2 = v2.first;
+                        min = d;
+                    }
                 }
-            }
-            {
-                const double d = hypot(v1.second.x() - v2.second.x(), v1.second.y() - v2.second.y());
-                if(d < min) {
-                    closest1 = v1.second;
-                    closest2 = v2.second;
-                    min = d;
+                {
+                    const double d = hypot(v1.second.x() - v2.second.x(), v1.second.y() - v2.second.y());
+                    if(d < min) {
+                        closest1 = v1.second;
+                        closest2 = v2.second;
+                        min = d;
+                    }
                 }
-            }
-            {
-                const double d = hypot(v1.first.x() - v2.second.x(), v1.first.y() - v2.second.y());
-                if(d < min) {
-                    closest1 = v1.first;
-                    closest2 = v2.second;
-                    min = d;
+                {
+                    const double d = hypot(v1.first.x() - v2.second.x(), v1.first.y() - v2.second.y());
+                    if(d < min) {
+                        closest1 = v1.first;
+                        closest2 = v2.second;
+                        min = d;
+                    }
                 }
-            }
-            {
-                const double d = hypot(v1.second.x() - v2.first.x(), v1.second.y() - v2.first.y());
-                if(d < min) {
-                    closest1 = v1.second;
-                    closest2 = v2.first;
-                    min = d;
+                {
+                    const double d = hypot(v1.second.x() - v2.first.x(), v1.second.y() - v2.first.y());
+                    if(d < min) {
+                        closest1 = v1.second;
+                        closest2 = v2.first;
+                        min = d;
+                    }
                 }
             }
         }
 
+        if(min <= max_point_distance_) {
+            corners.emplace_back(Point((closest1.x() + closest2.x()) * 0.5,
+                                       (closest1.y() + closest2.y()) * 0.5));
+        }
+
         progress(count / (double) vectors.size() * 100);
 
-        if(min > max_point_distance_)
-            continue;
-
-        double angle = utils_boost_geometry::algorithms::angle<double, Point>(v1, min_v);
-        if(fabs(angle) < fabs(min_line_angle_))
-            continue;
-
-        corners.emplace_back(Point((closest1.x() + closest2.x()) * 0.5,
-                                   (closest2.y() + closest2.y()) * 0.5));
     }
 
     progress(100);
