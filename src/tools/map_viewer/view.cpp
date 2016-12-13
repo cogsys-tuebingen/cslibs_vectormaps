@@ -26,7 +26,12 @@
 using namespace utils_gdal;
 
 View::View() :
-    ui_(new Ui::map_viewer)
+    ui_(new Ui::map_viewer),
+    view_(nullptr),
+    scene_(nullptr),
+    progress_(nullptr),
+    map_(nullptr),
+    control_(nullptr)
 {
     ui_->setupUi(this);
     view_ = new QInteractiveGraphicsView;
@@ -60,7 +65,11 @@ void View::setup(Map *model, Control *control)
 
     connect(map_,     SIGNAL(updated()), this, SLOT(update()), Qt::QueuedConnection);
     connect(map_,     SIGNAL(notification(QString)), this, SLOT(notification(QString)));
-    connect(control,  SIGNAL(notification(QString)), this, SLOT(notification(QString)));
+
+    connect(control_, SIGNAL(notification(QString)), this, SLOT(notification(QString)));
+    connect(control_, SIGNAL(openProgressDialog(QString)), this, SLOT(openProgressDialog(QString)), Qt::QueuedConnection);
+    connect(control_, SIGNAL(closeProgressDialog()), this, SLOT(closeProgressDialog()), Qt::QueuedConnection);
+
 }
 
 void View::update()
@@ -102,6 +111,35 @@ void View::notification(const QString &message)
     msg.exec();
 }
 
+void View::openProgressDialog(const QString &title)
+{
+    if(progress_) {
+        std::cerr << "Progress Dialog is already open!" << std::endl;
+        return;
+    }
+
+    progress_ = new QProgressDialog;
+    progress_->setLabelText(title);
+    progress_->setCancelButton(nullptr);
+    progress_->setValue(0);
+
+    connect(control_, SIGNAL(progress(int)), progress_, SLOT(setValue(int)), Qt::QueuedConnection);
+
+    progress_->setVisible(true);
+}
+
+void View::closeProgressDialog()
+{
+    if(!progress_)
+        return;
+
+    disconnect(control_, SIGNAL(progress(int)), progress_, SLOT(setValue(int)));
+
+    progress_->setVisible(false);
+    delete progress_;
+    progress_ = nullptr;
+}
+
 void View::hideLayerList()
 {
     if(ui_->layers->isHidden())
@@ -110,10 +148,6 @@ void View::hideLayerList()
         ui_->layers->hide();
 }
 
-void View::progressDialog()
-{
-    QProgressDialog progress;
-}
 
 void View::actionOpen()
 {
@@ -148,12 +182,19 @@ void View::renderLayer(const QString &name)
     LayerModel::Ptr l = map_->getLayer(name);
 
     std::vector<QLineF> lines;
+    std::vector<QPointF> points;
     l->getVectors(lines);
+    l->getPoints(points);
 
     QPainterPath painter;
     for(const QLineF &l : lines) {
         painter.moveTo(l.p1());
         painter.lineTo(l.p2());
+    }
+
+    for(const QPointF &p : points) {
+        painter.moveTo(p);
+        painter.addEllipse(p, 0.05, 0.05);
     }
 
     QPen p = pen_map_;

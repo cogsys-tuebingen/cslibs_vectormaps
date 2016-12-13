@@ -10,6 +10,7 @@ class QGraphicsScene;
 class QGraphicsView;
 class QGraphicsPathItem;
 class QLayerListItem;
+class QProgressDialog;
 
 namespace Ui {
 class map_viewer;
@@ -40,8 +41,10 @@ signals:
 public slots:
     void update();
     void notification(const QString &message);
+    void openProgressDialog(const QString &title);
+    void closeProgressDialog();
+
     void hideLayerList();
-    void progressDialog();
 
 private slots:
     void actionOpen();
@@ -53,6 +56,7 @@ private:
     Ui::map_viewer                    *ui_;
     QGraphicsView                     *view_;
     QGraphicsScene                    *scene_;
+    QProgressDialog                   *progress_;
 
     using QLayerListItemPtr = std::shared_ptr<QLayerListItem>;
 

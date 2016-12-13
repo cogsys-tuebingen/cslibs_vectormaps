@@ -23,7 +23,10 @@ public:
 
 signals:
     void notification(QString message);
-    void status(const int status);
+
+    void openProgressDialog(QString title);
+    void closeProgressDialog();
+    void progress(const int progress);
 
 public slots:
     void openDXF(const QString &path);
