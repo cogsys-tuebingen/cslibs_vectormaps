@@ -20,6 +20,7 @@ public:
     typedef std::vector<QPointF>        QPointFList;
 
     LayerModel();
+    virtual ~LayerModel();
 
     void setVisible(const bool visbile);
 
@@ -29,14 +30,6 @@ public:
     void setName(const std::string &setName);
 
     void getName(std::string &name) const;
-
-    void setVectors(const dxf::DXFMap::Vectors &v);
-
-    void getVectors(dxf::DXFMap::Vectors &v) const;
-
-    void setPoints(const dxf::DXFMap::Points &p);
-
-    void getPoints(dxf::DXFMap::Points &p);
 
     //// qt types
     void setName(const QString &name);
@@ -49,13 +42,11 @@ public:
         return StringT(name_.c_str());
     }
 
-    void setVectors(const QLineFList &vectors);
-
-    void getVectors(QLineFList &vectors) const;
-
-    void setPoints(const QPointFList &points);
-
-    void getPoints(QPointFList &points) const;
+    template<typename T>
+    static inline typename std::shared_ptr<T> as(const LayerModel::Ptr &ptr)
+    {
+        return std::dynamic_pointer_cast<T>(ptr);
+    }
 
     /// visualization specific
     void setColor(const QColor &color);
@@ -65,8 +56,6 @@ public:
 private:
     bool                 visible_;
     std::string          name_;
-    dxf::DXFMap::Vectors vectors_;      /// <<< this has to be exchanged by a generic
-    dxf::DXFMap::Points  points_;       ///     geometry wrapper
     QColor               color_;
 };
 }

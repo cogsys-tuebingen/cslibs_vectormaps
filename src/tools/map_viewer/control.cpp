@@ -33,7 +33,6 @@ void Control::runCornerDetection(const double min_distance,
 
     /// get all layers that are visible
     /// create a new layer model with points of corners
-
     dxf::DXFMap::Vectors v;
     auto execution = [this,&v](){corner_detection_->apply(v);};
     worker_thread_ = std::thread(execution);

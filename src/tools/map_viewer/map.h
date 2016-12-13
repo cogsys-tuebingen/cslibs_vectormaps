@@ -3,7 +3,7 @@
 
 #include <utils_gdal/dxf_map.h>
 
-#include "layer_model.h"
+#include "models/layer_model.h"
 
 #include <QPoint>
 #include <QLine>

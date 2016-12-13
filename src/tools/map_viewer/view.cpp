@@ -1,6 +1,9 @@
 #include "view.h"
 
 #include "map.h"
+#include "models/vector_layer_model.h"
+#include "models/point_layer_model.h"
+
 #include "control.h"
 #include "algorithms/corner_detection.h"
 #include "util/rng_color.hpp"
@@ -158,10 +161,16 @@ void View::updateLayer(const QString &name)
 
 void View::renderLayer(const QString &name)
 {
-    LayerModel::ConstPtr l = map_->getLayer(name);
-
     std::vector<QLineF> lines;
-    l->getVectors(lines);
+
+    LayerModel::ConstPtr l = map_->getLayer(name);
+    VectorLayerModel::ConstPtr lv = l->as<VectorLayerModel const>(l);
+    if(lv) {
+        l->getVectors(lines);
+    }
+    PointLayerModel::ConstPtr lp = l->as<PointLayerModel const>(l);
+
+
 
     QPainterPath painter;
     for(const QLineF &l : lines) {
