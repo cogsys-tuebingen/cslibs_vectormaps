@@ -36,7 +36,8 @@ public:
 
 signals:
     void openFile(const QString &path);
-    void runCornerDetection(const double max_point_distance,
+    void runCornerDetection(const double min_point_distance,
+                            const double max_point_distance,
                             const double min_line_angle);
 
 public slots:

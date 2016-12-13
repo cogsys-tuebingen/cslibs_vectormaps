@@ -161,7 +161,8 @@ void View::actionRun_corner_detection()
     QCornerParamDialog parameters;
     parameters.exec();
 
-    runCornerDetection(parameters.getMaxPointDistance(),
+    runCornerDetection(parameters.getMinPointDistance(),
+                       parameters.getMaxPointDistance(),
                        parameters.getMinLineAngle());
 }
 
@@ -183,6 +184,7 @@ void View::updateLayer(const QString &name)
     QPen pen = pen_map_;
     pen.setColor(l->getColor());
     p->setPen(pen);
+    p->setBrush(QBrush(l->getColor()));
     p->setVisible(l->getVisibility());
     view_->update();
 }
@@ -210,7 +212,7 @@ void View::renderLayer(const QString &name)
 
     for(const QPointF &p : points) {
         painter.moveTo(p);
-        painter.addEllipse(p, 0.05, 0.05);
+        painter.addEllipse(p, 0.1, 0.1);
     }
 
     QPen p = pen_map_;

@@ -13,11 +13,10 @@ public:
         ui_(new Ui::CornerParamDialog)
     {
         ui_->setupUi(this);
-        ui_->doubleSpinBox_min_angle->setMinimum(-M_PI);
-        ui_->doubleSpinBox_min_angle->setMaximum(M_PI);
 
         connect(ui_->doubleSpinBox_max_distance, SIGNAL(valueChanged(double)), this, SLOT(doubleSpinBox_max_distance_changed(double)));
         connect(ui_->doubleSpinBox_min_angle, SIGNAL(valueChanged(double)), this, SLOT(doubleSpinBox_min_angle_changed(double)));
+        connect(ui_->doubleSpinBox_min_distance, SIGNAL(valueChanged(double)), this, SLOT(doubleSpinBox_min_distance_changed(double)));
     }
 
     virtual ~QCornerParamDialog()
@@ -35,6 +34,11 @@ public:
         return max_point_distance_;
     }
 
+    double getMinPointDistance() const
+    {
+        return min_point_distance_;
+    }
+
 private slots:
     void doubleSpinBox_max_distance_changed(const double value)
     {
@@ -43,13 +47,19 @@ private slots:
 
     void doubleSpinBox_min_angle_changed(const double value)
     {
-        min_line_angle_ = value;
+        min_line_angle_ = value / 180.0 * M_PI;
+    }
+
+    void doubleSpinBox_min_distance_changed(const double value)
+    {
+        min_point_distance_ = value;
     }
 
 private:
     Ui::CornerParamDialog *ui_;
 
     double min_line_angle_;
+    double min_point_distance_;
     double max_point_distance_;
 
 

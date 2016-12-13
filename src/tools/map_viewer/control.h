@@ -37,7 +37,7 @@ public slots:
      * @brief Excecute corner detection on line elements of all
      *        visible layers.
      */
-    void runCornerDetection(const double max_point_distance,
+    void runCornerDetection(const double min_point_distance, const double max_point_distance,
                             const double min_line_angle);
 
 private:
@@ -46,7 +46,8 @@ private:
     std::atomic_bool  running_;
     std::thread worker_thread_; /// used to applied algorithms
 
-    void executeCornerDetection(const double max_point_distance,
+    void executeCornerDetection(const double min_point_distance,
+                                const double max_point_distance,
                                 const double min_line_angle);
 
 };

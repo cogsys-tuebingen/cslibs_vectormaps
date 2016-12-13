@@ -114,10 +114,7 @@ void Map::doLoad(const dxf::DXFMap::Ptr &map)
     corner_layer->setName(corner_layer_name);
     corner_layer->setColor(Qt::blue);
     dxf::DXFMap::Points corners;
-    corners.reserve(corner_set.size());
-    for(auto &c : corner_set) {
-        corners.emplace_back(c);
-    }
+    corners.assign(corner_set.begin(), corner_set.end());
     corner_layer->setPoints(corners);
 
     layers_[corner_layer_name] = PointLayerModel::asBase(corner_layer);
