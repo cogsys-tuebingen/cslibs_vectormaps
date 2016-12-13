@@ -38,18 +38,14 @@ void Map::getLayers(std::vector<LayerModel::Ptr> &layers)
     }
 }
 
-void Map::addLayer(LayerModel::Ptr &layer)
+void Map::setLayer(LayerModel::Ptr &layer)
 {
-    if(layers_.find(layer->getName<std::string>()) != layers_.end())
-        throw std::runtime_error("Layers cannot be overwritten with this method!");
     layers_[layer->getName<std::string>()] = layer;
     updated();
 }
 
-void Map::addLayer(LayerModel::Ptr layer)
+void Map::setLayer(LayerModel::Ptr layer)
 {
-    if(layers_.find(layer->getName<std::string>()) != layers_.end())
-        throw std::runtime_error("Layers cannot be overwritten with this method!");
     layers_[layer->getName<std::string>()] = layer;
     updated();
 }

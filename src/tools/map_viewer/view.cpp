@@ -191,33 +191,38 @@ void View::updateLayer(const QString &name)
 
 void View::renderLayer(const QString &name)
 {
-    std::vector<QLineF> lines;
-    std::vector<QPointF> points;
 
     LayerModel::ConstPtr l = map_->getLayer(name);
-    VectorLayerModel::ConstPtr lv = LayerModel::as<VectorLayerModel const>(l);
-    if(lv) {
-        lv->getVectors(lines);
-    }
-    PointLayerModel::ConstPtr lp = LayerModel::as<PointLayerModel const>(l);
-    if(lp)
-        lp->getPoints(points);
 
     QPainterPath painter;
     painter.setFillRule(Qt::WindingFill);
-    for(const QLineF &l : lines) {
-        painter.moveTo(l.p1());
-        painter.lineTo(l.p2());
-    }
-
-    for(const QPointF &p : points) {
-        painter.moveTo(p);
-        painter.addEllipse(p, 0.1, 0.1);
-    }
-
     QPen p = pen_map_;
-    p.setColor(l->getColor());
-    QGraphicsPathItem *path = scene_->addPath(painter, p, QBrush(l->getColor()));
+    QColor color = l->getColor();
+    p.setColor(color);
+    color.setAlpha(127);
+    QBrush b(color);
+
+    VectorLayerModel::ConstPtr lv = LayerModel::as<VectorLayerModel const>(l);
+    if(lv) {
+        std::vector<QLineF> lines;
+        lv->getVectors(lines);
+        for(const QLineF &l : lines) {
+            painter.moveTo(l.p1());
+            painter.lineTo(l.p2());
+        }
+    }
+    PointLayerModel::ConstPtr lp = LayerModel::as<PointLayerModel const>(l);
+    if(lp) {
+        p.setColor(Qt::black);
+
+        std::vector<QPointF> points;
+        lp->getPoints(points);
+        for(const QPointF &p : points) {
+            painter.moveTo(p);
+            painter.addEllipse(p, 0.1, 0.1);
+        }
+    }
+    QGraphicsPathItem *path = scene_->addPath(painter, p, b);
     paths_[name] = path;
     path->setVisible(l->getVisibility());
 

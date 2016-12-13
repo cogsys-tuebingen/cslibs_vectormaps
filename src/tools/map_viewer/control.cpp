@@ -103,8 +103,8 @@ void Control::executeCornerDetection(const double min_point_distance,
     layer_corners->setColor(Qt::green);
     layer_end_points->setColor(Qt::red);
 
-    map_->addLayer(PointLayerModel::asBase(layer_corners));
-    map_->addLayer(PointLayerModel::asBase(layer_end_points));
+    map_->setLayer(PointLayerModel::asBase(layer_corners));
+    map_->setLayer(PointLayerModel::asBase(layer_end_points));
 
     /// and there goes the progress
     running_.store(false);
