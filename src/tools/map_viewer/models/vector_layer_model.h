@@ -9,9 +9,20 @@ class VectorLayerModel : public LayerModel
 public:
     typedef std::shared_ptr<VectorLayerModel>        Ptr;
     typedef std::shared_ptr<VectorLayerModel const>  ConstPtr;
-    typedef std::vector<QPointF>        QPointFList;
+    typedef std::vector<QPointF>                     QPointFList;
 
     VectorLayerModel();
+    virtual ~VectorLayerModel();
+
+    static inline LayerModel::Ptr asBase(const Ptr &layer)
+    {
+        return std::dynamic_pointer_cast<LayerModel>(layer);
+    }
+
+    static inline LayerModel::ConstPtr asBase(const ConstPtr &layer)
+    {
+        return std::dynamic_pointer_cast<LayerModel const>(layer);
+    }
 
     void setVectors(const dxf::DXFMap::Vectors &v);
 

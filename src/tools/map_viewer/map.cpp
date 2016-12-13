@@ -5,6 +5,8 @@
 #include <thread>
 #include <functional>
 
+#include "models/vector_layer_model.h"
+
 using namespace utils_gdal;
 
 Map::Map()
@@ -40,6 +42,15 @@ void Map::addLayer(LayerModel::Ptr &layer)
     if(layers_.find(layer->getName<std::string>()) != layers_.end())
         throw std::runtime_error("Layers cannot be overwritten with this method!");
     layers_[layer->getName<std::string>()] = layer;
+    updated();
+}
+
+void Map::addLayer(LayerModel::Ptr layer)
+{
+    if(layers_.find(layer->getName<std::string>()) != layers_.end())
+        throw std::runtime_error("Layers cannot be overwritten with this method!");
+    layers_[layer->getName<std::string>()] = layer;
+    updated();
 }
 
 QPointF Map::getMin() const
@@ -79,11 +90,11 @@ void Map::doLoad(const dxf::DXFMap::Ptr &map)
         dxf::DXFMap::Vectors v;
         map->getVectors(v, dxf::DXFMap::getLayerAttribFilter(n));
 
-        LayerModel::Ptr layer(new LayerModel);
+        VectorLayerModel::Ptr layer(new VectorLayerModel);
         layer->setName(n);
         layer->setVectors(v);
 
-        layers_[n] = layer;
+        layers_[n] = VectorLayerModel::asBase(layer);
     }
     updated();
 }

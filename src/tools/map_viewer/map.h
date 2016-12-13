@@ -33,6 +33,8 @@ public:
 
     void addLayer(LayerModel::Ptr &layer);
 
+    void addLayer(LayerModel::Ptr   layer);
+
     QPointF getMin() const;
 
     QPointF getMax() const;

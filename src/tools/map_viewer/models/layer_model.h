@@ -48,6 +48,12 @@ public:
         return std::dynamic_pointer_cast<T>(ptr);
     }
 
+    template<typename T>
+    static inline typename std::shared_ptr<T const> as(const LayerModel::ConstPtr &ptr)
+    {
+        return std::dynamic_pointer_cast<T const>(ptr);
+    }
+
     /// visualization specific
     void setColor(const QColor &color);
 

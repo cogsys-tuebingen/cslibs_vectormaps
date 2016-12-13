@@ -1,40 +1,30 @@
 #ifndef CORNERDETECTION_H
 #define CORNERDETECTION_H
 
-#include <QObject>
-
 #include <utils_gdal/dxf_map.h>
+#include <functional>
 
 namespace utils_gdal {
-class CornerDetection : public QObject
+class CornerDetection
 {
-    Q_OBJECT
-
 public:
-    CornerDetection();
+    using Point   = dxf::DXFMap::Point;
+    using Points  = dxf::DXFMap::Points;
+    using Vector  = dxf::DXFMap::Vector;
+    using Vectors = dxf::DXFMap::Vectors;
 
-    /// apply
-    void apply(const dxf::DXFMap::Vectors &vectors);
+    using progress_callback = std::function<void(int)>;
 
-    void getResult(dxf::DXFMap::Points &points);
+    CornerDetection(const double max_point_distance,
+                    const double min_line_angle);
 
-    /// parameters
-    void setMinDistance(const double value);
-
-    void setMaxDistance(const double value);
-
-    double getMinDistance() const;
-
-    double getMaxDistance() const;
-
-signals:
-    void finished();
-
+    void operator() (const Vectors &vectors,
+                     Points &corners,
+                     Points &end_points,
+                     progress_callback progress = [](int current){});
 private:
-    double              min_distance_;
-    double              max_distance_;
-
-    dxf::DXFMap::Points result_;
+    const double max_point_distance_;
+    const double min_line_angle_;
 };
 }
 

@@ -7,7 +7,7 @@ PointLayerModel::PointLayerModel()
 
 }
 
-PointLayerModel::~LayerModel()
+PointLayerModel::~PointLayerModel()
 {
 
 }
@@ -17,7 +17,7 @@ void PointLayerModel::setPoints(const dxf::DXFMap::Points &p)
     points_ = p;
 }
 
-void PointLayerModel::getPoints(dxf::DXFMap::Points &p)
+void PointLayerModel::getPoints(dxf::DXFMap::Points &p) const
 {
     p = points_;
 }

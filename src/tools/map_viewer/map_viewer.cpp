@@ -14,10 +14,8 @@ int main(int argc, char *argv[])
     utils_gdal::View    v;
     utils_gdal::Control c;
 
-    utils_gdal::CornerDetection cd;
-
-    v.setup(&m, &cd, &c);
-    c.setup(&m, &v,  &cd);
+    v.setup(&m, &c);
+    c.setup(&m, &v);
 
     v.show();
 

@@ -15,13 +15,23 @@ public:
 
     virtual ~PointLayerModel();
 
-    void setPoints(const dxf::DXFMap::Vectors &v);
+    static inline LayerModel::Ptr asBase(const Ptr &layer)
+    {
+        return std::dynamic_pointer_cast<LayerModel>(layer);
+    }
 
-    void getPoints(dxf::DXFMap::Vectors &v) const;
+    static inline LayerModel::ConstPtr asBase(const ConstPtr &layer)
+    {
+        return std::dynamic_pointer_cast<LayerModel const>(layer);
+    }
 
-    void setPoints(const QLineFList &vectors);
+    void setPoints(const dxf::DXFMap::Points &p);
 
-    void getPoints(QLineFList &vectors) const;
+    void getPoints(dxf::DXFMap::Points &p) const;
+
+    void setPoints(const QPointFList &vectors);
+
+    void getPoints(QPointFList &points) const;
 
 private:
     dxf::DXFMap::Points points_;

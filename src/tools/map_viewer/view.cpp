@@ -22,12 +22,20 @@
 #include <QColorDialog>
 #include <QListWidgetItem>
 #include <QHBoxLayout>
+
 #include <QAction>
+#include <QProgressDialog>
+#include "qt/QCornerParamDialog.hpp"
 
 using namespace utils_gdal;
 
 View::View() :
-    ui_(new Ui::map_viewer)
+    ui_(new Ui::map_viewer),
+    view_(nullptr),
+    scene_(nullptr),
+    progress_(nullptr),
+    map_(nullptr),
+    control_(nullptr)
 {
     ui_->setupUi(this);
     view_ = new QInteractiveGraphicsView;
@@ -56,16 +64,17 @@ View::~View()
 }
 
 void View::setup(Map *model,
-                 CornerDetection *corner_detection,
                  Control *control)
 {
     map_ = model;
-    corner_detection_ = corner_detection;
+    control_ = control;
 
     connect(map_,     SIGNAL(updated()), this, SLOT(update()), Qt::QueuedConnection);
     connect(map_,     SIGNAL(notification(QString)), this, SLOT(notification(QString)));
-    connect(control,  SIGNAL(notification(QString)), this, SLOT(notification(QString)));
-    connect(corner_detection_, SIGNAL(finished()), this, SLOT(enableAction_run_corner_detection()), Qt::QueuedConnection);
+
+    connect(control_, SIGNAL(notification(QString)), this, SLOT(notification(QString)));
+    connect(control_, SIGNAL(openProgressDialog(QString)), this, SLOT(openProgressDialog(QString)), Qt::QueuedConnection);
+    connect(control_, SIGNAL(closeProgressDialog()), this, SLOT(closeProgressDialog()), Qt::QueuedConnection);
 }
 
 void View::update()
@@ -96,6 +105,7 @@ void View::update()
     scene_->setSceneRect(sr.x() - ds, sr.y() - ds,
                          sr.width() + 2 * ds, sr.height() + 2 * ds);
 
+    ui_->actionRun_corner_detection->setEnabled(true);
     view_->show();
 }
 
@@ -106,6 +116,35 @@ void View::notification(const QString &message)
     msg.exec();
 }
 
+void View::openProgressDialog(const QString &title)
+{
+    if(progress_) {
+        std::cerr << "Progress Dialog is already open!" << std::endl;
+        return;
+    }
+
+    progress_ = new QProgressDialog;
+    progress_->setLabelText(title);
+    progress_->setCancelButton(nullptr);
+    progress_->setValue(0);
+
+    connect(control_, SIGNAL(progress(int)), progress_, SLOT(setValue(int)), Qt::QueuedConnection);
+
+    progress_->setVisible(true);
+}
+
+void View::closeProgressDialog()
+{
+    if(!progress_)
+        return;
+
+    disconnect(control_, SIGNAL(progress(int)), progress_, SLOT(setValue(int)));
+
+    progress_->setVisible(false);
+    delete progress_;
+    progress_ = nullptr;
+}
+
 void View::hideLayerList()
 {
     if(ui_->layers->isHidden())
@@ -114,27 +153,21 @@ void View::hideLayerList()
         ui_->layers->hide();
 }
 
+
 void View::actionOpen()
 {
     QString file_name = QFileDialog::getOpenFileName(this, "Open DXF File", "", "*.dxf");
-    openFile(file_name);
+    if(file_name != "")
+        openFile(file_name);
 }
 
 void View::actionRun_corner_detection()
 {
-    double min_distnace = corner_detection_->getMinDistance();
-    double max_distance = corner_detection_->getMaxDistance();
-    ui_->actionRun_corner_detection->setDisabled(true);
+    QCornerParamDialog parameters;
+    parameters.exec();
 
-    /// here we should spawn a dialog
-    /// and disable the action
-
-    runCornerDetection(0.0, 0.0);
-}
-
-void View::actionFind_doors()
-{
-
+    runCornerDetection(parameters.getMaxPointDistance(),
+                       parameters.getMinLineAngle());
 }
 
 void View::actionBuild_topology()
@@ -142,9 +175,9 @@ void View::actionBuild_topology()
 
 }
 
-void View::enableAction_run_corner_detection()
+void View::actionFind_doors()
 {
-    ui_->actionRun_corner_detection->setEnabled(true);
+
 }
 
 void View::updateLayer(const QString &name)
@@ -162,20 +195,26 @@ void View::updateLayer(const QString &name)
 void View::renderLayer(const QString &name)
 {
     std::vector<QLineF> lines;
+    std::vector<QPointF> points;
 
     LayerModel::ConstPtr l = map_->getLayer(name);
-    VectorLayerModel::ConstPtr lv = l->as<VectorLayerModel const>(l);
+    VectorLayerModel::ConstPtr lv = LayerModel::as<VectorLayerModel const>(l);
     if(lv) {
-        l->getVectors(lines);
+        lv->getVectors(lines);
     }
-    PointLayerModel::ConstPtr lp = l->as<PointLayerModel const>(l);
-
-
+    PointLayerModel::ConstPtr lp = LayerModel::as<PointLayerModel const>(l);
+    if(lp)
+        lp->getPoints(points);
 
     QPainterPath painter;
     for(const QLineF &l : lines) {
         painter.moveTo(l.p1());
         painter.lineTo(l.p2());
+    }
+
+    for(const QPointF &p : points) {
+        painter.moveTo(p);
+        painter.addEllipse(p, 0.05, 0.05);
     }
 
     QPen p = pen_map_;

@@ -4,7 +4,10 @@ using namespace utils_gdal;
 
 VectorLayerModel::VectorLayerModel()
 {
+}
 
+VectorLayerModel::~VectorLayerModel()
+{
 }
 
 void VectorLayerModel::setVectors(const dxf::DXFMap::Vectors &v)

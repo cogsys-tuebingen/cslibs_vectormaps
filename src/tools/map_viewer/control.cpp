@@ -2,39 +2,43 @@
 
 #include "map.h"
 #include "view.h"
+
+#include "models/vector_layer_model.h"
+#include "models/point_layer_model.h"
+
 #include "algorithms/corner_detection.h"
 
 #include <utils_gdal/dxf_map.h>
 
+#include <iostream>
+
 using namespace utils_gdal;
 
-Control::Control()
+Control::Control() :
+    running_(false)
 {
 
 }
 
 void Control::setup(Map *map,
-                    View *view,
-                    CornerDetection *corner_detection)
+                    View *view)
 {
     map_ = map;
-    corner_detection_ = corner_detection;
 
     connect(view, SIGNAL(openFile(QString)), this, SLOT(openDXF(QString)));
-    connect(view, SIGNAL(runCornerDetection(const double, const double)), this, SLOT(runCornerDetection(const double, const double)));
-
+    connect(view, SIGNAL(runCornerDetection(double, double)), this, SLOT(runCornerDetection(double, double)));
 }
 
-void Control::runCornerDetection(const double min_distance,
-                                 const double max_distance)
+void Control::runCornerDetection(const double max_point_distance,
+                                 const double min_line_angle)
 {
-    corner_detection_->setMinDistance(min_distance);
-    corner_detection_->setMaxDistance(max_distance);
+    if(running_)
+        return;
 
-    /// get all layers that are visible
-    /// create a new layer model with points of corners
-    dxf::DXFMap::Vectors v;
-    auto execution = [this,&v](){corner_detection_->apply(v);};
+    running_.store(true);
+    auto execution = [max_point_distance, min_line_angle, this] () {
+        executeCornerDetection(max_point_distance, min_line_angle);
+    };
     worker_thread_ = std::thread(execution);
     worker_thread_.detach();
 }
@@ -50,3 +54,56 @@ void Control::openDXF(const QString &path)
     }
 }
 
+void Control::executeCornerDetection(const double max_point_distance,
+                                     const double min_line_angle)
+{
+
+    /// get all layers that are visible
+    /// create a new layer model with points of corners
+
+    openProgressDialog("Corner Detection");
+    progress(-1);
+
+    std::vector<LayerModel::Ptr> layers;
+    map_->getLayers(layers);
+
+    /// get all line segments from visible layers
+    dxf::DXFMap::Vectors vectors;
+    for(LayerModel::Ptr &l : layers) {
+        if(l->getVisibility()) {
+            VectorLayerModel::Ptr lv = LayerModel::as<VectorLayerModel>(l);
+            if(lv) {
+                dxf::DXFMap::Vectors v;
+                lv->getVectors(v);
+                vectors.insert(vectors.end(), v.begin(), v.end());
+            }
+        }
+    }
+
+    dxf::DXFMap::Points corners;
+    dxf::DXFMap::Points end_points;
+
+    auto progress_callback = [this] (int p) {progress(p);};
+
+    CornerDetection corner_detection(max_point_distance,
+                                     min_line_angle);
+    corner_detection(vectors, corners, end_points, progress_callback);
+
+    progress(-1);
+    PointLayerModel::Ptr layer_corners(new PointLayerModel);
+    PointLayerModel::Ptr layer_end_points(new PointLayerModel);
+    layer_corners->setName(QString("corner points"));
+    layer_end_points->setName(QString("end points"));
+    layer_corners->setPoints(corners);
+    layer_end_points->setPoints(end_points);
+
+    layer_corners->setColor(Qt::green);
+    layer_end_points->setColor(Qt::red);
+
+    map_->addLayer(PointLayerModel::asBase(layer_corners));
+    map_->addLayer(PointLayerModel::asBase(layer_end_points));
+
+    /// and there goes the progress
+    running_.store(false);
+    closeProgressDialog();
+}
