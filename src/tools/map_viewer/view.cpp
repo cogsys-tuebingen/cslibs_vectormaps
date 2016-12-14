@@ -179,13 +179,21 @@ void View::actionFind_doors()
 void View::updateLayer(const QString &name)
 {
     LayerModel::ConstPtr l = map_->getLayer(name);
-    QGraphicsPathItem *p = paths_[name];
+    QGraphicsPathItem *path = paths_[name];
 
-    QPen pen = pen_map_;
-    pen.setColor(l->getColor());
-    p->setPen(pen);
-    p->setBrush(QBrush(l->getColor()));
-    p->setVisible(l->getVisibility());
+    QPen p = pen_map_;
+
+    QColor color = l->getColor();
+    p.setColor(color);
+    color.setAlpha(127);
+    QBrush b(color);
+    PointLayerModel::ConstPtr lp = LayerModel::as<PointLayerModel const>(l);
+    if(lp) {
+        p.setColor(Qt::black);
+    }
+    path->setPen(p);
+    path->setBrush(b);
+    path->setVisible(l->getVisibility());
     view_->update();
 }
 

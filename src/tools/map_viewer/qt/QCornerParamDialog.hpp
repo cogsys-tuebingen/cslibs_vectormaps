@@ -2,6 +2,7 @@
 #define QCORNERPARAMDIALOG_HPP
 
 #include <QDialog>
+#include <QDoubleSpinBox>
 #include <ui_map_viewer_corner_param_dialog.h>
 
 class QCornerParamDialog : public QDialog {
@@ -14,9 +15,13 @@ public:
     {
         ui_->setupUi(this);
 
-        connect(ui_->doubleSpinBox_max_distance, SIGNAL(valueChanged(double)), this, SLOT(doubleSpinBox_max_distance_changed(double)));
-        connect(ui_->doubleSpinBox_min_angle, SIGNAL(valueChanged(double)), this, SLOT(doubleSpinBox_min_angle_changed(double)));
-        connect(ui_->doubleSpinBox_min_distance, SIGNAL(valueChanged(double)), this, SLOT(doubleSpinBox_min_distance_changed(double)));
+        connect(ui_->doubleSpinBox_max_corner_distance, SIGNAL(valueChanged(double)), this, SLOT(doubleSpinBox_max_distance_changed(double)));
+        connect(ui_->doubleSpinBox_min_line_angle, SIGNAL(valueChanged(double)), this, SLOT(doubleSpinBox_min_angle_changed(double)));
+        connect(ui_->doubleSpinBox_min_endpoint_distance, SIGNAL(valueChanged(double)), this, SLOT(doubleSpinBox_min_distance_changed(double)));
+
+        max_point_distance_ = ui_->doubleSpinBox_max_corner_distance->value();
+        min_point_distance_ = ui_->doubleSpinBox_min_endpoint_distance->value();
+        min_line_angle_     = ui_->doubleSpinBox_min_line_angle->value();
     }
 
     virtual ~QCornerParamDialog()

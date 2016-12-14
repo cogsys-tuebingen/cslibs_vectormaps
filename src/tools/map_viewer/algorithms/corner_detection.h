@@ -24,8 +24,8 @@ public:
                      Points &end_points,
                      progress_callback progress = [](int current){});
 private:
-    const double min_point_distance_;
-    const double max_point_distance_;
+    const double min_end_point_distance_;
+    const double max_corner_point_distance_;
     const double min_line_angle_;
 };
 }
