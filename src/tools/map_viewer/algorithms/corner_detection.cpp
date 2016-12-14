@@ -26,11 +26,8 @@ void CornerDetection::operator () (const Vectors &vectors,
         return p1.x() < p2.x() || p1.y() < p2.y();
     };
 
-    /// build associations
-    /// run time is quadratic in line segments
-    /// find the closest point to another
-    ///
-    /// TODO : extent to associate one line with multiple lines
+    /// implement endpoint to endpoint matching -- remove the distance calculation.
+
     std::size_t count = 0;
     std::set<dxf::DXFMap::Point, decltype(less)> corner_set(less);
 
