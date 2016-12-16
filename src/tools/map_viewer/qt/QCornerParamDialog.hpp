@@ -21,7 +21,7 @@ public:
 
         max_point_distance_ = ui_->doubleSpinBox_max_corner_distance->value();
         min_point_distance_ = ui_->doubleSpinBox_min_endpoint_distance->value();
-        min_line_angle_     = ui_->doubleSpinBox_min_line_angle->value();
+        min_line_angle_     = ui_->doubleSpinBox_min_line_angle->value() / 180.0 * M_PI;
     }
 
     virtual ~QCornerParamDialog()
