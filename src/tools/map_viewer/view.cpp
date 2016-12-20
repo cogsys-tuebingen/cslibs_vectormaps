@@ -161,9 +161,9 @@ void View::actionRun_corner_detection()
     QCornerParamDialog parameters;
     parameters.exec();
 
-    runCornerDetection(parameters.getMinPointDistance(),
-                       parameters.getMaxPointDistance(),
-                       parameters.getMinLineAngle());
+    runCornerDetection(parameters.getMaxPointDistance(),
+                       parameters.getMinLineAngle(),
+                       parameters.getMinLooseEndpointDistance());
 }
 
 void View::actionBuild_topology()

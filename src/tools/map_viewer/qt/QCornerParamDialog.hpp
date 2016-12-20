@@ -15,13 +15,16 @@ public:
     {
         ui_->setupUi(this);
 
-        connect(ui_->doubleSpinBox_max_corner_distance, SIGNAL(valueChanged(double)), this, SLOT(doubleSpinBox_max_distance_changed(double)));
-        connect(ui_->doubleSpinBox_min_line_angle, SIGNAL(valueChanged(double)), this, SLOT(doubleSpinBox_min_angle_changed(double)));
-        connect(ui_->doubleSpinBox_min_endpoint_distance, SIGNAL(valueChanged(double)), this, SLOT(doubleSpinBox_min_distance_changed(double)));
+        connect(ui_->doubleSpinBox_max_corner_distance, SIGNAL(valueChanged(double)),
+                this, SLOT(doubleSpinBox_max_distance_changed(double)));
+        connect(ui_->doubleSpinBox_min_line_angle, SIGNAL(valueChanged(double)),
+                this, SLOT(doubleSpinBox_min_angle_changed(double)));
+        connect(ui_->doubleSpinBox_min_loose_endpoint_distance, SIGNAL(valueChanged(double)),
+                this, SLOT(doubleSpinBox_min_loose_endpoint_distance_changed(double)));
 
         max_point_distance_ = ui_->doubleSpinBox_max_corner_distance->value();
-        min_point_distance_ = ui_->doubleSpinBox_min_endpoint_distance->value();
         min_line_angle_     = ui_->doubleSpinBox_min_line_angle->value() / 180.0 * M_PI;
+        min_loose_endpoint_distance_ = ui_->doubleSpinBox_min_loose_endpoint_distance->value();
     }
 
     virtual ~QCornerParamDialog()
@@ -39,9 +42,9 @@ public:
         return max_point_distance_;
     }
 
-    double getMinPointDistance() const
+    double getMinLooseEndpointDistance() const
     {
-        return min_point_distance_;
+        return min_loose_endpoint_distance_;
     }
 
 private slots:
@@ -55,17 +58,17 @@ private slots:
         min_line_angle_ = value / 180.0 * M_PI;
     }
 
-    void doubleSpinBox_min_distance_changed(const double value)
+    void doubleSpinBox_min_loose_endpoint_distance_changed(const double value)
     {
-        min_point_distance_ = value;
+        min_loose_endpoint_distance_ = value;
     }
 
 private:
     Ui::CornerParamDialog *ui_;
 
     double min_line_angle_;
-    double min_point_distance_;
     double max_point_distance_;
+    double min_loose_endpoint_distance_;
 
 
 };

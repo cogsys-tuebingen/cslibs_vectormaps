@@ -37,8 +37,9 @@ public slots:
      * @brief Excecute corner detection on line elements of all
      *        visible layers.
      */
-    void runCornerDetection(const double min_point_distance, const double max_point_distance,
-                            const double min_line_angle);
+    void runCornerDetection(const double max_point_distance,
+                            const double min_line_angle,
+                            const double min_loose_endpoint_distance);
 
 private:
     Map             *map_;
@@ -46,9 +47,9 @@ private:
     std::atomic_bool  running_;
     std::thread worker_thread_; /// used to applied algorithms
 
-    void executeCornerDetection(const double min_point_distance,
-                                const double max_point_distance,
-                                const double min_line_angle);
+    void executeCornerDetection(const double max_point_distance,
+                                const double min_line_angle,
+                                const double min_loose_endpoint_distance);
 
 };
 }

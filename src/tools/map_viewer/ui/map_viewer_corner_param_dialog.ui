@@ -7,14 +7,14 @@
     <x>0</x>
     <y>0</y>
     <width>370</width>
-    <height>139</height>
+    <height>131</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="2" column="2">
+   <item row="1" column="2">
     <widget class="QLabel" name="label_min_angular_distance">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
@@ -33,26 +33,10 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="3">
-    <widget class="QDoubleSpinBox" name="doubleSpinBox_min_line_angle">
-     <property name="decimals">
-      <number>1</number>
-     </property>
-     <property name="minimum">
-      <double>0.000000000000000</double>
-     </property>
-     <property name="maximum">
-      <double>90.000000000000000</double>
-     </property>
-     <property name="value">
-      <double>80.000000000000000</double>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="3">
+   <item row="0" column="3">
     <widget class="QDoubleSpinBox" name="doubleSpinBox_max_corner_distance">
      <property name="decimals">
-      <number>3</number>
+      <number>2</number>
      </property>
      <property name="maximum">
       <double>10.000000000000000</double>
@@ -62,17 +46,7 @@
      </property>
     </widget>
    </item>
-   <item row="0" column="3">
-    <widget class="QDoubleSpinBox" name="doubleSpinBox_min_endpoint_distance">
-     <property name="decimals">
-      <number>3</number>
-     </property>
-     <property name="maximum">
-      <double>10.000000000000000</double>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="2">
+   <item row="0" column="2">
     <widget class="QLabel" name="label_max_point_distance">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
@@ -91,10 +65,19 @@
      </property>
     </widget>
    </item>
-   <item row="0" column="2">
-    <widget class="QLabel" name="label_min_point_distance">
-     <property name="text">
-      <string>Min. point distance:</string>
+   <item row="1" column="3">
+    <widget class="QDoubleSpinBox" name="doubleSpinBox_min_line_angle">
+     <property name="decimals">
+      <number>1</number>
+     </property>
+     <property name="minimum">
+      <double>0.000000000000000</double>
+     </property>
+     <property name="maximum">
+      <double>90.000000000000000</double>
+     </property>
+     <property name="value">
+      <double>80.000000000000000</double>
      </property>
     </widget>
    </item>
@@ -105,6 +88,29 @@
      </property>
      <property name="standardButtons">
       <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="2">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>Min. loose endpoint distance:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="3">
+    <widget class="QDoubleSpinBox" name="doubleSpinBox_min_loose_endpoint_distance">
+     <property name="minimum">
+      <double>0.000000000000000</double>
+     </property>
+     <property name="maximum">
+      <double>1.000000000000000</double>
+     </property>
+     <property name="singleStep">
+      <double>0.010000000000000</double>
+     </property>
+     <property name="value">
+      <double>0.100000000000000</double>
      </property>
     </widget>
    </item>
