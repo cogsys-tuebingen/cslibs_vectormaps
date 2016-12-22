@@ -1,16 +1,15 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(utils_gdal)
+project(cslibs_gdal)
 
-
-find_package(catkin REQUIRED utils_boost_geometry)
+find_package(catkin REQUIRED cslibs_boost_geometry)
 find_package(GDAL   REQUIRED)
 find_package(Boost  REQUIRED system filesystem)
 
 catkin_package(
-  INCLUDE_DIRS include
-  LIBRARIES utils_gdal
-  CATKIN_DEPENDS utils_boost_geometry
-  DEPENDS Boost
+  INCLUDE_DIRS     include
+  LIBRARIES      ${PROJECT_NAME}
+  CATKIN_DEPENDS  cslibs_boost_geometry
+  DEPENDS          Boost GDAL
 )
 
 include(cmake/c++11.cmake)
@@ -28,11 +27,11 @@ include_directories(
     ${Qt5Core_INCLUDE_DIRS} ${Qt5Gui_INCLUDE_DIRS} ${Qt5Widgets_INCLUDE_DIRS} ${Qt5OpenGL_INCLUDE_DIRS}
 )
 
-add_library(utils_gdal
+add_library(${PROJECT_NAME}
    src/map/dxf_map.cpp
 )
 
-target_link_libraries(utils_gdal
+target_link_libraries(${PROJECT_NAME}
     ${catkin_LIBRARIES}
     ${GDAL_LIBRARIES}
     ${Boost_LIBRARIES}
@@ -41,24 +40,15 @@ target_link_libraries(utils_gdal
 if(${OpenCV_FOUND} AND ${roscpp_FOUND})
 include_directories(${OpenCV_INCLUDE_DIRS})
 include_directories(${roscpp_INCLUDE_DIRS})
-add_executable(gdal_dxf_map_to_occupancy
+add_executable(${PROJECT_NAME}_dxf_to_occupancy_grid
     src/tools/dxf_to_occupancy.cpp
 )
 
-target_link_libraries(gdal_dxf_map_to_occupancy
+target_link_libraries(${PROJECT_NAME}_dxf_to_occupancy_grid
     ${catkin_LIBRARIES}
     ${OpenCV_LIBRARIES}
     ${roscpp_LIBRARIES}
-    utils_gdal
-)
-
-add_executable(gdal_dxf_map_renderer
-    src/tools/dxf_map_renderer.cpp
-)
-
-target_link_libraries(gdal_dxf_map_renderer
-    ${OpenCV_LIBRARIES}
-    utils_gdal
+    ${PROJECT_NAME}
 )
 
 endif()
@@ -77,7 +67,7 @@ if(${Qt5_FOUND} AND ${OPENGL_FOUND})
                 src/tools/map_viewer/ui/map_viewer_list_item.ui
                 src/tools/map_viewer/ui/map_viewer_corner_param_dialog.ui)
 
-    add_executable(gdal_map_viewer
+    add_executable(${PROJECT_NAME}_map_viewer
         src/tools/map_viewer/map_viewer.cpp
         src/tools/map_viewer/view.cpp
         src/tools/map_viewer/control.cpp
@@ -98,8 +88,8 @@ if(${Qt5_FOUND} AND ${OPENGL_FOUND})
         ${QT_UI}
     )
 
-    target_link_libraries(gdal_map_viewer
-        utils_gdal
+    target_link_libraries(${PROJECT_NAME}_map_viewer
+        ${PROJECT_NAME}
         Qt5::Core Qt5::Gui Qt5::Widgets Qt5::OpenGL
         ${OPENGL_LIBRARIES}
     )
@@ -108,26 +98,26 @@ if(${Qt5_FOUND} AND ${OPENGL_FOUND})
 
 endif()
 if(${gazebo_FOUND} AND ${xacro_FOUND} AND ${EIGEN3_FOUND})
-    add_library(gazebo_dxf_map_plugin
+    add_library(${PROJECT_NAME}_gazebo_dxf_map_plugin
         src/gazebo/dxf_map_gazebo.cpp
         src/gazebo/mesh.cpp
     )
-    target_link_libraries(gazebo_dxf_map_plugin
+    target_link_libraries(${PROJECT_NAME}_gazebo_dxf_map_plugin
         ${GAZEBO_LIBRARIES}
-        utils_gdal
+        ${PROJECT_NAME}
     )
     xacro_add_xacro_file("${CMAKE_CURRENT_LIST_DIR}/gazebo/launch/empty.xacro"
                          "${CMAKE_CURRENT_LIST_DIR}/gazebo/launch/empty.world")
 
-    add_custom_target(world ALL DEPENDS "gazebo/launch/empty.world")
+    add_custom_target(${PROJECT_NAME}_world ALL DEPENDS "gazebo/launch/empty.world")
 
-    add_executable(dxf_to_world
+    add_executable(${PROJECT_NAME}_dxf_to_gazebo_world
         src/gazebo/dxf_to_world.cpp
         src/gazebo/mesh.cpp
     )
-    target_link_libraries(dxf_to_world
+    target_link_libraries(${PROJECT_NAME}_dxf_to_gazebo_world
         ${GAZEBO_LIBRARIES}
-        utils_gdal
+        ${PROJECT_NAME}
         yaml-cpp
     )
 
