@@ -24,7 +24,7 @@ public:
     typedef utils_boost_geometry::types::Point2d
     Point;
 
-    typedef utils_boost_geometry::types::Point2d
+    typedef utils_boost_geometry::types::PointSet2d
     Points;
 
     typedef utils_boost_geometry::types::Line2d

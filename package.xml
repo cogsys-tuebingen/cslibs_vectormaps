@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package>
-  <name>utils_gdal</name>
+  <name>cslibs_gdal</name>
   <version>0.0.1</version>
   <description>
     The utils_gdal package contains extensions and simplifying
@@ -8,13 +8,20 @@
   </description>
 
 
+  <author email="richard.hanten@uni-tuebingen.de">Richard Hanten</author>
   <maintainer email="richard.hanten@uni-tuebingen.de">Richard Hanten</maintainer>
+
 
   <license>BSD</license>
 
   <buildtool_depend>catkin</buildtool_depend>
-  <build_depend>utils_boost_geometry</build_depend>
-  <run_depend>utils_boost_geometry</run_depend>
+  <build_depend>cslibs_boost_geometry</build_depend>
+  <build_depend>GDAL</build_depend>
+  <build_depend>Boost</build_depend>
+
+  <run_depend>cslibs_boost_geometry</run_depend>
+  <run_depend>GDAL</run_depend>
+  <run_depend>Boost</run_depend>
 
   <export>
   </export>

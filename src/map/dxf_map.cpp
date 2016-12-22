@@ -376,6 +376,9 @@ bool DXFMap::retrieveBounding()
 void DXFMap::retrieveVectors(Vectors &vectors,
                              const std::string &attrib_filter)
 {
+    if(dxf_layer_ == nullptr)
+        return;
+
     dxf_layer_->ResetReading();
     OGRErr err = dxf_layer_->SetAttributeFilter(attrib_filter.c_str());
     if(err != 0) {
