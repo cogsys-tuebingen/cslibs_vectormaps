@@ -10,13 +10,19 @@ before_script:
   # Add the SSH key stored in SSH_PRIVATE_KEY variable to the agent store
   - ssh-add <(echo "$SSH_PRIVATE_KEY")
 
-  # For Docker builds disable host key checking. Be aware that by adding that
+   # For Docker builds disable host key checking. Be aware that by adding that
   # you are suspectible to man-in-the-middle attacks.
   # WARNING: Use this only with the Docker executor, if you use it with shell
   # you will overwrite your user's SSH config.
   - mkdir -p ~/.ssh
   - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+
+  # Here we are at /build/$CI_PROJECT_NAME
+  # For pure catkin projects, we need a workspace:
+  - mkdir -p /build/ws/src/
+  - cd /build/ws
   - ln -s $CI_PROJECT_DIR src/$CI_PROJECT_NAME
+  # clone dependencies here:
   - cd src
   - git clone gitlab@gitlab.cs.uni-tuebingen.de:libs/cslibs_boost_geometry.git
   - cd ..
