@@ -97,7 +97,7 @@ if(${Qt5_FOUND} AND ${OPENGL_FOUND})
 
 
 endif()
-if(${gazebo_FOUND} AND ${xacro_FOUND} AND ${Eigen3_FOUND})
+if(${gazebo_FOUND} AND ${xacro_FOUND})
     add_library(${PROJECT_NAME}_gazebo_dxf_map_plugin
         src/gazebo/dxf_map_gazebo.cpp
         src/gazebo/mesh.cpp
