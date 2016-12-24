@@ -22,6 +22,7 @@ include_directories(
     ${GDAL_INCLUDE_DIRS}
     ${Boost_INCLUDE_DIRS}
     ${GAZEBO_INCLUDE_DIRS}
+    ${Eigen3_INCLUDE_DIRS}
     ${OPENGL_INCLUDE_DIR}
     ${Qt5Core_INCLUDE_DIRS} ${Qt5Gui_INCLUDE_DIRS} ${Qt5Widgets_INCLUDE_DIRS} ${Qt5OpenGL_INCLUDE_DIRS}
 )
@@ -54,7 +55,7 @@ endif()
 
 if(${Qt5_FOUND} AND ${OPENGL_FOUND})
 
-    add_definitions(${Qt5Widgets_DEFINITIONS})
+    add_definitions(${Qt5Widgets_DEFINITIONS} -lpthread)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
     set(CMAKE_AUTOMOC True)
 
