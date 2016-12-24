@@ -2,7 +2,7 @@ before_script:
   # Install ssh-agent if not already installed, it is required by Docker.
   # (change apt-get to yum if you use a CentOS-based image)
   - 'apt-get -qq update -y'
-  - 'apt-get -qq install build-essential openssh-client libboost-dev libopencv-dev qt5-default libyaml-cpp-dev sudo -y'
+  - 'apt-get -qq install build-essential openssh-client libboost-dev libopencv-dev qt5-default libyaml-cpp-dev libgdal-dev sudo -y'
 
   # Run ssh-agent (inside the build environment)
   - eval $(ssh-agent -s)
@@ -10,13 +10,19 @@ before_script:
   # Add the SSH key stored in SSH_PRIVATE_KEY variable to the agent store
   - ssh-add <(echo "$SSH_PRIVATE_KEY")
 
-  # For Docker builds disable host key checking. Be aware that by adding that
+   # For Docker builds disable host key checking. Be aware that by adding that
   # you are suspectible to man-in-the-middle attacks.
   # WARNING: Use this only with the Docker executor, if you use it with shell
   # you will overwrite your user's SSH config.
   - mkdir -p ~/.ssh
   - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+
+  # Here we are at /build/$CI_PROJECT_NAME
+  # For pure catkin projects, we need a workspace:
+  - mkdir -p /build/ws/src/
+  - cd /build/ws
   - ln -s $CI_PROJECT_DIR src/$CI_PROJECT_NAME
+  # clone dependencies here:
   - cd src
   - git clone gitlab@gitlab.cs.uni-tuebingen.de:libs/cslibs_boost_geometry.git
   - cd ..
@@ -29,10 +35,8 @@ indigo:
   image: ros:indigo
   script:
     - source /opt/ros/$(ls /opt/ros/ | sort -r | head -n 1)/setup.bash
-    # run catkin once to generate the devel space, ignore the result
-    - catkin_make --force-cmake || true 
-    - source devel/setup.bash
-    - rosdep install --all -y
+    - ls -R
+    - rosdep install -y -r -i --from-paths src
     - catkin_make
 
 jade:
@@ -40,10 +44,8 @@ jade:
   image: ros:jade
   script:
     - source /opt/ros/$(ls /opt/ros/ | sort -r | head -n 1)/setup.bash
-    # run catkin once to generate the devel space, ignore the result
-    - catkin_make --force-cmake || true
-    - source devel/setup.bash
-    - rosdep install --all -y
+    - ls -R
+    - rosdep install -y -r -i --from-paths src
     - catkin_make
 
 kinetic:
@@ -51,8 +53,6 @@ kinetic:
   image: ros:kinetic
   script:
     - source /opt/ros/$(ls /opt/ros/ | sort -r | head -n 1)/setup.bash
-    # run catkin once to generate the devel space, ignore the result
-    - catkin_make --force-cmake || true
-    - source devel/setup.bash
-    - rosdep install --all -y
+    - ls -R
+    - rosdep install -y -r -i --from-paths src
     - catkin_make
