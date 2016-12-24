@@ -35,10 +35,8 @@ indigo:
   image: ros:indigo
   script:
     - source /opt/ros/$(ls /opt/ros/ | sort -r | head -n 1)/setup.bash
-    # run catkin once to generate the devel space, ignore the result
-    - catkin_make --force-cmake || true 
-    - source devel/setup.bash
-    - rosdep install --all -y
+    - ls -R
+    - rosdep install -y -r -i --from-paths src
     - catkin_make
 
 jade:
@@ -46,10 +44,8 @@ jade:
   image: ros:jade
   script:
     - source /opt/ros/$(ls /opt/ros/ | sort -r | head -n 1)/setup.bash
-    # run catkin once to generate the devel space, ignore the result
-    - catkin_make --force-cmake || true
-    - source devel/setup.bash
-    - rosdep install --all -y
+    - ls -R
+    - rosdep install -y -r -i --from-paths src
     - catkin_make
 
 kinetic:
@@ -57,8 +53,6 @@ kinetic:
   image: ros:kinetic
   script:
     - source /opt/ros/$(ls /opt/ros/ | sort -r | head -n 1)/setup.bash
-    # run catkin once to generate the devel space, ignore the result
-    - catkin_make --force-cmake || true
-    - source devel/setup.bash
-    - rosdep install --all -y
+    - ls -R
+    - rosdep install -y -r -i --from-paths src
     - catkin_make
