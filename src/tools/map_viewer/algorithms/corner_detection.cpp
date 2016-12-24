@@ -1,7 +1,6 @@
 #include "corner_detection.h"
 #include <utils_boost_geometry/algorithms.h>
 #include <boost/geometry/algorithms/distance.hpp>
-#include <eigen3/Eigen/Core>
 
 using namespace utils_gdal;
 
