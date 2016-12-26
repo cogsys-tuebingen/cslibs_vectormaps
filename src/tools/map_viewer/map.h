@@ -1,7 +1,7 @@
 #ifndef MODEL_H
 #define MODEL_H
 
-#include <utils_gdal/dxf_map.h>
+#include <cslibs_gdal/dxf_map.h>
 
 #include "models/layer_model.h"
 

@@ -1,7 +1,7 @@
 #ifndef CORNERDETECTION_H
 #define CORNERDETECTION_H
 
-#include <utils_gdal/dxf_map.h>
+#include <cslibs_gdal/dxf_map.h>
 #include <functional>
 
 namespace utils_gdal {

@@ -2,7 +2,7 @@
 #include <ros/ros.h>
 #include <nav_msgs/OccupancyGrid.h>
 #include <opencv2/opencv.hpp>
-#include <utils_gdal/dxf_map.h>
+#include <cslibs_gdal/dxf_map.h>
 
 using namespace utils_gdal;
 

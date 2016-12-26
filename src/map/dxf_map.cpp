@@ -1,6 +1,6 @@
 /// HEADER
-#include <utils_gdal/dxf_map.h>
-#include <utils_boost_geometry/algorithms.h>
+#include <cslibs_gdal/dxf_map.h>
+#include <cslibs_boost_geometry/algorithms.h>
 #include <boost/geometry/algorithms/difference.hpp>
 #include <boost/geometry/strategies/strategies.hpp>
 #include <boost/geometry/geometries/ring.hpp>
@@ -67,7 +67,7 @@ void DXFMap::getPolygon(Polygon &polygon,
             inner_it  = polygons.begin() ;
             inner_it != polygons.end() ;
             ++inner_it) {
-            utils_boost_geometry::algorithms::within<Point>(*inner_it, *outer_it);
+            cslibs_boost_geometry::algorithms::within<Point>(*inner_it, *outer_it);
         }
 
         if(contains_all) {

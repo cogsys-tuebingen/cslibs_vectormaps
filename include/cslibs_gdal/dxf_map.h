@@ -2,7 +2,7 @@
 #define DXF_MAP_H
 
 /// PROJECT
-#include <utils_boost_geometry/types.hpp>
+#include <cslibs_boost_geometry/types.hpp>
 
 /// SYSTEM
 #include <gdal/ogrsf_frmts.h>
@@ -18,28 +18,28 @@ class DXFMap
 {
 public:
     /// TYPEDEFS FOR SHORTENING OF SIGNATURES
-    typedef utils_boost_geometry::types::Dim2d
+    typedef cslibs_boost_geometry::types::Dim2d
     Dimension;
 
-    typedef utils_boost_geometry::types::Point2d
+    typedef cslibs_boost_geometry::types::Point2d
     Point;
 
-    typedef utils_boost_geometry::types::PointSet2d
+    typedef cslibs_boost_geometry::types::PointSet2d
     Points;
 
-    typedef utils_boost_geometry::types::Line2d
+    typedef cslibs_boost_geometry::types::Line2d
     Vector;
 
-    typedef utils_boost_geometry::types::LineSet2d
+    typedef cslibs_boost_geometry::types::LineSet2d
     Vectors;
 
-    typedef utils_boost_geometry::types::Polygon2d
+    typedef cslibs_boost_geometry::types::Polygon2d
     Polygon;
 
-    typedef std::vector<utils_boost_geometry::types::Polygon2d>
+    typedef std::vector<cslibs_boost_geometry::types::Polygon2d>
     Polygons;
 
-    typedef utils_boost_geometry::types::Box2d
+    typedef cslibs_boost_geometry::types::Box2d
     BoundingBox;
 
     /**
