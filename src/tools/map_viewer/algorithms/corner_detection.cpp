@@ -1,5 +1,5 @@
 #include "corner_detection.h"
-#include <utils_boost_geometry/algorithms.h>
+#include <cslibs_boost_geometry/algorithms.h>
 #include <boost/geometry/algorithms/distance.hpp>
 
 using namespace utils_gdal;
@@ -39,10 +39,10 @@ void CornerDetection::operator () (const Vectors &vectors,
         /// both ends of the line have to minimized not only one !!! that is the problem why it doesn't work
 
         for(const Vector &v2 : vectors) {
-            double distance_p1 = utils_boost_geometry::algorithms::distance<double, Point>(v1.first,  v2);
-            double distance_p2 = utils_boost_geometry::algorithms::distance<double, Point>(v1.second, v2);
+            double distance_p1 = cslibs_boost_geometry::algorithms::distance<double, Point>(v1.first,  v2);
+            double distance_p2 = cslibs_boost_geometry::algorithms::distance<double, Point>(v1.second, v2);
 
-            if(utils_boost_geometry::algorithms::equal<Point, double>(v1,v2, 1e-6))
+            if(cslibs_boost_geometry::algorithms::equal<Point, double>(v1,v2, 1e-6))
                 continue;
 
             if(distance_p1 <= min_distance_p1) {
@@ -55,8 +55,8 @@ void CornerDetection::operator () (const Vectors &vectors,
             }
         }
 
-        double angle_p1 = utils_boost_geometry::algorithms::angle<double, Point>(v1,closest_p1);
-        double angle_p2 = utils_boost_geometry::algorithms::angle<double, Point>(v1,closest_p2);
+        double angle_p1 = cslibs_boost_geometry::algorithms::angle<double, Point>(v1,closest_p1);
+        double angle_p2 = cslibs_boost_geometry::algorithms::angle<double, Point>(v1,closest_p2);
 
         if(capped_abs(angle_p1) >= min_line_angle_ &&
                 min_distance_p1 <= max_corner_point_distance_) {

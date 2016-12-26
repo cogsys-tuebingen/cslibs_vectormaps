@@ -8,7 +8,7 @@
 
 #include "algorithms/corner_detection.h"
 
-#include <utils_gdal/dxf_map.h>
+#include <cslibs_gdal/dxf_map.h>
 
 #include <iostream>
 

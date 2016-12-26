@@ -1,7 +1,7 @@
 #ifndef LAYERMODEL_H
 #define LAYERMODEL_H
 
-#include <utils_gdal/dxf_map.h>
+#include <cslibs_gdal/dxf_map.h>
 #include <array>
 #include <memory>
 
