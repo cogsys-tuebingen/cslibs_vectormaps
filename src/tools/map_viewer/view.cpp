@@ -66,7 +66,7 @@ void View::setup(Map *model,
     map_ = model;
     control_ = control;
 
-    renderer_->setup(this, map_, view_);
+    renderer_->setup(map_, view_);
 
     connect(map_,     SIGNAL(updated()), this, SLOT(update()), Qt::QueuedConnection);
     connect(map_,     SIGNAL(notification(QString)), this, SLOT(notification(QString)));

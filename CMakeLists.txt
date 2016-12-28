@@ -12,8 +12,14 @@ catkin_package(
   DEPENDS          Boost GDAL
 )
 
+# C++ 11
 include(cmake/c++11.cmake)
+# OpenMP
+set(OpenMP true)
+include(cmake/omp.cmake)
+# Optional Dependencies
 include(cmake/optional_dependencies.cmake)
+# Show the headers
 include(cmake/show_headers.cmake)
 
 include_directories(
@@ -54,7 +60,6 @@ target_link_libraries(${PROJECT_NAME}_dxf_to_occupancy_grid
 endif()
 
 if(${Qt5_FOUND} AND ${OPENGL_FOUND})
-
     set(CMAKE_EXE_LINKER_FLAGS "-lpthread ${CMAKE_EXE_LINKER_FLAGS}")
     add_definitions(-lpthread ${Qt5Widgets_DEFINITIONS})
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
