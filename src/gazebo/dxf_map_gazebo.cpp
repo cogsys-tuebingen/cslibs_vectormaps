@@ -4,11 +4,11 @@
 #include <gazebo/physics/World.hh>
 #include <gazebo/physics/BoxShape.hh>
 
-#include <utils_gdal/dxf_map.h>
+#include <cslibs_gdal/dxf_map.h>
 #include "mesh.h"
 
 using namespace gazebo;
-using namespace utils_gdal;
+using namespace cslibs_gdal;
 
 GZ_REGISTER_WORLD_PLUGIN(DXFMapGazebo)
 
@@ -34,7 +34,7 @@ void DXFMapGazebo::Load(physics::WorldPtr _parent, sdf::ElementPtr _sdf)
     double      mesh_height      = _sdf->Get<double>("height");
     bool        debug_sphere     = _sdf->Get<std::string>("debug_sphere") == "true";
 
-    utils_gdal::dxf::DXFMap map;
+    cslibs_gdal::dxf::DXFMap map;
     if(!map.open(map_path)) {
         gzerr << "'" << map_path << "' not found!" << std::endl;
         return;

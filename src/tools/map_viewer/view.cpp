@@ -4,6 +4,8 @@
 #include "models/vector_layer_model.h"
 #include "models/point_layer_model.h"
 
+#include "renderer.h"
+
 #include "control.h"
 #include "algorithms/corner_detection.h"
 #include "util/rng_color.hpp"
@@ -15,10 +17,7 @@
 #include <ui_map_viewer_list_item.h>
 
 #include <QFileDialog>
-#include <QGraphicsScene>
 #include <QMessageBox>
-#include <QPainterPath>
-#include <QGraphicsPathItem>
 #include <QColorDialog>
 #include <QListWidgetItem>
 #include <QHBoxLayout>
@@ -27,12 +26,11 @@
 #include <QProgressDialog>
 #include "qt/QCornerParamDialog.hpp"
 
-using namespace utils_gdal;
+using namespace cslibs_gdal;
 
 View::View() :
     ui_(new Ui::map_viewer),
     view_(nullptr),
-    scene_(nullptr),
     progress_(nullptr),
     map_(nullptr),
     control_(nullptr)
@@ -41,15 +39,13 @@ View::View() :
     view_ = new QInteractiveGraphicsView;
     ui_->graphicsLayout->addWidget(view_);
 
-    scene_ = new QGraphicsScene(view_);
-    view_->setScene(scene_);
-    view_->setOptimizationFlags(QGraphicsView::DontSavePainterState);
+    QPen pen;
+    pen.setColor(Qt::black);
+    pen.setWidthF(0.5f);
+    pen.setCosmetic(true);
 
-
-    /// styles
-    pen_map_.setColor(Qt::black);
-    pen_map_.setWidth(1);
-    pen_map_.setCosmetic(true);
+    renderer_ = new Renderer;
+    renderer_->setDefaultPen(pen);
 
     connect(ui_->actionOpen, SIGNAL(triggered()), this, SLOT(actionOpen()));
     connect(ui_->buttonHideLayerList, SIGNAL(clicked(bool)), this, SLOT(hideLayerList()));
@@ -61,6 +57,7 @@ View::~View()
 {
     delete view_;
     delete ui_;
+    delete renderer_;
 }
 
 void View::setup(Map *model,
@@ -68,6 +65,8 @@ void View::setup(Map *model,
 {
     map_ = model;
     control_ = control;
+
+    renderer_->setup(this, map_, view_);
 
     connect(map_,     SIGNAL(updated()), this, SLOT(update()), Qt::QueuedConnection);
     connect(map_,     SIGNAL(notification(QString)), this, SLOT(notification(QString)));
@@ -79,8 +78,6 @@ void View::setup(Map *model,
 
 void View::update()
 {
-    scene_->clear();
-
     std::vector<LayerModel::Ptr> layers;
     map_->getLayers(layers);
 
@@ -96,9 +93,10 @@ void View::update()
         i->setModel(l);
         ui_->layerListLayout->addWidget(i);
         connect(i,SIGNAL(hasChanged(QString)), this, SLOT(updateLayer(QString)));
-        renderLayer(l->getName<QString>());
         layer_items_[l->getName<QString>()].reset(i);
     }
+
+    renderer_->repaint();
 
     ui_->actionRun_corner_detection->setEnabled(true);
     view_->show();
@@ -178,60 +176,10 @@ void View::actionFind_doors()
 
 void View::updateLayer(const QString &name)
 {
-    LayerModel::ConstPtr l = map_->getLayer(name);
-    QGraphicsPathItem *path = paths_[name];
-
-    QPen p = pen_map_;
-
-    QColor color = l->getColor();
-    p.setColor(color);
-    color.setAlpha(127);
-    QBrush b(color);
-    PointLayerModel::ConstPtr lp = LayerModel::as<PointLayerModel const>(l);
-    if(lp) {
-        p.setColor(Qt::black);
-    }
-    path->setPen(p);
-    path->setBrush(b);
-    path->setVisible(l->getVisibility());
-    view_->update();
+    renderer_->update(name);
 }
 
 void View::renderLayer(const QString &name)
 {
-
-    LayerModel::ConstPtr l = map_->getLayer(name);
-
-    QPainterPath painter;
-    painter.setFillRule(Qt::WindingFill);
-    QPen p = pen_map_;
-    QColor color = l->getColor();
-    p.setColor(color);
-    color.setAlpha(127);
-    QBrush b(color);
-
-    VectorLayerModel::ConstPtr lv = LayerModel::as<VectorLayerModel const>(l);
-    if(lv) {
-        std::vector<QLineF> lines;
-        lv->getVectors(lines);
-        for(const QLineF &l : lines) {
-            painter.moveTo(l.p1());
-            painter.lineTo(l.p2());
-        }
-    }
-    PointLayerModel::ConstPtr lp = LayerModel::as<PointLayerModel const>(l);
-    if(lp) {
-        p.setColor(Qt::black);
-
-        std::vector<QPointF> points;
-        lp->getPoints(points);
-        for(const QPointF &p : points) {
-            painter.moveTo(p);
-            painter.addEllipse(p, 0.1, 0.1);
-        }
-    }
-    QGraphicsPathItem *path = scene_->addPath(painter, p, b);
-    paths_[name] = path;
-    path->setVisible(l->getVisibility());
-
+    renderer_->repaint(name);
 }

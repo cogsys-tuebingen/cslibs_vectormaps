@@ -2,7 +2,7 @@
 #include <cslibs_boost_geometry/algorithms.h>
 #include <boost/geometry/algorithms/distance.hpp>
 
-using namespace utils_gdal;
+using namespace cslibs_gdal;
 
 CornerDetection::CornerDetection(const double max_point_distance,
                                  const double min_line_angle,

@@ -1,6 +1,6 @@
 #include "layer_model.h"
 
-using namespace utils_gdal;
+using namespace cslibs_gdal;
 
 LayerModel::LayerModel() :
     visible_(true),

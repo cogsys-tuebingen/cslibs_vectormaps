@@ -2,12 +2,12 @@
 
 #include <boost/polygon/polygon.hpp>
 #include <boost/polygon/voronoi.hpp>
-#include <utils_gdal/dxf_map.h>
+#include <cslibs_gdal/dxf_map.h>
 
 namespace boost {
 namespace polygon {
-using PointType = utils_gdal::dxf::DXFMap::Point;
-using SegmentType = utils_gdal::dxf::DXFMap::Vector;
+using PointType = cslibs_gdal::dxf::DXFMap::Point;
+using SegmentType = cslibs_gdal::dxf::DXFMap::Vector;
 template<>
 struct geometry_concept<PointType> {
     typedef point_concept type;

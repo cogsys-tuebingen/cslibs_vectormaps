@@ -17,9 +17,10 @@ class map_viewer;
 class map_viewer_list_item;
 }
 
-namespace utils_gdal {
+namespace cslibs_gdal {
 class Map;
 class Control;
+class Renderer;
 class CornerDetection;
 
 class View : public QMainWindow
@@ -60,19 +61,16 @@ private:
     //// qt
     Ui::map_viewer                    *ui_;
     QGraphicsView                     *view_;
-    QGraphicsScene                    *scene_;
-    QRectF                             scene_rect_;
     QProgressDialog                   *progress_;
 
     using QLayerListItemPtr = std::shared_ptr<QLayerListItem>;
 
     std::map<QString, QLayerListItemPtr>    layer_items_;
-    std::map<QString, QGraphicsPathItem*>   paths_;
-    QPen                                    pen_map_;
 
     //// models
     Map                                    *map_;
     Control                                *control_;
+    Renderer                               *renderer_;
 
     void renderLayer(const QString &name);
 

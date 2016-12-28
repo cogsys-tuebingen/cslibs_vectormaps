@@ -12,7 +12,7 @@
 
 #include <iostream>
 
-using namespace utils_gdal;
+using namespace cslibs_gdal;
 
 Control::Control() :
     running_(false)

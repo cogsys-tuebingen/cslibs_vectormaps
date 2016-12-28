@@ -3,7 +3,7 @@
 
 #include "layer_model.h"
 
-namespace utils_gdal {
+namespace cslibs_gdal {
 class VectorLayerModel : public LayerModel
 {
 public:

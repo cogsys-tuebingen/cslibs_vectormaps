@@ -8,7 +8,7 @@
 #include "models/vector_layer_model.h"
 #include "models/point_layer_model.h"
 
-using namespace utils_gdal;
+using namespace cslibs_gdal;
 
 Map::Map()
 {

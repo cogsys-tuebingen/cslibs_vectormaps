@@ -3,7 +3,7 @@
   <name>cslibs_gdal</name>
   <version>0.0.1</version>
   <description>
-    The utils_gdal package contains extensions and simplifying
+    The cslibs_gdal package contains extensions and simplifying
     interfaces for the gdal library.
   </description>
 

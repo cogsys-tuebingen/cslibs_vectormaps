@@ -4,7 +4,7 @@
 #include <opencv2/opencv.hpp>
 #include <cslibs_gdal/dxf_map.h>
 
-using namespace utils_gdal;
+using namespace cslibs_gdal;
 
 namespace {
 

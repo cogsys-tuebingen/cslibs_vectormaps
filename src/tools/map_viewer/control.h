@@ -9,7 +9,7 @@
 
 
 
-namespace utils_gdal {
+namespace cslibs_gdal {
 class Map;
 class View;
 class CornerDetection;

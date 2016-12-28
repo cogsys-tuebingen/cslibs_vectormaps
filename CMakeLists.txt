@@ -73,6 +73,7 @@ if(${Qt5_FOUND} AND ${OPENGL_FOUND})
         src/tools/map_viewer/view.cpp
         src/tools/map_viewer/control.cpp
         src/tools/map_viewer/map.cpp
+        src/tools/map_viewer/renderer.cpp
 
         src/tools/map_viewer/models/layer_model.cpp
         src/tools/map_viewer/models/point_layer_model.cpp

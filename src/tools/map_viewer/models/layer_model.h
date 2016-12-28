@@ -10,7 +10,7 @@
 #include <QColor>
 #include <QObject>
 
-namespace utils_gdal {
+namespace cslibs_gdal {
 class LayerModel
 {
 public:

@@ -13,7 +13,7 @@
 #include <thread>
 #include <mutex>
 
-namespace utils_gdal {
+namespace cslibs_gdal {
 class View;
 
 class Map : public QObject

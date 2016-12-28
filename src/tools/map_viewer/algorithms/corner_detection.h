@@ -4,7 +4,7 @@
 #include <cslibs_gdal/dxf_map.h>
 #include <functional>
 
-namespace utils_gdal {
+namespace cslibs_gdal {
 class CornerDetection
 {
 public:

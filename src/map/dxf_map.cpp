@@ -5,7 +5,7 @@
 #include <boost/geometry/strategies/strategies.hpp>
 #include <boost/geometry/geometries/ring.hpp>
 
-using namespace utils_gdal;
+using namespace cslibs_gdal;
 using namespace dxf;
 
 DXFMap::DXFMap(const bool debug) :
