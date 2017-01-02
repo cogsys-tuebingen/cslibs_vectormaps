@@ -128,3 +128,7 @@ if(${gazebo_FOUND} AND ${xacro_FOUND})
         yaml-cpp
     )
 endif()
+
+install(DIRECTORY include/${PROJECT_NAME}/
+        DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION})
+
