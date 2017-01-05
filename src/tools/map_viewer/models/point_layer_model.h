@@ -25,15 +25,15 @@ public:
         return std::dynamic_pointer_cast<LayerModel const>(layer);
     }
 
-    void setPoints(const dxf::DXFMap::Points &p);
+    virtual void setPoints(const dxf::DXFMap::Points &points);
 
     void getPoints(dxf::DXFMap::Points &p) const;
 
-    void setPoints(const QPointFList &vectors);
+    virtual void setPoints(const QPointFList &points);
 
     void getPoints(QPointFList &points) const;
 
-private:
+protected:
     dxf::DXFMap::Points points_;
 
 };
