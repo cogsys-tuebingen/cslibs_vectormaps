@@ -9,6 +9,7 @@
 #include "map.h"
 #include "models/vector_layer_model.h"
 #include "models/point_layer_model.h"
+#include "models/corner_layer_model.h"
 
 using namespace cslibs_gdal;
 
@@ -111,61 +112,112 @@ void Renderer::doRepaint()
 void Renderer::doRepaint(const QString &layer_name)
 {
     LayerModel::ConstPtr l = map_->getLayer(layer_name);
-
-    QPainterPath painter;
-    painter.setFillRule(Qt::WindingFill);
-    QPen p = default_pen_;
-    QColor color = l->getColor();
-    p.setColor(color);
-    color.setAlpha(127);
-    QBrush b(color);
+    QGraphicsItemGroup *g = nullptr;
 
     VectorLayerModel::ConstPtr lv = LayerModel::as<VectorLayerModel const>(l);
     if(lv) {
-        std::vector<QLineF> lines;
-        lv->getVectors(lines);
-        for(const QLineF &l : lines) {
-            painter.moveTo(l.p1());
-            painter.lineTo(l.p2());
-        }
+        g = render(*lv);
     }
-
+    CornerLayerModel::ConstPtr cl = LayerModel::as<CornerLayerModel const>(l);
+    if(cl) {
+        g = render(*cl);
+    }
     PointLayerModel::ConstPtr lp = LayerModel::as<PointLayerModel const>(l);
-    if(lp) {
-        p.setColor(Qt::black);
-
-        std::vector<QPointF> points;
-        lp->getPoints(points);
-        for(const QPointF &p : points) {
-            painter.moveTo(p);
-            painter.addEllipse(p, 0.1, 0.1);
-        }
+    if(lp && !cl) {
+        g = render(*lp);
     }
-
-    QGraphicsPathItem *path = scene_->addPath(painter, p, b);
-    paths_[layer_name] = path;
-    path->setVisible(l->getVisibility());
+    if(g) {
+        scene_->addItem(g);
+        groups_[layer_name] = g;
+        g->setVisible(l->getVisibility());
+    }
 }
 
 void Renderer::doUpdate(const QString &layer_name)
 {
     LayerModel::ConstPtr l = map_->getLayer(layer_name);
-    QGraphicsPathItem *path = paths_[layer_name];
+    QGraphicsItemGroup *g = groups_[layer_name];
 
-    QPen p = default_pen_;
-
-    QColor color = l->getColor();
-    p.setColor(color);
-    color.setAlpha(127);
-    QBrush b(color);
-    PointLayerModel::ConstPtr lp = LayerModel::as<PointLayerModel const>(l);
-    if(lp) {
-        p.setColor(Qt::black);
+    VectorLayerModel::ConstPtr lv = LayerModel::as<VectorLayerModel const>(l);
+    if(lv) {
+        update(*lv, g);
     }
-    path->setPen(p);
-    path->setBrush(b);
-    path->setVisible(l->getVisibility());
+    CornerLayerModel::ConstPtr cl = LayerModel::as<CornerLayerModel const>(l);
+    if(cl) {
+        update(*cl, g);
+    }
+    PointLayerModel::ConstPtr  lp = LayerModel::as<PointLayerModel const>(l);
+    if(lp && !cl) {
+        update(*lp, g);
+    }
+    g->setVisible(l->getVisibility());
+}
 
+QGraphicsItemGroup* Renderer::render(const CornerLayerModel &model)
+{
+
+}
+
+QGraphicsItemGroup* Renderer::render(const PointLayerModel &model)
+{
+    QPen    p(default_pen_);
+    p.setColor(Qt::black);
+    QColor  c(model.getColor());
+    c.setAlphaF(0.8);
+    QBrush  b(c);
+
+    QGraphicsItemGroup *g = new QGraphicsItemGroup;
+    std::vector<QPointF> points;
+    model.getPoints(points);
+    for(const QPointF &point : points) {
+        QGraphicsEllipseItem *i = new QGraphicsEllipseItem(point.x() - 0.1, point.y() - 0.1, 0.2, 0.2, g);
+        i->setPen(p);
+        i->setBrush(b);
+    }
+    return g;
+}
+
+QGraphicsItemGroup* Renderer::render(const VectorLayerModel &model)
+{
+    QPen    p(default_pen_);
+    p.setColor(model.getColor());
+    QGraphicsItemGroup *g = new QGraphicsItemGroup;
+    std::vector<QLineF> lines;
+    model.getVectors(lines);
+    for(auto l : lines) {
+        QGraphicsLineItem *i = new QGraphicsLineItem(QLineF(l.p1(), l.p2()), g);
+        i->setPen(p);
+    }
+    return g;
+}
+
+void Renderer::update(const CornerLayerModel &model,
+                      QGraphicsItemGroup *group)
+{
+
+}
+
+void Renderer::update(const PointLayerModel &model,
+                      QGraphicsItemGroup *group)
+{
+    QColor c(model.getColor());
+    c.setAlphaF(0.8);
+    QBrush b(c);
+    QList<QGraphicsItem*> children = group->childItems();
+    for(auto *child : children) {
+        static_cast<QGraphicsEllipseItem*>(child)->setBrush(b);
+    }
+}
+
+void Renderer::update(const VectorLayerModel &model,
+                      QGraphicsItemGroup *group)
+{
+    QColor c(model.getColor());
+    QPen p(c);
+    QList<QGraphicsItem*> children = group->childItems();
+    for(auto *child : children) {
+        static_cast<QGraphicsLineItem*>(child)->setPen(p);
+    }
 }
 
 

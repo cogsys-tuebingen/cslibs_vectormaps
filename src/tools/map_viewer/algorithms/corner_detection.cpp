@@ -11,17 +11,35 @@ CornerDetection::CornerDetection(const CornerDetectionParameter &parameter) :
 
 void CornerDetection::operator () (const Vectors &vectors,
                                    Points &corners,
+                                   std::vector<double> &cornerness,
                                    Points &loose_endpoints,
                                    progress_callback progress)
 {
+    struct Corner {
+        Corner(const dxf::DXFMap::Point &point,
+               const double cornerness) :
+            point(point),
+            cornerness(cornerness)
+        {
+        }
+
+        dxf::DXFMap::Point  point;
+        double              cornerness;
+    };
+
     auto capped_abs  = [] (const double x)
     {return (fabs(M_PI - fabs(x))  < 1e-3) ? 0.0 : fabs(x);};
-    auto less           = [] (const dxf::DXFMap::Point &p1,const dxf::DXFMap::Point &p2)
+    auto less_corner= [] (const Corner &c1,const Corner &c2)
+    {return c1.point.x() < c2.point.x() || c1.point.y() < c2.point.y();};
+    auto less_point = [] (const dxf::DXFMap::Point &p1,const dxf::DXFMap::Point &p2)
     {return p1.x() < p2.x() || p1.y() < p2.y();};
+
+
     std::size_t count = 0;
 
-    std::set<dxf::DXFMap::Point, decltype(less)> corner_set(less);
-    std::set<dxf::DXFMap::Point, decltype(less)> loose_endpoint_set(less);
+    std::set<Corner, decltype(less_corner)> corner_set(less_corner);
+    std::set<dxf::DXFMap::Point, decltype(less_point)> loose_endpoint_set(less_point);
+
 
     for(const Vector &v1 : vectors) {
         double min_distance_p1 = std::numeric_limits<double>::max();
@@ -56,19 +74,23 @@ void CornerDetection::operator () (const Vectors &vectors,
 
         if(capped_abs(angle_p1) >= parameter_.min_corner_angle &&
                 min_distance_p1 <= parameter_.max_corner_point_distance) {
-            corner_set.insert(v1.first);
+            corner_set.insert(Corner(v1.first, 0.0));
         } else if(min_distance_p1 >= parameter_.min_loose_endpoint_distance) {
             loose_endpoint_set.insert(v1.first);
         }
         if(capped_abs(angle_p2) >= parameter_.min_corner_angle &&
                 min_distance_p2 <= parameter_.max_corner_point_distance) {
-            corner_set.insert(v1.second);
+            corner_set.insert(Corner(v1.second, 0.0));
         } else if(min_distance_p2 >= parameter_.min_loose_endpoint_distance) {
             loose_endpoint_set.insert(v1.second);
         }
         progress(++count / (double) vectors.size() * 100);
     }
-    corners.assign(corner_set.begin(), corner_set.end());
+
+    for(Corner c : corner_set) {
+        corners.emplace_back(c.point);
+        cornerness.emplace_back(c.cornerness);
+    }
     loose_endpoints.assign(loose_endpoint_set.begin(), loose_endpoint_set.end());
     progress(100);
 }

@@ -27,6 +27,7 @@ public:
 
     void operator() (const Vectors &vectors,
                      Points &corners,
+                     std::vector<double> &cornerness,
                      Points &end_points,
                      progress_callback progress = [](int current){});
 private:

@@ -14,10 +14,17 @@
 class QGraphicsView;
 class QGraphicsScene;
 class QGraphicsPathItem;
+class QGraphicsItemGroup;
 
 namespace cslibs_gdal {
 class Map;
 class View;
+
+/// forward declarations for rendering
+class VectorLayerModel;
+class CornerLayerModel;
+class PointLayerModel;
+
 
 class Renderer : QObject
 {
@@ -48,22 +55,35 @@ private:
     std::mutex      scene_mutex_;
     QRectF          scene_rect_;
 
-    std::map<QString, QGraphicsPathItem*>   paths_;
-    QPen                                    default_pen_;
+    std::map<QString, QGraphicsItemGroup*>   groups_;
+    QPen                                     default_pen_;
 
-    Map                                    *map_;
+    Map                                     *map_;
 
-    std::thread                             worker_thread_;
-    bool                                    stop_;
+    std::thread                              worker_thread_;
+    bool                                     stop_;
+
+    mutable std::mutex                      render_queue_mutex_;
+    std::queue<std::function<void()>>       render_queue_;
+    std::condition_variable                 render_condition_;
 
     void run();
     void doRepaint();
     void doRepaint(const QString &name);
     void doUpdate(const QString &name);
 
-    mutable std::mutex                      render_queue_mutex_;
-    std::queue<std::function<void()>>       render_queue_;
-    std::condition_variable                 render_condition_;
+    QGraphicsItemGroup *render(const CornerLayerModel &model);
+    QGraphicsItemGroup *render(const PointLayerModel  &model);
+    QGraphicsItemGroup *render(const VectorLayerModel &model);
+
+    void update(const VectorLayerModel &model,
+                QGraphicsItemGroup *group);
+    void update(const CornerLayerModel &model,
+                QGraphicsItemGroup *group);
+    void update(const PointLayerModel  &model,
+                QGraphicsItemGroup *group);
+
+
 
 };
 }

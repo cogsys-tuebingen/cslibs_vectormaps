@@ -27,6 +27,8 @@ struct QInteractiveGraphicsView : public QGraphicsView
             scale_factor_inv = 1.0 / scale_factor;
             scale(scale_factor, scale_factor);
         }
+
+        // auto r = mapToScene(viewport()->geometry()).boundingRect();
         show();
     }
 

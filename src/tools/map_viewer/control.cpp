@@ -5,6 +5,7 @@
 
 #include "models/vector_layer_model.h"
 #include "models/point_layer_model.h"
+#include "models/corner_layer_model.h"
 
 #include "algorithms/corner_detection.h"
 
@@ -26,8 +27,8 @@ void Control::setup(Map *map,
     map_ = map;
 
     connect(view, SIGNAL(openFile(QString)), this, SLOT(openDXF(QString)));
-    connect(view, SIGNAL(runCornerDetection(CornerDetectionParameter)),
-            this, SLOT(runCornerDetection(CornerDetectionParameter)));
+    connect(view, SIGNAL(runCornerDetection(const CornerDetectionParameter&)),
+            this, SLOT(runCornerDetection(const CornerDetectionParameter&)));
 }
 
 void Control::runCornerDetection(const CornerDetectionParameter &params)
@@ -80,25 +81,28 @@ void Control::executeCornerDetection(const CornerDetectionParameter &params)
     }
 
     dxf::DXFMap::Points corners;
+    std::vector<double> cornerness;
     dxf::DXFMap::Points end_points;
+
 
     auto progress_callback = [this] (int p) {progress(p);};
 
     CornerDetection corner_detection(params);
-    corner_detection(vectors, corners, end_points, progress_callback);
+    corner_detection(vectors, corners, cornerness, end_points, progress_callback);
 
     progress(-1);
-    PointLayerModel::Ptr layer_corners(new PointLayerModel);
+    CornerLayerModel::Ptr layer_corners(new CornerLayerModel);
     PointLayerModel::Ptr layer_end_points(new PointLayerModel);
     layer_corners->setName(QString("corner points"));
     layer_end_points->setName(QString("end points"));
     layer_corners->setPoints(corners);
+    layer_corners->setCornerness(cornerness);
     layer_end_points->setPoints(end_points);
 
     layer_corners->setColor(Qt::green);
     layer_end_points->setColor(Qt::red);
 
-    map_->setLayer(PointLayerModel::asBase(layer_corners));
+    map_->setLayer(CornerLayerModel::asBase(layer_corners));
     map_->setLayer(PointLayerModel::asBase(layer_end_points));
 
     /// and there goes the progress

@@ -37,7 +37,7 @@ public:
 
 signals:
     void openFile(const QString &path);
-    void runCornerDetection(CornerDetectionParameter &param);
+    void runCornerDetection(const CornerDetectionParameter &params);
 
 public slots:
     void update();

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>390</width>
-    <height>194</height>
+    <height>203</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -126,6 +126,9 @@
      <property name="maximum">
       <double>180.000000000000000</double>
      </property>
+     <property name="value">
+      <double>90.000000000000000</double>
+     </property>
     </widget>
    </item>
    <item row="3" column="2">
@@ -137,8 +140,14 @@
    </item>
    <item row="3" column="3">
     <widget class="QDoubleSpinBox" name="doubleSpinBox_pref_corner_angle_std_dev">
+     <property name="minimum">
+      <double>1.000000000000000</double>
+     </property>
      <property name="maximum">
       <double>45.000000000000000</double>
+     </property>
+     <property name="value">
+      <double>5.000000000000000</double>
      </property>
     </widget>
    </item>
