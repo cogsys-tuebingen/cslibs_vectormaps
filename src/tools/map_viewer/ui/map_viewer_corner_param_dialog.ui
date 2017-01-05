@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>370</width>
-    <height>131</height>
+    <width>390</width>
+    <height>194</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,7 +15,7 @@
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="1" column="2">
-    <widget class="QLabel" name="label_min_angular_distance">
+    <widget class="QLabel" name="label_min_corner_angle">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
        <horstretch>0</horstretch>
@@ -29,7 +29,7 @@
       </size>
      </property>
      <property name="text">
-      <string>Min. angular line distance:</string>
+      <string>Minimal corner angle:</string>
      </property>
     </widget>
    </item>
@@ -47,7 +47,7 @@
     </widget>
    </item>
    <item row="0" column="2">
-    <widget class="QLabel" name="label_max_point_distance">
+    <widget class="QLabel" name="label_max_end_point_distance">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
        <horstretch>0</horstretch>
@@ -61,12 +61,12 @@
       </size>
      </property>
      <property name="text">
-      <string>Max. point distance:</string>
+      <string>Max. corner end point distance:</string>
      </property>
     </widget>
    </item>
    <item row="1" column="3">
-    <widget class="QDoubleSpinBox" name="doubleSpinBox_min_line_angle">
+    <widget class="QDoubleSpinBox" name="doubleSpinBox_min_corner_angle">
      <property name="decimals">
       <number>1</number>
      </property>
@@ -81,7 +81,7 @@
      </property>
     </widget>
    </item>
-   <item row="3" column="3">
+   <item row="5" column="3">
     <widget class="QDialogButtonBox" name="buttonBox">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -92,13 +92,20 @@
     </widget>
    </item>
    <item row="2" column="2">
-    <widget class="QLabel" name="label">
+    <widget class="QLabel" name="label_pref_corner_angle">
+     <property name="text">
+      <string>Preferred corner angle:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="2">
+    <widget class="QLabel" name="label_min_loose_end_point_distance">
      <property name="text">
       <string>Min. loose endpoint distance:</string>
      </property>
     </widget>
    </item>
-   <item row="2" column="3">
+   <item row="4" column="3">
     <widget class="QDoubleSpinBox" name="doubleSpinBox_min_loose_endpoint_distance">
      <property name="minimum">
       <double>0.000000000000000</double>
@@ -111,6 +118,27 @@
      </property>
      <property name="value">
       <double>0.100000000000000</double>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="3">
+    <widget class="QDoubleSpinBox" name="doubleSpinBox_pref_corner_angle">
+     <property name="maximum">
+      <double>180.000000000000000</double>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="2">
+    <widget class="QLabel" name="label_pref_corner_std_dev">
+     <property name="text">
+      <string>Corner angle std. deviation: </string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="3">
+    <widget class="QDoubleSpinBox" name="doubleSpinBox_pref_corner_angle_std_dev">
+     <property name="maximum">
+      <double>45.000000000000000</double>
      </property>
     </widget>
    </item>
