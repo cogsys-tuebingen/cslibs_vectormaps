@@ -10,10 +10,13 @@
 #include "models/vector_layer_model.h"
 #include "models/point_layer_model.h"
 #include "models/corner_layer_model.h"
+#include "util/bezier_color.hpp"
+#include "util/hsv.hpp"
 
 using namespace cslibs_gdal;
 
 Renderer::Renderer() :
+    default_point_alpha_(0.8),
     stop_(false)
 {
 }
@@ -155,7 +158,32 @@ void Renderer::doUpdate(const QString &layer_name)
 
 QGraphicsItemGroup* Renderer::render(const CornerLayerModel &model)
 {
+    QColor color = model.getColor();
+    color.setAlphaF(default_point_alpha_);
+    QColor s1 = hsv::shiftHue(color, -135.); /// support color 1
+    QColor s2 = hsv::shiftHue(color,  135.); /// support color 2
 
+    bezier  bez({s1, color, s2});
+    QPen    p(default_pen_);
+    p.setColor(Qt::black);
+
+    QGraphicsItemGroup *g = new QGraphicsItemGroup;
+    std::vector<QPointF> points;
+    std::vector<double>  cornerness;
+    model.getPoints(points);
+    model.getCornerness(cornerness);
+
+    for(std::size_t i = 0 ; i < points.size(); ++i) {
+        const QPointF &point = points[i];
+        const double  &corner = cornerness[i];
+        QBrush  b(bez.get(corner));
+        QGraphicsEllipseItem *item = new QGraphicsEllipseItem(point.x() - 0.1, point.y() - 0.1, 0.2, 0.2);
+        item->setPen(p);
+        item->setBrush(b);
+        g->addToGroup(item);
+    }
+
+    return g;
 }
 
 QGraphicsItemGroup* Renderer::render(const PointLayerModel &model)
@@ -163,16 +191,17 @@ QGraphicsItemGroup* Renderer::render(const PointLayerModel &model)
     QPen    p(default_pen_);
     p.setColor(Qt::black);
     QColor  c(model.getColor());
-    c.setAlphaF(0.8);
+    c.setAlphaF(default_point_alpha_);
     QBrush  b(c);
 
     QGraphicsItemGroup *g = new QGraphicsItemGroup;
     std::vector<QPointF> points;
     model.getPoints(points);
     for(const QPointF &point : points) {
-        QGraphicsEllipseItem *i = new QGraphicsEllipseItem(point.x() - 0.1, point.y() - 0.1, 0.2, 0.2, g);
+        QGraphicsEllipseItem *i = new QGraphicsEllipseItem(point.x() - 0.1, point.y() - 0.1, 0.2, 0.2);
         i->setPen(p);
         i->setBrush(b);
+        g->addToGroup(i);
     }
     return g;
 }
@@ -185,8 +214,9 @@ QGraphicsItemGroup* Renderer::render(const VectorLayerModel &model)
     std::vector<QLineF> lines;
     model.getVectors(lines);
     for(auto l : lines) {
-        QGraphicsLineItem *i = new QGraphicsLineItem(QLineF(l.p1(), l.p2()), g);
+        QGraphicsLineItem *i = new QGraphicsLineItem(QLineF(l.p1(), l.p2()));
         i->setPen(p);
+        g->addToGroup(i);
     }
     return g;
 }
@@ -194,14 +224,33 @@ QGraphicsItemGroup* Renderer::render(const VectorLayerModel &model)
 void Renderer::update(const CornerLayerModel &model,
                       QGraphicsItemGroup *group)
 {
+    QColor color = model.getColor();
+    color.setAlphaF(default_point_alpha_);
+    QColor s1 = hsv::shiftHue(color, -135.); /// support color 1
+    QColor s2 = hsv::shiftHue(color,  135.); /// support color 2
 
+    bezier  bez({s1, color, s2});
+    QPen    p(default_pen_);
+    p.setColor(Qt::black);
+
+    std::vector<double>  cornerness;
+    model.getCornerness(cornerness);
+
+    QList<QGraphicsItem*> children = group->childItems();
+    assert(cornerness.size() == children.size());
+    for(std::size_t i = 0 ; i < children.size(); ++i) {
+        QGraphicsEllipseItem *item = static_cast<QGraphicsEllipseItem*>(children[i]);
+        const double  &corner = cornerness[i];
+        QBrush  b(bez.get(corner));
+        item->setBrush(b);
+    }
 }
 
 void Renderer::update(const PointLayerModel &model,
                       QGraphicsItemGroup *group)
 {
     QColor c(model.getColor());
-    c.setAlphaF(0.8);
+    c.setAlphaF(default_point_alpha_);
     QBrush b(c);
     QList<QGraphicsItem*> children = group->childItems();
     for(auto *child : children) {

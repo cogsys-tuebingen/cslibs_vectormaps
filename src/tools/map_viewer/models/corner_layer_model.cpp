@@ -27,7 +27,7 @@ void CornerLayerModel::setCornerness(const std::vector<double> &cornerness)
     cornerness_ = cornerness;
 }
 
-void CornerLayerModel::getCornerNess(std::vector<double> &cornerness) const
+void CornerLayerModel::getCornerness(std::vector<double> &cornerness) const
 {
     cornerness = cornerness_;
 }

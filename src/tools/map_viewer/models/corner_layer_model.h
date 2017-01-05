@@ -27,7 +27,7 @@ public:
     void setPoints(const QPointFList &points) override;
 
     void setCornerness(const std::vector<double> &cornerness);
-    void getCornerNess(std::vector<double> &cornerness) const;
+    void getCornerness(std::vector<double> &cornerness) const;
 
 private:
     std::vector<double> cornerness_;

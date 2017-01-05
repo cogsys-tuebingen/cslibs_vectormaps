@@ -57,6 +57,7 @@ private:
 
     std::map<QString, QGraphicsItemGroup*>   groups_;
     QPen                                     default_pen_;
+    double                                   default_point_alpha_;
 
     Map                                     *map_;
 
