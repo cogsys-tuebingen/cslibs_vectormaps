@@ -4,12 +4,8 @@
 
 using namespace cslibs_gdal;
 
-CornerDetection::CornerDetection(const double max_point_distance,
-                                 const double min_line_angle,
-                                 const double min_loose_endpoint_distance) :
-    max_corner_point_distance_(max_point_distance),
-    min_line_angle_(min_line_angle),
-    min_loose_endpoint_distance_(min_loose_endpoint_distance)
+CornerDetection::CornerDetection(const CornerDetectionParameter &parameter) :
+    parameter_(parameter)
 {
 }
 
@@ -58,16 +54,16 @@ void CornerDetection::operator () (const Vectors &vectors,
         double angle_p1 = cslibs_boost_geometry::algorithms::angle<double, Point>(v1,closest_p1);
         double angle_p2 = cslibs_boost_geometry::algorithms::angle<double, Point>(v1,closest_p2);
 
-        if(capped_abs(angle_p1) >= min_line_angle_ &&
-                min_distance_p1 <= max_corner_point_distance_) {
+        if(capped_abs(angle_p1) >= parameter_.min_corner_angle &&
+                min_distance_p1 <= parameter_.max_corner_point_distance) {
             corner_set.insert(v1.first);
-        } else if(min_distance_p1 >= min_loose_endpoint_distance_) {
+        } else if(min_distance_p1 >= parameter_.min_loose_endpoint_distance) {
             loose_endpoint_set.insert(v1.first);
         }
-        if(capped_abs(angle_p2) >= min_line_angle_ &&
-                min_distance_p2 <= max_corner_point_distance_) {
+        if(capped_abs(angle_p2) >= parameter_.min_corner_angle &&
+                min_distance_p2 <= parameter_.max_corner_point_distance) {
             corner_set.insert(v1.second);
-        } else if(min_distance_p2 >= min_loose_endpoint_distance_) {
+        } else if(min_distance_p2 >= parameter_.min_loose_endpoint_distance) {
             loose_endpoint_set.insert(v1.second);
         }
         progress(++count / (double) vectors.size() * 100);

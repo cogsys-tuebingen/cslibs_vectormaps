@@ -38,12 +38,12 @@ public:
         delete ui_;
     }
 
-    double getMinLineAngle() const
+    double getMinCornerAngle() const
     {
         return min_corner_angle_;
     }
 
-    double getMaxPointDistance() const
+    double getMaxCornerPointDistance() const
     {
         return max_corner_point_distance_;
     }

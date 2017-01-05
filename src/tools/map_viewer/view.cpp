@@ -156,12 +156,17 @@ void View::actionOpen()
 
 void View::actionRun_corner_detection()
 {
-    QCornerParamDialog parameters;
-    parameters.exec();
+    QCornerParamDialog param_dialog;
+    param_dialog.exec();
 
-    runCornerDetection(parameters.getMaxPointDistance(),
-                       parameters.getMinLineAngle(),
-                       parameters.getMinLooseEndpointDistance());
+    CornerDetectionParameter params;
+    params.max_corner_point_distance   = param_dialog.getMaxCornerPointDistance();
+    params.min_corner_angle            = param_dialog.getMinCornerAngle();
+    params.min_loose_endpoint_distance = param_dialog.getMinLooseEndpointDistance();
+    params.pref_corner_angle           = param_dialog.getPrefCornerAngle();
+    params.pref_corner_angle_std_dev   = param_dialog.getPrefCornerAngleStdDev();
+
+    runCornerDetection(params);
 }
 
 void View::actionBuild_topology()

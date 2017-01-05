@@ -26,20 +26,18 @@ void Control::setup(Map *map,
     map_ = map;
 
     connect(view, SIGNAL(openFile(QString)), this, SLOT(openDXF(QString)));
-    connect(view, SIGNAL(runCornerDetection(double, double, double)),
-            this, SLOT(runCornerDetection(double, double, double)));
+    connect(view, SIGNAL(runCornerDetection(CornerDetectionParameter)),
+            this, SLOT(runCornerDetection(CornerDetectionParameter)));
 }
 
-void Control::runCornerDetection(const double max_point_distance,
-                                 const double min_line_angle,
-                                 const double min_loose_endpoint_distance)
+void Control::runCornerDetection(const CornerDetectionParameter &params)
 {
     if(running_)
         return;
 
     running_.store(true);
-    auto execution = [min_loose_endpoint_distance,max_point_distance, min_line_angle, this] () {
-        executeCornerDetection(max_point_distance, min_line_angle, min_loose_endpoint_distance);
+    auto execution = [params, this] () {
+        executeCornerDetection(params);
     };
     worker_thread_ = std::thread(execution);
     worker_thread_.detach();
@@ -56,9 +54,7 @@ void Control::openDXF(const QString &path)
     }
 }
 
-void Control::executeCornerDetection(const double max_point_distance,
-                                     const double min_line_angle,
-                                     const double min_loose_endpoint_distance)
+void Control::executeCornerDetection(const CornerDetectionParameter &params)
 {
 
     /// get all layers that are visible
@@ -88,9 +84,7 @@ void Control::executeCornerDetection(const double max_point_distance,
 
     auto progress_callback = [this] (int p) {progress(p);};
 
-    CornerDetection corner_detection(max_point_distance,
-                                     min_line_angle,
-                                     min_loose_endpoint_distance);
+    CornerDetection corner_detection(params);
     corner_detection(vectors, corners, end_points, progress_callback);
 
     progress(-1);

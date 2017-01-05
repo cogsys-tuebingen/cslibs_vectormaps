@@ -18,10 +18,10 @@ class map_viewer_list_item;
 }
 
 namespace cslibs_gdal {
-class Map;
-class Control;
-class Renderer;
-class CornerDetection;
+class  Map;
+class  Control;
+class  Renderer;
+struct CornerDetectionParameter;
 
 class View : public QMainWindow
 {
@@ -37,9 +37,7 @@ public:
 
 signals:
     void openFile(const QString &path);
-    void runCornerDetection(const double max_point_distance,
-                            const double min_line_angle,
-                            const double min_loose_endpoint_distance);
+    void runCornerDetection(CornerDetectionParameter &param);
 
 public slots:
     void update();

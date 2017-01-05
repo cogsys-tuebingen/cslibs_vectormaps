@@ -12,7 +12,7 @@
 namespace cslibs_gdal {
 class Map;
 class View;
-class CornerDetection;
+class CornerDetectionParameter;
 
 class Control : public QObject
 {
@@ -37,9 +37,7 @@ public slots:
      * @brief Excecute corner detection on line elements of all
      *        visible layers.
      */
-    void runCornerDetection(const double max_point_distance,
-                            const double min_line_angle,
-                            const double min_loose_endpoint_distance);
+    void runCornerDetection(const CornerDetectionParameter &params);
 
 private:
     Map             *map_;
@@ -47,9 +45,7 @@ private:
     std::atomic_bool  running_;
     std::thread worker_thread_; /// used to applied algorithms
 
-    void executeCornerDetection(const double max_point_distance,
-                                const double min_line_angle,
-                                const double min_loose_endpoint_distance);
+    void executeCornerDetection(const CornerDetectionParameter &params);
 
 };
 }

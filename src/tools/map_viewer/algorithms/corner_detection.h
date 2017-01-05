@@ -5,6 +5,14 @@
 #include <functional>
 
 namespace cslibs_gdal {
+struct CornerDetectionParameter {
+    double max_corner_point_distance;
+    double min_corner_angle;
+    double min_loose_endpoint_distance;
+    double pref_corner_angle;
+    double pref_corner_angle_std_dev;
+};
+
 class CornerDetection
 {
 public:
@@ -15,18 +23,14 @@ public:
 
     using progress_callback = std::function<void(int)>;
 
-    CornerDetection(const double max_point_distance,
-                    const double min_line_angle,
-                    const double min_loose_endpoint_distance);
+    CornerDetection(const CornerDetectionParameter &parameter);
 
     void operator() (const Vectors &vectors,
                      Points &corners,
                      Points &end_points,
                      progress_callback progress = [](int current){});
 private:
-    const double max_corner_point_distance_;
-    const double min_line_angle_;
-    const double min_loose_endpoint_distance_;
+    const CornerDetectionParameter parameter_;
 };
 }
 
