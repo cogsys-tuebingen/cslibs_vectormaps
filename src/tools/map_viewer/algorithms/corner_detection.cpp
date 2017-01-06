@@ -102,11 +102,19 @@ void CornerDetection::operator () (const Vectors &vectors,
         progress(++count / (double) vectors.size() * 100);
     }
 
-    for(Corner c : corner_set) {
-        corners.emplace_back(c.point);
-        cornerness.emplace_back(c.cornerness);
+    auto it_last = corner_set.begin();
+    auto it = corner_set.begin();
+    ++it;
+    corners.emplace_back(it_last->point);
+    cornerness.emplace_back(it_last->cornerness);
+    while(it != corner_set.end()) {
+        if(!cslibs_boost_geometry::algorithms::equal<Point, double>(it->point,it_last->point, 1e-2)) {
+            corners.emplace_back(it->point);
+            cornerness.emplace_back(it->cornerness);
+        }
+        ++it;
+        ++it_last;
     }
-
 
     loose_endpoints.assign(loose_endpoint_set.begin(), loose_endpoint_set.end());
     progress(100);

@@ -279,7 +279,7 @@ void Renderer::update(const VectorLayerModel &model,
 {
     QColor c(model.getColor());
     QPen    p(default_pen_);
-    p.setColor(Qt::black);
+    p.setColor(c);
     QList<QGraphicsItem*> children = group->childItems();
     for(auto *child : children) {
         static_cast<QGraphicsLineItem*>(child)->setPen(p);

@@ -29,8 +29,7 @@ include_directories(
     ${Boost_INCLUDE_DIRS}
     ${GAZEBO_INCLUDE_DIRS}
     ${Eigen3_INCLUDE_DIRS}
-    ${OPENGL_INCLUDE_DIR}
-    ${Qt5Core_INCLUDE_DIRS} ${Qt5Gui_INCLUDE_DIRS} ${Qt5Widgets_INCLUDE_DIRS} ${Qt5OpenGL_INCLUDE_DIRS}
+    ${Qt5Core_INCLUDE_DIRS} ${Qt5Gui_INCLUDE_DIRS} ${Qt5Widgets_INCLUDE_DIRS}
 )
 
 add_library(${PROJECT_NAME}
@@ -59,7 +58,7 @@ target_link_libraries(${PROJECT_NAME}_dxf_to_occupancy_grid
 
 endif()
 
-if(${Qt5_FOUND} AND ${OPENGL_FOUND} AND ${OpenCV_FOUND})
+if(${Qt5_FOUND} AND ${OpenCV_FOUND})
     set(CMAKE_EXE_LINKER_FLAGS "-lpthread ${CMAKE_EXE_LINKER_FLAGS}")
     add_definitions(-lpthread ${Qt5Widgets_DEFINITIONS})
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
@@ -98,15 +97,15 @@ if(${Qt5_FOUND} AND ${OPENGL_FOUND} AND ${OpenCV_FOUND})
         src/tools/map_viewer/algorithms/rasterization.cpp
 
         ${QT_UI}
+
     )
 
     target_link_libraries(${PROJECT_NAME}_map_viewer
         ${PROJECT_NAME}
-        Qt5::Core Qt5::Gui Qt5::Widgets Qt5::OpenGL
-        ${OPENGL_LIBRARIES}
+        Qt5::Core Qt5::Gui Qt5::Widgets
+        ${catkin_LIBRARIES}
+        ${OpenCV_LIBRARIES}
     )
-
-
 
 endif()
 if(${gazebo_FOUND} AND ${xacro_FOUND})

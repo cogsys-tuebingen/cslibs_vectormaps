@@ -1,6 +1,24 @@
 #include "rasterization.h"
 
-Rasterization::Rasterization()
-{
+using namespace cslibs_gdal;
 
+Rasterization::Rasterization(const RasterizationParamters &parameters)
+{
 }
+
+void Rasterization::operator ()(const Vectors &vectors)
+{
+    /// raster
+    ///
+    /// save image
+    ///
+    /// save yaml
+}
+
+
+//image: testmap.png
+//resolution: 0.1
+//origin: [0.0, 0.0, 0.0]
+//occupied_thresh: 0.65
+//free_thresh: 0.196
+//negate: 0
