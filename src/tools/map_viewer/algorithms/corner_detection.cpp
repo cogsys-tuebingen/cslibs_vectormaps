@@ -34,12 +34,17 @@ void CornerDetection::operator () (const Vectors &vectors,
     auto less_point = [] (const dxf::DXFMap::Point &p1,const dxf::DXFMap::Point &p2)
     {return p1.x() < p2.x() || p1.y() < p2.y();};
 
+    const double mu = parameter_.pref_corner_angle;
+    const double sigma = parameter_.pref_corner_angle_std_dev;
+    auto cornerness_from_angle = [mu, sigma](const double x)
+    {
+        return std::exp(-0.5 * (x - mu) * (x - mu) / (sigma * sigma));
+    };
 
     std::size_t count = 0;
 
     std::set<Corner, decltype(less_corner)> corner_set(less_corner);
     std::set<dxf::DXFMap::Point, decltype(less_point)> loose_endpoint_set(less_point);
-
 
     for(const Vector &v1 : vectors) {
         double min_distance_p1 = std::numeric_limits<double>::max();
@@ -74,15 +79,25 @@ void CornerDetection::operator () (const Vectors &vectors,
 
         if(capped_abs(angle_p1) >= parameter_.min_corner_angle &&
                 min_distance_p1 <= parameter_.max_corner_point_distance) {
-            corner_set.insert(Corner(v1.first, 0.0));
+
+            double c = cornerness_from_angle(angle_p1);
+            corner_set.insert(Corner(v1.first, c));
+
         } else if(min_distance_p1 >= parameter_.min_loose_endpoint_distance) {
+
             loose_endpoint_set.insert(v1.first);
+
         }
         if(capped_abs(angle_p2) >= parameter_.min_corner_angle &&
                 min_distance_p2 <= parameter_.max_corner_point_distance) {
-            corner_set.insert(Corner(v1.second, 0.0));
+
+            double c = cornerness_from_angle(angle_p2);
+            corner_set.insert(Corner(v1.second, c));
+
         } else if(min_distance_p2 >= parameter_.min_loose_endpoint_distance) {
+
             loose_endpoint_set.insert(v1.second);
+
         }
         progress(++count / (double) vectors.size() * 100);
     }
@@ -91,6 +106,8 @@ void CornerDetection::operator () (const Vectors &vectors,
         corners.emplace_back(c.point);
         cornerness.emplace_back(c.cornerness);
     }
+
+
     loose_endpoints.assign(loose_endpoint_set.begin(), loose_endpoint_set.end());
     progress(100);
 }

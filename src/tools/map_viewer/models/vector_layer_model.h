@@ -14,16 +14,6 @@ public:
     VectorLayerModel();
     virtual ~VectorLayerModel();
 
-    static inline LayerModel::Ptr asBase(const Ptr &layer)
-    {
-        return std::dynamic_pointer_cast<LayerModel>(layer);
-    }
-
-    static inline LayerModel::ConstPtr asBase(const ConstPtr &layer)
-    {
-        return std::dynamic_pointer_cast<LayerModel const>(layer);
-    }
-
     void setVectors(const dxf::DXFMap::Vectors &v);
 
     void getVectors(dxf::DXFMap::Vectors &v) const;

@@ -92,7 +92,7 @@ void Control::executeCornerDetection(const CornerDetectionParameter &params)
 
     progress(-1);
     CornerLayerModel::Ptr layer_corners(new CornerLayerModel);
-    PointLayerModel::Ptr layer_end_points(new PointLayerModel);
+    PointLayerModel::Ptr  layer_end_points(new PointLayerModel);
     layer_corners->setName(QString("corner points"));
     layer_end_points->setName(QString("end points"));
     layer_corners->setPoints(corners);
@@ -102,8 +102,8 @@ void Control::executeCornerDetection(const CornerDetectionParameter &params)
     layer_corners->setColor(Qt::green);
     layer_end_points->setColor(Qt::red);
 
-    map_->setLayer(CornerLayerModel::asBase(layer_corners));
-    map_->setLayer(PointLayerModel::asBase(layer_end_points));
+    map_->setLayer(layer_corners);
+    map_->setLayer(layer_end_points);
 
     /// and there goes the progress
     running_.store(false);

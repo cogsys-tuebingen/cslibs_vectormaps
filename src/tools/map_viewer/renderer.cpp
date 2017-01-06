@@ -16,7 +16,7 @@
 using namespace cslibs_gdal;
 
 Renderer::Renderer() :
-    default_point_alpha_(0.8),
+    default_point_alpha_(0.6),
     stop_(false)
 {
 }
@@ -44,6 +44,9 @@ void Renderer::setup(Map *map, QGraphicsView *grahpics_view)
     view_->setScene(scene_);
 
     connect(this, SIGNAL(finished()), this, SLOT(postRendering()), Qt::QueuedConnection);
+    connect(this, SIGNAL(clear()), this, SLOT(clearScene()), Qt::QueuedConnection);
+    connect(this, SIGNAL(add(QGraphicsItemGroup*)), this, SLOT(addGroup(QGraphicsItemGroup*)), Qt::QueuedConnection);
+
     worker_thread_ = std::thread([this](){run();});
 }
 
@@ -99,16 +102,26 @@ void Renderer::postRendering()
     view_->update();
 }
 
-void Renderer::doRepaint()
+void Renderer::clearScene()
 {
     scene_->clear();
+}
+
+void Renderer::addGroup(QGraphicsItemGroup *g)
+{
+    scene_->addItem(g);
+}
+
+void Renderer::doRepaint()
+{
+    clear();
+    groups_.clear();
 
     std::vector<LayerModel::Ptr> layers;
     map_->getLayers(layers);
 
-    /// create new path items
-    for(auto l = layers.begin() ; l < layers.end() ; ++l) {
-        doRepaint((*l)->getName<QString>());
+    for(auto &l : layers) {
+        doRepaint(l->getName<QString>());
     }
 }
 
@@ -117,22 +130,34 @@ void Renderer::doRepaint(const QString &layer_name)
     LayerModel::ConstPtr l = map_->getLayer(layer_name);
     QGraphicsItemGroup *g = nullptr;
 
+    /// TODO : REFACTORING TO DOUBLE CALL PATTERN
+
     VectorLayerModel::ConstPtr lv = LayerModel::as<VectorLayerModel const>(l);
     if(lv) {
-        g = render(*lv);
+        QGraphicsItemGroup *g = new QGraphicsItemGroup;
+        render(*lv, *g);
+        groups_[layer_name] = g;
+        g->setVisible(l->getVisibility());
+
+        add(g);
     }
     CornerLayerModel::ConstPtr cl = LayerModel::as<CornerLayerModel const>(l);
     if(cl) {
-        g = render(*cl);
-    }
-    PointLayerModel::ConstPtr lp = LayerModel::as<PointLayerModel const>(l);
-    if(lp && !cl) {
-        g = render(*lp);
-    }
-    if(g) {
-        scene_->addItem(g);
+        QGraphicsItemGroup *g = new QGraphicsItemGroup;
+        render(*cl, *g);
         groups_[layer_name] = g;
         g->setVisible(l->getVisibility());
+
+        add(g);
+   }
+    PointLayerModel::ConstPtr lp = LayerModel::as<PointLayerModel const>(l);
+    if(lp && !cl) {
+        QGraphicsItemGroup *g = new QGraphicsItemGroup;
+        render(*lp, *g);
+        groups_[layer_name] = g;
+        g->setVisible(l->getVisibility());
+
+        add(g);
     }
 }
 
@@ -156,18 +181,13 @@ void Renderer::doUpdate(const QString &layer_name)
     g->setVisible(l->getVisibility());
 }
 
-QGraphicsItemGroup* Renderer::render(const CornerLayerModel &model)
+void Renderer::render(const CornerLayerModel &model,
+                      QGraphicsItemGroup &group)
 {
     QColor color = model.getColor();
-    color.setAlphaF(default_point_alpha_);
-    QColor s1 = hsv::shiftHue(color, -135.); /// support color 1
-    QColor s2 = hsv::shiftHue(color,  135.); /// support color 2
-
-    bezier  bez({s1, color, s2});
     QPen    p(default_pen_);
     p.setColor(Qt::black);
 
-    QGraphicsItemGroup *g = new QGraphicsItemGroup;
     std::vector<QPointF> points;
     std::vector<double>  cornerness;
     model.getPoints(points);
@@ -176,17 +196,18 @@ QGraphicsItemGroup* Renderer::render(const CornerLayerModel &model)
     for(std::size_t i = 0 ; i < points.size(); ++i) {
         const QPointF &point = points[i];
         const double  &corner = cornerness[i];
-        QBrush  b(bez.get(corner));
+        color.setAlphaF(corner * default_point_alpha_);
+        QBrush  b(color);
         QGraphicsEllipseItem *item = new QGraphicsEllipseItem(point.x() - 0.1, point.y() - 0.1, 0.2, 0.2);
-        item->setPen(p);
         item->setBrush(b);
-        g->addToGroup(item);
+        item->setPen(p);
+        group.addToGroup(item);
     }
 
-    return g;
 }
 
-QGraphicsItemGroup* Renderer::render(const PointLayerModel &model)
+void Renderer::render(const PointLayerModel &model,
+                      QGraphicsItemGroup &group)
 {
     QPen    p(default_pen_);
     p.setColor(Qt::black);
@@ -201,35 +222,28 @@ QGraphicsItemGroup* Renderer::render(const PointLayerModel &model)
         QGraphicsEllipseItem *i = new QGraphicsEllipseItem(point.x() - 0.1, point.y() - 0.1, 0.2, 0.2);
         i->setPen(p);
         i->setBrush(b);
-        g->addToGroup(i);
+        group.addToGroup(i);
     }
-    return g;
 }
 
-QGraphicsItemGroup* Renderer::render(const VectorLayerModel &model)
+void Renderer::render(const VectorLayerModel &model,
+                      QGraphicsItemGroup &group)
 {
     QPen    p(default_pen_);
     p.setColor(model.getColor());
-    QGraphicsItemGroup *g = new QGraphicsItemGroup;
     std::vector<QLineF> lines;
     model.getVectors(lines);
     for(auto l : lines) {
         QGraphicsLineItem *i = new QGraphicsLineItem(QLineF(l.p1(), l.p2()));
         i->setPen(p);
-        g->addToGroup(i);
+        group.addToGroup(i);
     }
-    return g;
 }
 
 void Renderer::update(const CornerLayerModel &model,
                       QGraphicsItemGroup *group)
 {
     QColor color = model.getColor();
-    color.setAlphaF(default_point_alpha_);
-    QColor s1 = hsv::shiftHue(color, -135.); /// support color 1
-    QColor s2 = hsv::shiftHue(color,  135.); /// support color 2
-
-    bezier  bez({s1, color, s2});
     QPen    p(default_pen_);
     p.setColor(Qt::black);
 
@@ -241,8 +255,10 @@ void Renderer::update(const CornerLayerModel &model,
     for(std::size_t i = 0 ; i < children.size(); ++i) {
         QGraphicsEllipseItem *item = static_cast<QGraphicsEllipseItem*>(children[i]);
         const double  &corner = cornerness[i];
-        QBrush  b(bez.get(corner));
+        color.setAlphaF(corner * default_point_alpha_);
+        QBrush  b(color);
         item->setBrush(b);
+        item->setPen(p);
     }
 }
 
@@ -262,7 +278,8 @@ void Renderer::update(const VectorLayerModel &model,
                       QGraphicsItemGroup *group)
 {
     QColor c(model.getColor());
-    QPen p(c);
+    QPen    p(default_pen_);
+    p.setColor(Qt::black);
     QList<QGraphicsItem*> children = group->childItems();
     for(auto *child : children) {
         static_cast<QGraphicsLineItem*>(child)->setPen(p);

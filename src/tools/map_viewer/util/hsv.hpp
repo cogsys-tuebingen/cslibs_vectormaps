@@ -22,8 +22,7 @@ struct hsv {
 
         hue = normalize(hue + rad(deg));
         QColor shifted_color;
-        shifted_color.setHsvF(hue * _1_2_M_PI, sat, val);
-
+        shifted_color.setHsvF(hue * _1_2_M_PI, sat, val, color.alphaF());
         return shifted_color;
     }
 

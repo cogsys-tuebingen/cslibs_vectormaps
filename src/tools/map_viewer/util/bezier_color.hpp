@@ -11,10 +11,10 @@ struct bezier
     bezier(const std::vector<QColor> &support_colors)
     {
         for(const QColor &c : support_colors) {
-            support_color_vectors_.emplace_back(QVector4D(c.redF(),
-                                                          c.greenF(),
-                                                          c.blueF(),
-                                                          c.alphaF()));
+            support_color_vectors_.emplace_back(QVector4D(c.red(),
+                                                          c.green(),
+                                                          c.blue(),
+                                                          c.alpha()));
         }
     }
 
@@ -33,6 +33,8 @@ struct bezier
 
     inline QColor get(const double t) const
     {
+        assert(t >= 0.0);
+        assert(t <= 1.0);
         QVector4D c = get(t, 0, support_color_vectors_.size() - 1);
         return QColor(std::floor(c.x() + 0.5),
                       std::floor(c.y() + 0.5),

@@ -38,14 +38,9 @@ void Map::getLayers(std::vector<LayerModel::Ptr> &layers)
     }
 }
 
-void Map::setLayer(LayerModel::Ptr &layer)
+void Map::setLayer(const LayerModel::Ptr &layer)
 {
-    layers_[layer->getName<std::string>()] = layer;
-    updated();
-}
-
-void Map::setLayer(LayerModel::Ptr layer)
-{
+    std::unique_lock<std::mutex> l(layers_mutex_);
     layers_[layer->getName<std::string>()] = layer;
     updated();
 }
@@ -102,7 +97,7 @@ void Map::doLoad(const dxf::DXFMap::Ptr &map)
         layer->setName(n);
         layer->setVectors(vectors);
 
-        layers_[n] = VectorLayerModel::asBase(layer);
+        layers_[n] = layer;
     }
 
     PointLayerModel::Ptr corner_layer(new PointLayerModel);
@@ -113,7 +108,7 @@ void Map::doLoad(const dxf::DXFMap::Ptr &map)
     corners.assign(corner_set.begin(), corner_set.end());
     corner_layer->setPoints(corners);
 
-    layers_[corner_layer_name] = PointLayerModel::asBase(corner_layer);
+    layers_[corner_layer_name] = corner_layer;
 
     updated();
 }

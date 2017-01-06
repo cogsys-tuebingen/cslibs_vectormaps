@@ -13,16 +13,6 @@ public:
     CornerLayerModel();
     virtual ~CornerLayerModel();
 
-    static inline LayerModel::Ptr asBase(const Ptr &layer)
-    {
-        return std::dynamic_pointer_cast<LayerModel>(layer);
-    }
-
-    static inline LayerModel::ConstPtr asBase(const ConstPtr &layer)
-    {
-        return std::dynamic_pointer_cast<LayerModel const>(layer);
-    }
-
     void setPoints(const dxf::DXFMap::Points &points) override;
     void setPoints(const QPointFList &points) override;
 

@@ -59,14 +59,16 @@ target_link_libraries(${PROJECT_NAME}_dxf_to_occupancy_grid
 
 endif()
 
-if(${Qt5_FOUND} AND ${OPENGL_FOUND})
+if(${Qt5_FOUND} AND ${OPENGL_FOUND} AND ${OpenCV_FOUND})
     set(CMAKE_EXE_LINKER_FLAGS "-lpthread ${CMAKE_EXE_LINKER_FLAGS}")
     add_definitions(-lpthread ${Qt5Widgets_DEFINITIONS})
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
     set(CMAKE_AUTOMOC True)
 
-    include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
-    include_directories(${CMAKE_CURRENT_BINARY_DIR})
+    include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src
+                        ${CMAKE_CURRENT_BINARY_DIR}
+                        ${OpenCV_INCLUDE_DIRS}
+    )
 
     qt5_wrap_ui(QT_UI
                 src/tools/map_viewer/ui/map_viewer.ui
@@ -93,6 +95,7 @@ if(${Qt5_FOUND} AND ${OPENGL_FOUND})
         src/tools/map_viewer/util/rng_color.hpp
 
         src/tools/map_viewer/algorithms/corner_detection.cpp
+        src/tools/map_viewer/algorithms/rasterization.cpp
 
         ${QT_UI}
     )

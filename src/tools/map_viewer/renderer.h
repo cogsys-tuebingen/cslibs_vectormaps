@@ -45,9 +45,13 @@ public:
 
 signals:
     void finished();
+    void clear();
+    void add(QGraphicsItemGroup *g);
 
 private slots:
     void postRendering();
+    void clearScene();
+    void addGroup(QGraphicsItemGroup *g);
 
 private:
     QGraphicsView  *view_;
@@ -73,9 +77,12 @@ private:
     void doRepaint(const QString &name);
     void doUpdate(const QString &name);
 
-    QGraphicsItemGroup *render(const CornerLayerModel &model);
-    QGraphicsItemGroup *render(const PointLayerModel  &model);
-    QGraphicsItemGroup *render(const VectorLayerModel &model);
+    void render(const CornerLayerModel &model,
+                QGraphicsItemGroup &group);
+    void render(const PointLayerModel  &model,
+                QGraphicsItemGroup &group);
+    void render(const VectorLayerModel &model,
+                QGraphicsItemGroup &group);
 
     void update(const VectorLayerModel &model,
                 QGraphicsItemGroup *group);

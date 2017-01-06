@@ -31,9 +31,7 @@ public:
 
     void getLayers(std::vector<LayerModel::Ptr> &layers);
 
-    void setLayer(LayerModel::Ptr &layer);
-
-    void setLayer(LayerModel::Ptr  layer);
+    void setLayer(const LayerModel::Ptr &layer);
 
     QPointF getMin() const;
 

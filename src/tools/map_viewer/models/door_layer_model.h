@@ -13,17 +13,6 @@ public:
     DoorLayerModel();
     virtual ~DoorLayerModel();
 
-    static inline LayerModel::Ptr asBase(const Ptr &layer)
-    {
-        return std::dynamic_pointer_cast<LayerModel>(layer);
-    }
-
-    static inline LayerModel::ConstPtr asBase(const ConstPtr &layer)
-    {
-        return std::dynamic_pointer_cast<LayerModel const>(layer);
-    }
-
-
 };
 }
 

@@ -30,7 +30,7 @@ public:
         min_corner_angle_            = toRad(ui_->doubleSpinBox_min_corner_angle->value());
         min_loose_endpoint_distance_ = ui_->doubleSpinBox_min_loose_endpoint_distance->value();
         pref_corner_angle_           = toRad(ui_->doubleSpinBox_pref_corner_angle->value());
-        pref_corner_angle_std_dev_   = ui_->doubleSpinBox_pref_corner_angle_std_dev->value();
+        pref_corner_angle_std_dev_   = toRad(ui_->doubleSpinBox_pref_corner_angle_std_dev->value());
     }
 
     virtual ~QCornerParamDialog()

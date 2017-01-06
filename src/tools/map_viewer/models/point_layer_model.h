@@ -15,16 +15,6 @@ public:
 
     virtual ~PointLayerModel();
 
-    static inline LayerModel::Ptr asBase(const Ptr &layer)
-    {
-        return std::dynamic_pointer_cast<LayerModel>(layer);
-    }
-
-    static inline LayerModel::ConstPtr asBase(const ConstPtr &layer)
-    {
-        return std::dynamic_pointer_cast<LayerModel const>(layer);
-    }
-
     virtual void setPoints(const dxf::DXFMap::Points &points);
 
     void getPoints(dxf::DXFMap::Points &p) const;
