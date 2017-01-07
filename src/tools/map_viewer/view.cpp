@@ -8,6 +8,7 @@
 
 #include "control.h"
 #include "algorithms/corner_detection.h"
+#include "algorithms/rasterization.h"
 #include "util/rng_color.hpp"
 
 #include "qt/QInteractiveGraphicsView.hpp"
@@ -25,6 +26,7 @@
 #include <QAction>
 #include <QProgressDialog>
 #include "qt/QCornerParamDialog.hpp"
+#include "qt/QGridmapParamDialog.hpp"
 
 using namespace cslibs_gdal;
 
@@ -48,9 +50,9 @@ View::View() :
     renderer_->setDefaultPen(pen);
 
     connect(ui_->actionOpen, SIGNAL(triggered()), this, SLOT(actionOpen()));
+    connect(ui_->actionExport_Gridmap, SIGNAL(triggered()), this, SLOT(actionExportGridmap()));
     connect(ui_->buttonHideLayerList, SIGNAL(clicked(bool)), this, SLOT(hideLayerList()));
     connect(ui_->actionRun_corner_detection, SIGNAL(triggered()), this, SLOT(actionRun_corner_detection()));
-
 }
 
 View::~View()
@@ -99,6 +101,8 @@ void View::update()
     renderer_->repaint();
 
     ui_->actionRun_corner_detection->setEnabled(true);
+    ui_->actionExport_Gridmap->setEnabled(true);
+
     view_->show();
 }
 
@@ -152,6 +156,20 @@ void View::actionOpen()
     QString file_name = QFileDialog::getOpenFileName(this, "Open DXF File", "", "*.dxf");
     if(file_name != "")
         openFile(file_name);
+}
+
+void View::actionExportGridmap()
+{
+    QGridmapParamDialog param_dialog;
+    param_dialog.exec();
+
+    RasterizationParamter params;
+    params.origin = param_dialog.getOrigin();
+    params.resolution = param_dialog.getResolution();
+
+    QString path = param_dialog.getPath();
+
+    runGridmapExport(params, path);
 }
 
 void View::actionRun_corner_detection()

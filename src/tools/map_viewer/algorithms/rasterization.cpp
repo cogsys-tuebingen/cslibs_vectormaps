@@ -2,11 +2,12 @@
 
 using namespace cslibs_gdal;
 
-Rasterization::Rasterization(const RasterizationParamters &parameters)
+Rasterization::Rasterization(const RasterizationParamter &parameters)
 {
 }
 
-void Rasterization::operator ()(const Vectors &vectors)
+void Rasterization::operator ()(const Vectors &vectors,
+                                cv::Mat &map)
 {
     /// raster
     ///

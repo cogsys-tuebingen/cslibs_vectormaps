@@ -22,6 +22,7 @@ class  Map;
 class  Control;
 class  Renderer;
 struct CornerDetectionParameter;
+struct RasterizationParamter;
 
 class View : public QMainWindow
 {
@@ -38,6 +39,7 @@ public:
 signals:
     void openFile(const QString &path);
     void runCornerDetection(const CornerDetectionParameter &params);
+    void runGridmapExport(const RasterizationParamter &params, const QString &path);
 
 public slots:
     void update();
@@ -49,6 +51,7 @@ public slots:
 
 private slots:
     void actionOpen();
+    void actionExportGridmap();
     void actionRun_corner_detection();
     void actionBuild_topology();
     void actionFind_doors();

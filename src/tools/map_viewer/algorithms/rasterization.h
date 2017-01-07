@@ -3,11 +3,11 @@
 
 #include <string>
 #include <array>
+#include <opencv2/opencv.hpp>
 #include <cslibs_gdal/dxf_map.h>
 
 namespace cslibs_gdal {
-struct RasterizationParamters {
-    std::string           path;
+struct RasterizationParamter {
     double                resolution;
     std::array<double, 3> origin;
 };
@@ -19,9 +19,10 @@ public:
     using Point   = dxf::DXFMap::Point;
     using Vector  = dxf::DXFMap::Vector;
 
-    Rasterization(const RasterizationParamters &parameters);
+    Rasterization(const RasterizationParamter &parameters);
 
-    void operator() (const Vectors &vectors);
+    void operator() (const Vectors &vectors,
+                     cv::Mat &map);
 
 };
 }

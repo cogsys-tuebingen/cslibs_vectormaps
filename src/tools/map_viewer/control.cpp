@@ -8,6 +8,8 @@
 #include "models/corner_layer_model.h"
 
 #include "algorithms/corner_detection.h"
+#include "algorithms/rasterization.h"
+#include "util/map_meta_exporter.hpp"
 
 #include <cslibs_gdal/dxf_map.h>
 
@@ -33,8 +35,10 @@ void Control::setup(Map *map,
 
 void Control::runCornerDetection(const CornerDetectionParameter &params)
 {
-    if(running_)
+    if(running_) {
+        notification("Already running a process!");
         return;
+    }
 
     running_.store(true);
     auto execution = [params, this] () {
@@ -43,6 +47,23 @@ void Control::runCornerDetection(const CornerDetectionParameter &params)
     worker_thread_ = std::thread(execution);
     worker_thread_.detach();
 }
+
+void Control::runGridmapExport(const RasterizationParamter &params,
+                               const QString &path)
+{
+    if(running_) {
+        notification("Already running a process!");
+        return;
+    }
+
+    running_.store(true);
+    auto execution = [params, path, this] () {
+        executeGridmapExport(params, path);
+    };
+    worker_thread_ = std::thread(execution);
+    worker_thread_.detach();
+}
+
 
 void Control::openDXF(const QString &path)
 {
@@ -106,6 +127,41 @@ void Control::executeCornerDetection(const CornerDetectionParameter &params)
     map_->setLayer(layer_end_points);
 
     /// and there goes the progress
+    running_.store(false);
+    closeProgressDialog();
+}
+
+void Control::executeGridmapExport(const RasterizationParamter &params,
+                                   const QString &path)
+{
+    std::vector<LayerModel::Ptr> layers;
+    map_->getLayers(layers);
+
+    /// get all line segments from visible layers
+    dxf::DXFMap::Vectors vectors;
+    for(LayerModel::Ptr &l : layers) {
+        if(l->getVisibility()) {
+            VectorLayerModel::Ptr lv = LayerModel::as<VectorLayerModel>(l);
+            if(lv) {
+                dxf::DXFMap::Vectors v;
+                lv->getVectors(v);
+                vectors.insert(vectors.end(), v.begin(), v.end());
+            }
+        }
+    }
+
+    openProgressDialog("Corner Detection");
+    progress(-1);
+
+    /// RASTER
+    Rasterization raster(params);
+    cv::Mat map;
+    raster(vectors, map);
+
+    /// SAVE
+    cv::imwrite(path.toStdString() + ".ppm", map);
+    MapMetaExporter::exportYAML(path.toStdString() + ".yaml", params.origin, params.resolution);
+
     running_.store(false);
     closeProgressDialog();
 }
