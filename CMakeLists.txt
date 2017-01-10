@@ -5,6 +5,14 @@ find_package(catkin REQUIRED cslibs_boost_geometry)
 find_package(GDAL   REQUIRED)
 find_package(Boost  REQUIRED system filesystem)
 
+# Optional Dependencies
+find_package(OpenCV QUIET)
+find_package(roscpp QUIET)
+find_package(gazebo QUIET)
+find_package(xacro  QUIET)
+find_package(Qt5 COMPONENTS Core Gui Widgets QUIET)
+find_package(Eigen3 QUIET)
+
 catkin_package(
   INCLUDE_DIRS     include
   LIBRARIES      ${PROJECT_NAME}
@@ -13,14 +21,12 @@ catkin_package(
 )
 
 # C++ 11
-include(cmake/c++11.cmake)
+include(cmake/cslibs_gdal_c++11.cmake)
 # OpenMP
 set(OpenMP true)
-include(cmake/omp.cmake)
-# Optional Dependencies
-include(cmake/optional_dependencies.cmake)
+include(cmake/cslibs_gdal_omp.cmake)
 # Show the headers
-include(cmake/show_headers.cmake)
+include(cmake/cslibs_gdal_show_headers.cmake)
 
 include_directories(
     include
@@ -120,8 +126,10 @@ if(${gazebo_FOUND} AND ${xacro_FOUND})
         ${GAZEBO_LIBRARIES}
         ${PROJECT_NAME}
     )
+
     xacro_add_xacro_file("${CMAKE_CURRENT_LIST_DIR}/gazebo/launch/empty.xacro"
-                         "${CMAKE_CURRENT_LIST_DIR}/gazebo/launch/empty.world")
+                         "${CMAKE_CURRENT_LIST_DIR}/gazebo/launch/empty.world"
+                         INORDER)
 
     add_custom_target(${PROJECT_NAME}_world ALL DEPENDS "gazebo/launch/empty.world")
 

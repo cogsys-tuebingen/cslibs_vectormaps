@@ -12,7 +12,7 @@
     <include>
       <uri>model://ground_plane</uri>
     </include>
-    <plugin filename="libgazebo_dxf_map_plugin.so" name="gazebo_dxf">
+    <plugin filename="libcslibs_gdal_gazebo_dxf_map_plugin.so" name="gazebo_dxf">
       <map>${cslibs_gdal_res}/walls.dxf</map>
       <mesh_common>${cslibs_gdal_res}/mesh_common.dae</mesh_common>
       <material>BlueTransparent</material>
