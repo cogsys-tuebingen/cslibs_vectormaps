@@ -21,8 +21,10 @@ namespace cslibs_gdal {
 class  Map;
 class  Control;
 class  Renderer;
+class  Parameters;
 struct CornerDetectionParameter;
-struct RasterizationParamter;
+struct RasterizationParameter;
+
 
 class View : public QMainWindow
 {
@@ -39,7 +41,7 @@ public:
 signals:
     void openFile(const QString &path);
     void runCornerDetection(const CornerDetectionParameter &params);
-    void runGridmapExport(const RasterizationParamter &params, const QString &path);
+    void runGridmapExport(const RasterizationParameter &params);
 
 public slots:
     void update();
@@ -72,6 +74,7 @@ private:
     Map                                    *map_;
     Control                                *control_;
     Renderer                               *renderer_;
+    Parameters                             *parameters_;
 
     void renderLayer(const QString &name);
 

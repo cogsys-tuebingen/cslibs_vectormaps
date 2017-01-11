@@ -7,12 +7,17 @@
 #include "renderer.h"
 
 #include "control.h"
+#include "parameters.h"
+
 #include "algorithms/corner_detection.h"
 #include "algorithms/rasterization.h"
+
 #include "util/rng_color.hpp"
 
 #include "qt/QInteractiveGraphicsView.hpp"
 #include "qt/QLayerListItem.hpp"
+#include "qt/QCornerParamDialog.hpp"
+#include "qt/QGridmapParamDialog.hpp"
 
 #include <ui_map_viewer.h>
 #include <ui_map_viewer_list_item.h>
@@ -25,8 +30,7 @@
 
 #include <QAction>
 #include <QProgressDialog>
-#include "qt/QCornerParamDialog.hpp"
-#include "qt/QGridmapParamDialog.hpp"
+
 
 using namespace cslibs_gdal;
 
@@ -35,7 +39,8 @@ View::View() :
     view_(nullptr),
     progress_(nullptr),
     map_(nullptr),
-    control_(nullptr)
+    control_(nullptr),
+    parameters_(new Parameters)
 {
     ui_->setupUi(this);
     view_ = new QInteractiveGraphicsView;
@@ -60,6 +65,7 @@ View::~View()
     delete view_;
     delete ui_;
     delete renderer_;
+    delete parameters_;
 }
 
 void View::setup(Map *model,
@@ -161,28 +167,33 @@ void View::actionOpen()
 void View::actionExportGridmap()
 {
     QGridmapParamDialog param_dialog;
+    RasterizationParameter &params = parameters_->getRasterizationParameters();
+    param_dialog.setup(params.origin,
+                       params.resolution,
+                       params.path);
     param_dialog.exec();
+    param_dialog.get(params.origin,
+                     params.resolution,
+                     params.path);
 
-    RasterizationParamter params;
-    params.origin = param_dialog.getOrigin();
-    params.resolution = param_dialog.getResolution();
-
-    QString path = param_dialog.getPath();
-
-    runGridmapExport(params, path);
+    runGridmapExport(params);
 }
 
 void View::actionRun_corner_detection()
 {
-    QCornerParamDialog param_dialog;
+    QCornerParamDialog        param_dialog;
+    CornerDetectionParameter &params = parameters_->getCornerDetectionParameters();
+    param_dialog.setup(params.min_corner_angle,
+                       params.max_corner_point_distance,
+                       params.min_loose_endpoint_distance,
+                       params.pref_corner_angle,
+                       params.pref_corner_angle_std_dev);
     param_dialog.exec();
-
-    CornerDetectionParameter params;
-    params.max_corner_point_distance   = param_dialog.getMaxCornerPointDistance();
-    params.min_corner_angle            = param_dialog.getMinCornerAngle();
-    params.min_loose_endpoint_distance = param_dialog.getMinLooseEndpointDistance();
-    params.pref_corner_angle           = param_dialog.getPrefCornerAngle();
-    params.pref_corner_angle_std_dev   = param_dialog.getPrefCornerAngleStdDev();
+    param_dialog.get(params.min_corner_angle,
+                     params.max_corner_point_distance,
+                     params.min_loose_endpoint_distance,
+                     params.pref_corner_angle,
+                     params.pref_corner_angle_std_dev);
 
     runCornerDetection(params);
 }

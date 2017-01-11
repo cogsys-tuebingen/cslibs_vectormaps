@@ -2,7 +2,7 @@
 
 using namespace cslibs_gdal;
 
-Rasterization::Rasterization(const RasterizationParamter &parameters)
+Rasterization::Rasterization(const RasterizationParameter &parameters)
 {
 }
 

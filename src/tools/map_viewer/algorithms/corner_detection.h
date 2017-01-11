@@ -11,6 +11,15 @@ struct CornerDetectionParameter {
     double min_loose_endpoint_distance;
     double pref_corner_angle;
     double pref_corner_angle_std_dev;
+
+    CornerDetectionParameter() :
+        max_corner_point_distance(0.01),
+        min_corner_angle(M_PI / 4.0),
+        min_loose_endpoint_distance(0.1),
+        pref_corner_angle(M_PI / 2.0),
+        pref_corner_angle_std_dev(M_PI / 180.0)
+    {
+    }
 };
 
 class CornerDetection

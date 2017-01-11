@@ -74,8 +74,8 @@ void CornerDetection::operator () (const Vectors &vectors,
             }
         }
 
-        double angle_p1 = cslibs_boost_geometry::algorithms::angle<double, Point>(v1,closest_p1);
-        double angle_p2 = cslibs_boost_geometry::algorithms::angle<double, Point>(v1,closest_p2);
+        double angle_p1 = cslibs_boost_geometry::algorithms::angle<double, Point>(v1,closest_p1, 1e-6);
+        double angle_p2 = cslibs_boost_geometry::algorithms::angle<double, Point>(v1,closest_p2, 1e-6);
 
         if(capped_abs(angle_p1) >= parameter_.min_corner_angle &&
                 min_distance_p1 <= parameter_.max_corner_point_distance) {

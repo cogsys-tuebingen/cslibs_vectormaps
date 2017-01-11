@@ -31,24 +31,42 @@ public:
         delete ui_;
     }
 
-    Pose getOrigin() const
+    void setup(const Pose    &origin,
+               const double   resolution,
+               const QString &path)
     {
-        return {
-            ui_->doubleSpinBox_origin_x->value(),
-            ui_->doubleSpinBox_origin_y->value(),
-            ui_->doubleSpinBox_origin_phi->value() / 180. * M_PI
-        };
+        ui_->doubleSpinBox_origin_x->setValue(origin[0]);
+        ui_->doubleSpinBox_origin_y->setValue(origin[1]);
+        ui_->doubleSpinBox_origin_phi->setValue(toDeg(origin[2]));
+
+        ui_->doubleSpinBox_resolution->setValue(resolution);
+
+        ui_->lineEdit_path->setText(path);
     }
 
-    double getResolution() const
+    void get(Pose    &origin,
+             double  &resolution,
+             QString &path)
     {
-        return ui_->doubleSpinBox_resolution->value();
+        origin[0] = ui_->doubleSpinBox_origin_x->value();
+        origin[1] = ui_->doubleSpinBox_origin_y->value();
+        origin[2] = ui_->doubleSpinBox_origin_phi->value();
+
+        resolution = ui_->doubleSpinBox_resolution->value();
+
+        path = ui_->lineEdit_path->text();
     }
 
-    QString getPath() const
+    inline double toRad(const double &deg) const
     {
-        return ui_->lineEdit_path->text();
+        return deg / 180.0 * M_PI;
     }
+
+    inline double toDeg(const double &rad) const
+    {
+        return rad * 180.0 / M_PI;
+    }
+
 
 private slots:
     void pushButton_path_pushed(bool)

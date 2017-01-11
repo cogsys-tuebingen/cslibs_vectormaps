@@ -5,11 +5,20 @@
 #include <array>
 #include <opencv2/opencv.hpp>
 #include <cslibs_gdal/dxf_map.h>
+#include <QString>
 
 namespace cslibs_gdal {
-struct RasterizationParamter {
+struct RasterizationParameter {
     double                resolution;
     std::array<double, 3> origin;
+    QString               path;
+
+    RasterizationParameter() :
+        resolution(0.05),
+        origin{0.0, 0.0, 0.0},
+        path("")
+    {
+    }
 };
 
 class Rasterization
@@ -19,7 +28,7 @@ public:
     using Point   = dxf::DXFMap::Point;
     using Vector  = dxf::DXFMap::Vector;
 
-    Rasterization(const RasterizationParamter &parameters);
+    Rasterization(const RasterizationParameter &parameters);
 
     void operator() (const Vectors &vectors,
                      cv::Mat &map);

@@ -13,7 +13,7 @@ namespace cslibs_gdal {
 class Map;
 class View;
 class CornerDetectionParameter;
-class RasterizationParamter;
+class RasterizationParameter;
 
 class Control : public QObject
 {
@@ -39,8 +39,7 @@ public slots:
      *        visible layers.
      */
     void runCornerDetection(const CornerDetectionParameter &params);
-    void runGridmapExport(const RasterizationParamter &params,
-                          const QString &path);
+    void runGridmapExport(const RasterizationParameter &params);
 
 private:
     Map             *map_;
@@ -49,8 +48,7 @@ private:
     std::thread worker_thread_; /// used to applied algorithms
 
     void executeCornerDetection(const CornerDetectionParameter &params);
-    void executeGridmapExport(const RasterizationParamter &params,
-                              const QString &path);
+    void executeGridmapExport(const RasterizationParameter &params);
 
 };
 }

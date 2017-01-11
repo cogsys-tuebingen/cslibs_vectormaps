@@ -31,6 +31,8 @@ void Control::setup(Map *map,
     connect(view, SIGNAL(openFile(QString)), this, SLOT(openDXF(QString)));
     connect(view, SIGNAL(runCornerDetection(const CornerDetectionParameter&)),
             this, SLOT(runCornerDetection(const CornerDetectionParameter&)));
+    connect(view, SIGNAL(runGridmapExport(const RasterizationParameter&)),
+            this, SLOT(runGridmapExport(const RasterizationParameter&)));
 }
 
 void Control::runCornerDetection(const CornerDetectionParameter &params)
@@ -48,8 +50,7 @@ void Control::runCornerDetection(const CornerDetectionParameter &params)
     worker_thread_.detach();
 }
 
-void Control::runGridmapExport(const RasterizationParamter &params,
-                               const QString &path)
+void Control::runGridmapExport(const RasterizationParameter &params)
 {
     if(running_) {
         notification("Already running a process!");
@@ -57,8 +58,8 @@ void Control::runGridmapExport(const RasterizationParamter &params,
     }
 
     running_.store(true);
-    auto execution = [params, path, this] () {
-        executeGridmapExport(params, path);
+    auto execution = [params, this] () {
+        executeGridmapExport(params);
     };
     worker_thread_ = std::thread(execution);
     worker_thread_.detach();
@@ -131,8 +132,7 @@ void Control::executeCornerDetection(const CornerDetectionParameter &params)
     closeProgressDialog();
 }
 
-void Control::executeGridmapExport(const RasterizationParamter &params,
-                                   const QString &path)
+void Control::executeGridmapExport(const RasterizationParameter &params)
 {
     std::vector<LayerModel::Ptr> layers;
     map_->getLayers(layers);
@@ -159,8 +159,8 @@ void Control::executeGridmapExport(const RasterizationParamter &params,
     raster(vectors, map);
 
     /// SAVE
-    cv::imwrite(path.toStdString() + ".ppm", map);
-    MapMetaExporter::exportYAML(path.toStdString() + ".yaml", params.origin, params.resolution);
+    cv::imwrite(params.path.toStdString() + ".ppm", map);
+    MapMetaExporter::exportYAML(params.path.toStdString() + ".yaml", params.origin, params.resolution);
 
     running_.store(false);
     closeProgressDialog();
