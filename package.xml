@@ -1,10 +1,11 @@
 <?xml version="1.0"?>
 <package>
-  <name>cslibs_gdal</name>
+  <name>cslibs_vectormaps</name>
   <version>0.0.1</version>
   <description>
-    The cslibs_gdal package contains extensions and simplifying
+    The cslibs_vectormaps package contains extensions and a simplified
     interfaces for the gdal library.
+    It also provides an efficient representation for vector maps.
   </description>
 
 
