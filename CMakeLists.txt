@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(cslibs_gdal)
+project(cslibs_vectormaps)
 
 find_package(catkin REQUIRED cslibs_boost_geometry)
 find_package(GDAL   REQUIRED)
