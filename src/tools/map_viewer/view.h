@@ -17,7 +17,7 @@ class map_viewer;
 class map_viewer_list_item;
 }
 
-namespace cslibs_gdal {
+namespace cslibs_vectormaps {
 class  Map;
 class  Control;
 class  Renderer;

@@ -1,6 +1,6 @@
 #include "vector_layer_model.h"
 
-using namespace cslibs_gdal;
+using namespace cslibs_vectormaps;
 
 VectorLayerModel::VectorLayerModel()
 {

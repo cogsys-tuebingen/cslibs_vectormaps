@@ -32,7 +32,7 @@
 #include <QProgressDialog>
 
 
-using namespace cslibs_gdal;
+using namespace cslibs_vectormaps;
 
 View::View() :
     ui_(new Ui::map_viewer),

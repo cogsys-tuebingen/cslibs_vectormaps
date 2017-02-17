@@ -5,7 +5,7 @@
 #include <vector>
 #include <QColor>
 
-namespace cslibs_gdal {
+namespace cslibs_vectormaps {
 struct bezier
 {
     bezier(const std::vector<QColor> &support_colors)

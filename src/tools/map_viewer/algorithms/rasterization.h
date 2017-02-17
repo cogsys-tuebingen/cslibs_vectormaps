@@ -4,10 +4,10 @@
 #include <string>
 #include <array>
 #include <opencv2/opencv.hpp>
-#include <cslibs_gdal/dxf_map.h>
+#include <cslibs_vectormaps/dxf_map.h>
 #include <QString>
 
-namespace cslibs_gdal {
+namespace cslibs_vectormaps {
 struct RasterizationParameter {
     double                resolution;
     std::array<double, 3> origin;

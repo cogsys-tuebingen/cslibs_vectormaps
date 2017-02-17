@@ -1,7 +1,7 @@
 #ifndef LAYERMODEL_H
 #define LAYERMODEL_H
 
-#include <cslibs_gdal/dxf_map.h>
+#include <cslibs_vectormaps/dxf_map.h>
 #include <array>
 #include <memory>
 
@@ -10,7 +10,7 @@
 #include <QColor>
 #include <QObject>
 
-namespace cslibs_gdal {
+namespace cslibs_vectormaps {
 class LayerModel
 {
 public:

@@ -2,7 +2,7 @@
 #include <cslibs_boost_geometry/algorithms.h>
 #include <boost/geometry/algorithms/distance.hpp>
 
-using namespace cslibs_gdal;
+using namespace cslibs_vectormaps;
 
 CornerDetection::CornerDetection(const CornerDetectionParameter &parameter) :
     parameter_(parameter)

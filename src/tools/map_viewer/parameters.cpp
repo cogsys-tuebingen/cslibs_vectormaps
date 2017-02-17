@@ -1,6 +1,6 @@
 #include "parameters.h"
 
-using namespace cslibs_gdal;
+using namespace cslibs_vectormaps;
 
 Parameters::Parameters()
 {

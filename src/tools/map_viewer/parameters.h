@@ -4,7 +4,7 @@
 #include "algorithms/corner_detection.h"
 #include "algorithms/rasterization.h"
 
-namespace cslibs_gdal {
+namespace cslibs_vectormaps {
 class Parameters
 {
 public:

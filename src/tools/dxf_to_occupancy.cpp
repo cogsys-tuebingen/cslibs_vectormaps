@@ -2,9 +2,9 @@
 #include <ros/ros.h>
 #include <nav_msgs/OccupancyGrid.h>
 #include <opencv2/opencv.hpp>
-#include <cslibs_gdal/dxf_map.h>
+#include <cslibs_vectormaps/dxf_map.h>
 
-using namespace cslibs_gdal;
+using namespace cslibs_vectormaps;
 
 namespace {
 

@@ -11,11 +11,11 @@
 #include "algorithms/rasterization.h"
 #include "util/map_meta_exporter.hpp"
 
-#include <cslibs_gdal/dxf_map.h>
+#include <cslibs_vectormaps/dxf_map.h>
 
 #include <iostream>
 
-using namespace cslibs_gdal;
+using namespace cslibs_vectormaps;
 
 Control::Control() :
     running_(false)

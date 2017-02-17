@@ -7,7 +7,7 @@
 #include <random>
 #include <array>
 
-namespace cslibs_gdal {
+namespace cslibs_vectormaps {
 struct RNGColor {
 
     RNGColor() :

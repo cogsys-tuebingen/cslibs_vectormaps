@@ -3,7 +3,7 @@
 
 #include "point_layer_model.h"
 
-namespace cslibs_gdal {
+namespace cslibs_vectormaps {
 class CornerLayerModel : public PointLayerModel
 { 
 public:

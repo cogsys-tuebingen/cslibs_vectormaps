@@ -3,7 +3,7 @@
 
 #include "layer_model.h"
 
-namespace cslibs_gdal {
+namespace cslibs_vectormaps {
 class DoorLayerModel : public LayerModel
 {
 public:

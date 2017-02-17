@@ -4,7 +4,7 @@
 #include <yaml-cpp/yaml.h>
 #include <fstream>
 
-namespace cslibs_gdal {
+namespace cslibs_vectormaps {
 
 class MapMetaExporter {
 public:

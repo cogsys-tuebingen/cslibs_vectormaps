@@ -1,6 +1,6 @@
 #include "layer_model.h"
 
-using namespace cslibs_gdal;
+using namespace cslibs_vectormaps;
 
 LayerModel::LayerModel() :
     visible_(true),

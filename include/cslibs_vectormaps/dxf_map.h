@@ -8,7 +8,7 @@
 #include <gdal/ogrsf_frmts.h>
 #include <boost/shared_ptr.hpp>
 
-namespace cslibs_gdal {
+namespace cslibs_vectormaps {
 namespace dxf {
 /**
  * @brief The DXFVectorMap class can be used to load

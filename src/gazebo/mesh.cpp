@@ -1,6 +1,6 @@
 #include "mesh.h"
 
-using namespace cslibs_gdal::dxf;
+using namespace cslibs_vectormaps::dxf;
 
 
 #include <gazebo/physics/Model.hh>

@@ -9,7 +9,7 @@
 
 
 
-namespace cslibs_gdal {
+namespace cslibs_vectormaps {
 class Map;
 class View;
 class CornerDetectionParameter;

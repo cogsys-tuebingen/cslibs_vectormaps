@@ -21,12 +21,12 @@ catkin_package(
 )
 
 # C++ 11
-include(cmake/cslibs_gdal_c++11.cmake)
+include(cmake/cslibs_vectormaps_c++11.cmake)
 # OpenMP
 set(OpenMP true)
-include(cmake/cslibs_gdal_omp.cmake)
+include(cmake/cslibs_vectormaps_omp.cmake)
 # Show the headers
-include(cmake/cslibs_gdal_show_headers.cmake)
+include(cmake/cslibs_vectormaps_show_headers.cmake)
 
 include_directories(
     include

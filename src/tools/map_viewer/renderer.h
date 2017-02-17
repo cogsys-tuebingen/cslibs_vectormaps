@@ -16,7 +16,7 @@ class QGraphicsScene;
 class QGraphicsPathItem;
 class QGraphicsItemGroup;
 
-namespace cslibs_gdal {
+namespace cslibs_vectormaps {
 class Map;
 class View;
 

@@ -1,7 +1,7 @@
 #ifndef MODEL_H
 #define MODEL_H
 
-#include <cslibs_gdal/dxf_map.h>
+#include <cslibs_vectormaps/dxf_map.h>
 
 #include "models/layer_model.h"
 
@@ -13,7 +13,7 @@
 #include <thread>
 #include <mutex>
 
-namespace cslibs_gdal {
+namespace cslibs_vectormaps {
 class View;
 
 class Map : public QObject

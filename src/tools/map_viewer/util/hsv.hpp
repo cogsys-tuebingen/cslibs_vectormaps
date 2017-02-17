@@ -3,7 +3,7 @@
 
 #include <QColor>
 
-namespace cslibs_gdal {
+namespace cslibs_vectormaps {
 struct hsv {
     static constexpr double _2_M_PI = 2 * M_PI;
     static constexpr double _1_2_M_PI = 1. / _2_M_PI;

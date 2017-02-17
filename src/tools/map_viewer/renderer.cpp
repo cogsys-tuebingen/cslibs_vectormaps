@@ -13,7 +13,7 @@
 #include "util/bezier_color.hpp"
 #include "util/hsv.hpp"
 
-using namespace cslibs_gdal;
+using namespace cslibs_vectormaps;
 
 Renderer::Renderer() :
     default_point_alpha_(0.6),

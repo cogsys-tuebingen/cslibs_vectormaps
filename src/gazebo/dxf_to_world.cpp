@@ -4,14 +4,14 @@
 #include <gazebo/physics/World.hh>
 #include <gazebo/physics/BoxShape.hh>
 
-#include <cslibs_gdal/dxf_map.h>
+#include <cslibs_vectormaps/dxf_map.h>
 #include <yaml-cpp/yaml.h>
 
 #include "mesh.h"
 
 
 using namespace gazebo;
-using namespace cslibs_gdal;
+using namespace cslibs_vectormaps;
 
 // implemented similar to: https://gitlab.cs.uni-tuebingen.de/utils/gdal/blob/master/src/dxf_map_gazebo.cpp
 
@@ -50,7 +50,7 @@ bool readConfig(const std::string filename,
 int main(int argc, char* argv[])
 {
 
-    std::string map_path  = "/home/rauscher/ws/tmp/src/utils/cslibs_gdal/res/ek.dxf";
+    std::string map_path  = "/home/rauscher/ws/tmp/src/utils/cslibs_vectormaps/res/ek.dxf";
     if(argc < 2) {
         std::cerr << "dxf_to_world <map.dxf> [config.yaml]" << std::endl;
         return 0;
@@ -60,7 +60,7 @@ int main(int argc, char* argv[])
 
 
     std::string output_path = "/tmp/sand.world";
-    std::string mesh_common_path = "/home/rauscher/ws/tmp/src/utils/cslibs_gdal/res/mesh_common.dae";
+    std::string mesh_common_path = "/home/rauscher/ws/tmp/src/utils/cslibs_vectormaps/res/mesh_common.dae";
     std::string mesh_material    = "BlueTransparent";
     std::string mesh_name        = "map";
     double      mesh_height      = 2.0;
@@ -90,7 +90,7 @@ int main(int argc, char* argv[])
 
 
     std::cout << "Starting to convert " << map_path << " ... " << std::endl;;
-    cslibs_gdal::dxf::DXFMap map;
+    cslibs_vectormaps::dxf::DXFMap map;
     if(!map.open(map_path)) {
         gzerr << "'" << map_path << "' not found!" << std::endl;
         return 0;

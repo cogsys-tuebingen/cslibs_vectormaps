@@ -1,11 +1,11 @@
 /// HEADER
-#include <cslibs_gdal/dxf_map.h>
+#include <cslibs_vectormaps/dxf_map.h>
 #include <cslibs_boost_geometry/algorithms.h>
 #include <boost/geometry/algorithms/difference.hpp>
 #include <boost/geometry/strategies/strategies.hpp>
 #include <boost/geometry/geometries/ring.hpp>
 
-using namespace cslibs_gdal;
+using namespace cslibs_vectormaps;
 using namespace dxf;
 
 DXFMap::DXFMap(const bool debug) :

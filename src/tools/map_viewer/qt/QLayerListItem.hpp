@@ -9,7 +9,7 @@
 
 #include <ui_map_viewer_list_item.h>
 
-namespace cslibs_gdal {
+namespace cslibs_vectormaps {
 class LayerModel;
 }
 
@@ -18,7 +18,7 @@ class QLayerListItem : public QWidget
     Q_OBJECT
 
 public:
-    using ModelPtr = typename std::shared_ptr<cslibs_gdal::LayerModel>;
+    using ModelPtr = typename std::shared_ptr<cslibs_vectormaps::LayerModel>;
 
     QLayerListItem(QWidget * parent = 0) :
         QWidget(parent),

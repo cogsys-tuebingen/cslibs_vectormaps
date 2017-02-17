@@ -1,6 +1,6 @@
 #include "rasterization.h"
 
-using namespace cslibs_gdal;
+using namespace cslibs_vectormaps;
 
 Rasterization::Rasterization(const RasterizationParameter &parameters)
 {

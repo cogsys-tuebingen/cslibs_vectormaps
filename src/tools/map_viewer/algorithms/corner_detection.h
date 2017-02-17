@@ -1,10 +1,10 @@
 #ifndef CORNERDETECTION_H
 #define CORNERDETECTION_H
 
-#include <cslibs_gdal/dxf_map.h>
+#include <cslibs_vectormaps/dxf_map.h>
 #include <functional>
 
-namespace cslibs_gdal {
+namespace cslibs_vectormaps {
 struct CornerDetectionParameter {
     double max_corner_point_distance;
     double min_corner_angle;
