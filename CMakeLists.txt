@@ -3,15 +3,11 @@ project(cslibs_vectormaps)
 
 find_package(catkin REQUIRED cslibs_boost_geometry)
 find_package(GDAL   REQUIRED)
-find_package(Boost  REQUIRED system filesystem)
 
 # Optional Dependencies
-find_package(OpenCV QUIET)
-find_package(roscpp QUIET)
 find_package(gazebo QUIET)
 find_package(xacro  QUIET)
 find_package(Qt5 COMPONENTS Core Gui Widgets QUIET)
-find_package(Eigen3 QUIET)
 
 catkin_package(
   INCLUDE_DIRS     include
@@ -32,9 +28,7 @@ include_directories(
     include
     ${catkin_INCLUDE_DIRS}
     ${GDAL_INCLUDE_DIRS}
-    ${Boost_INCLUDE_DIRS}
     ${GAZEBO_INCLUDE_DIRS}
-    ${Eigen3_INCLUDE_DIRS}
     ${Qt5Core_INCLUDE_DIRS} ${Qt5Gui_INCLUDE_DIRS} ${Qt5Widgets_INCLUDE_DIRS}
 )
 
@@ -48,23 +42,7 @@ target_link_libraries(${PROJECT_NAME}
     ${Boost_LIBRARIES}
 )
 
-if(${OpenCV_FOUND} AND ${roscpp_FOUND})
-include_directories(${OpenCV_INCLUDE_DIRS})
-include_directories(${roscpp_INCLUDE_DIRS})
-add_executable(${PROJECT_NAME}_dxf_to_occupancy_grid
-    src/tools/dxf_to_occupancy.cpp
-)
-
-target_link_libraries(${PROJECT_NAME}_dxf_to_occupancy_grid
-    ${catkin_LIBRARIES}
-    ${OpenCV_LIBRARIES}
-    ${roscpp_LIBRARIES}
-    ${PROJECT_NAME}
-)
-
-endif()
-
-if(${Qt5_FOUND} AND ${OpenCV_FOUND})
+if(${Qt5_FOUND})
     set(CMAKE_EXE_LINKER_FLAGS "-lpthread ${CMAKE_EXE_LINKER_FLAGS}")
     add_definitions(-lpthread ${Qt5Widgets_DEFINITIONS})
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
@@ -114,11 +92,18 @@ if(${Qt5_FOUND} AND ${OpenCV_FOUND})
         Qt5::Core Qt5::Gui Qt5::Widgets
         yaml-cpp
         ${catkin_LIBRARIES}
-        ${OpenCV_LIBRARIES}
     )
 
 endif()
 if(${gazebo_FOUND} AND ${xacro_FOUND})
+    find_package(Eigen3 REQUIRED)
+    find_package(Boost  REQUIRED system filesystem)
+
+    include_directories(
+        ${Eigen3_INCLUDE_DIRS}
+        ${Boost_INCLUDE_DIRS}
+    )
+
     add_library(${PROJECT_NAME}_gazebo_dxf_map_plugin
         src/gazebo/dxf_map_gazebo.cpp
         src/gazebo/mesh.cpp
@@ -140,6 +125,7 @@ if(${gazebo_FOUND} AND ${xacro_FOUND})
     )
     target_link_libraries(${PROJECT_NAME}_dxf_to_gazebo_world
         ${GAZEBO_LIBRARIES}
+        ${Boost_LIBRARIES}
         ${PROJECT_NAME}
         yaml-cpp
     )
