@@ -171,12 +171,12 @@ void View::actionExportGridmap()
     param_dialog.setup(params.origin,
                        params.resolution,
                        params.path);
-    param_dialog.exec();
-    param_dialog.get(params.origin,
-                     params.resolution,
-                     params.path);
-
-    runGridmapExport(params);
+    if(param_dialog.exec() == QDialog::Accepted) {
+        param_dialog.get(params.origin,
+                         params.resolution,
+                         params.path);
+        runGridmapExport(params);
+    }
 }
 
 void View::actionRun_corner_detection()
@@ -188,14 +188,14 @@ void View::actionRun_corner_detection()
                        params.min_loose_endpoint_distance,
                        params.pref_corner_angle,
                        params.pref_corner_angle_std_dev);
-    param_dialog.exec();
-    param_dialog.get(params.min_corner_angle,
-                     params.max_corner_point_distance,
-                     params.min_loose_endpoint_distance,
-                     params.pref_corner_angle,
-                     params.pref_corner_angle_std_dev);
-
-    runCornerDetection(params);
+    if(param_dialog.exec() == QDialog::Accepted) {
+        param_dialog.get(params.min_corner_angle,
+                         params.max_corner_point_distance,
+                         params.min_loose_endpoint_distance,
+                         params.pref_corner_angle,
+                         params.pref_corner_angle_std_dev);
+        runCornerDetection(params);
+    }
 }
 
 void View::actionBuild_topology()

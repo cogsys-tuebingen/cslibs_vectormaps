@@ -71,7 +71,7 @@ public:
 private slots:
     void pushButton_path_pushed(bool)
     {
-        QString file_name = QFileDialog::getExistingDirectory(this, "Save under ...", "~", QFileDialog::ShowDirsOnly);
+        QString file_name = QFileDialog::getSaveFileName(this, "Save under ...", ui_->lineEdit_path->text());
         if(file_name != "")
             ui_->lineEdit_path->setText(file_name);
     }

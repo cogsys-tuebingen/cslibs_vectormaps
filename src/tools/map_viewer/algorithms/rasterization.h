@@ -3,9 +3,10 @@
 
 #include <string>
 #include <array>
-#include <opencv2/opencv.hpp>
 #include <cslibs_vectormaps/dxf_map.h>
 #include <QString>
+#include <QImage>
+#include <QPixmap>
 
 namespace cslibs_vectormaps {
 struct RasterizationParameter {
@@ -24,15 +25,15 @@ struct RasterizationParameter {
 class Rasterization
 {
 public:
-    using Vectors = dxf::DXFMap::Vectors;
-    using Point   = dxf::DXFMap::Point;
-    using Vector  = dxf::DXFMap::Vector;
+    using QLineFList  = std::vector<QLineF> ;
 
     Rasterization(const RasterizationParameter &parameters);
 
-    void operator() (const Vectors &vectors,
-                     cv::Mat &map);
-
+    bool operator ()(const QLineFList &vectors,
+                     const QPointF    &min,
+                     const QPointF    &max);
+private:
+    RasterizationParameter parameters_;
 };
 }
 

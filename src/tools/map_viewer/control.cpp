@@ -138,12 +138,12 @@ void Control::executeGridmapExport(const RasterizationParameter &params)
     map_->getLayers(layers);
 
     /// get all line segments from visible layers
-    dxf::DXFMap::Vectors vectors;
+    VectorLayerModel::QLineFList vectors;
     for(LayerModel::Ptr &l : layers) {
         if(l->getVisibility()) {
             VectorLayerModel::Ptr lv = LayerModel::as<VectorLayerModel>(l);
             if(lv) {
-                dxf::DXFMap::Vectors v;
+                VectorLayerModel::QLineFList v;
                 lv->getVectors(v);
                 vectors.insert(vectors.end(), v.begin(), v.end());
             }
@@ -153,14 +153,9 @@ void Control::executeGridmapExport(const RasterizationParameter &params)
     openProgressDialog("Corner Detection");
     progress(-1);
 
-    /// RASTER
     Rasterization raster(params);
-    cv::Mat map;
-    raster(vectors, map);
-
-    /// SAVE
-    cv::imwrite(params.path.toStdString() + ".ppm", map);
-    MapMetaExporter::exportYAML(params.path.toStdString() + ".yaml", params.origin, params.resolution);
+    if(!raster(vectors, map_->getMin(), map_->getMax()))
+        notification("Rasterization Failed!");
 
     running_.store(false);
     closeProgressDialog();
