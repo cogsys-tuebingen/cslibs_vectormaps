@@ -1,7 +1,7 @@
 #ifndef CORNERDETECTION_H
 #define CORNERDETECTION_H
 
-#include <cslibs_vectormaps/dxf_map.h>
+#include <cslibs_vectormaps/dxf/dxf_map.h>
 #include <functional>
 
 namespace cslibs_vectormaps {

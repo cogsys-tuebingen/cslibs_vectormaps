@@ -3,7 +3,7 @@
 
 #include <string>
 #include <array>
-#include <cslibs_vectormaps/dxf_map.h>
+#include <cslibs_vectormaps/dxf/dxf_map.h>
 #include <QString>
 #include <QImage>
 #include <QPixmap>

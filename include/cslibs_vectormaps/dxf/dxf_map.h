@@ -30,7 +30,7 @@ public:
     typedef cslibs_boost_geometry::types::Line2d
     Vector;
 
-    typedef cslibs_boost_geometry::types::LineSet2d
+    typedef cslibs_boost_geometry::types::Line2dSet
     Vectors;
 
     typedef cslibs_boost_geometry::types::Polygon2d

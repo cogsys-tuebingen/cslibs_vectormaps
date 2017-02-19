@@ -1,7 +1,7 @@
 #ifndef MESH_H
 #define MESH_H
 
-#include <cslibs_vectormaps/dxf_map.h>
+#include <cslibs_vectormaps/dxf/dxf_map.h>
 #include <gazebo/gazebo.hh>
 
 struct Mesh {

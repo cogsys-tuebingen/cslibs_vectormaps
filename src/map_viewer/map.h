@@ -1,7 +1,7 @@
 #ifndef MODEL_H
 #define MODEL_H
 
-#include <cslibs_vectormaps/dxf_map.h>
+#include <cslibs_vectormaps/dxf/dxf_map.h>
 
 #include "models/layer_model.h"
 

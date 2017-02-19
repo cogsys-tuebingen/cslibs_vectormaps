@@ -11,7 +11,7 @@
 #include "algorithms/rasterization.h"
 #include "util/map_meta_exporter.hpp"
 
-#include <cslibs_vectormaps/dxf_map.h>
+#include <cslibs_vectormaps/dxf/dxf_map.h>
 
 #include <iostream>
 

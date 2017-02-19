@@ -1,7 +1,7 @@
 #ifndef LAYERMODEL_H
 #define LAYERMODEL_H
 
-#include <cslibs_vectormaps/dxf_map.h>
+#include <cslibs_vectormaps/dxf/dxf_map.h>
 #include <array>
 #include <memory>
 

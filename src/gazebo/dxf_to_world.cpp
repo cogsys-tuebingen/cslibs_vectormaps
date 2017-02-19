@@ -4,7 +4,7 @@
 #include <gazebo/physics/World.hh>
 #include <gazebo/physics/BoxShape.hh>
 
-#include <cslibs_vectormaps/dxf_map.h>
+#include <cslibs_vectormaps/dxf/dxf_map.h>
 #include <yaml-cpp/yaml.h>
 
 #include "mesh.h"

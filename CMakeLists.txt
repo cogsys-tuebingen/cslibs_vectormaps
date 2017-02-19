@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(cslibs_vectormaps)
 
-find_package(catkin REQUIRED cslibs_boost_geometry)
+find_package(catkin REQUIRED cslibs_boost_geometry cslibs_indexed_storage)
 find_package(GDAL   REQUIRED)
 
 # Optional Dependencies
@@ -11,8 +11,8 @@ find_package(Qt5 COMPONENTS Core Gui Widgets QUIET)
 
 catkin_package(
   INCLUDE_DIRS     include
-  LIBRARIES      ${PROJECT_NAME}
-  CATKIN_DEPENDS  cslibs_boost_geometry
+  LIBRARIES        ${PROJECT_NAME}
+  CATKIN_DEPENDS   cslibs_boost_geometry
   DEPENDS          Boost GDAL
 )
 
@@ -33,7 +33,10 @@ include_directories(
 )
 
 add_library(${PROJECT_NAME}
-   src/map/dxf_map.cpp
+   src/dxf/dxf_map.cpp
+   src/vector/vector_map_grid.cpp
+   src/vector/vector_map_grid_orientation.cpp
+   src/vector/vector_map_grid_visibility.cpp
 )
 
 target_link_libraries(${PROJECT_NAME}
@@ -54,34 +57,34 @@ if(${Qt5_FOUND})
     )
 
     qt5_wrap_ui(QT_UI
-                src/tools/map_viewer/ui/map_viewer.ui
-                src/tools/map_viewer/ui/map_viewer_list_item.ui
-                src/tools/map_viewer/ui/map_viewer_corner_param_dialog.ui
-                src/tools/map_viewer/ui/map_viewer_gridmap_param_dialog.ui)
+                src/map_viewer/ui/map_viewer.ui
+                src/map_viewer/ui/map_viewer_list_item.ui
+                src/map_viewer/ui/map_viewer_corner_param_dialog.ui
+                src/map_viewer/ui/map_viewer_gridmap_param_dialog.ui)
 
     add_executable(${PROJECT_NAME}_map_viewer
-        src/tools/map_viewer/map_viewer.cpp
-        src/tools/map_viewer/view.cpp
-        src/tools/map_viewer/control.cpp
-        src/tools/map_viewer/map.cpp
-        src/tools/map_viewer/renderer.cpp
-        src/tools/map_viewer/parameters.cpp
+        src/map_viewer/map_viewer.cpp
+        src/map_viewer/view.cpp
+        src/map_viewer/control.cpp
+        src/map_viewer/map.cpp
+        src/map_viewer/renderer.cpp
+        src/map_viewer/parameters.cpp
 
-        src/tools/map_viewer/models/layer_model.cpp
-        src/tools/map_viewer/models/point_layer_model.cpp
-        src/tools/map_viewer/models/corner_layer_model.cpp
-        src/tools/map_viewer/models/vector_layer_model.cpp
-        src/tools/map_viewer/models/door_layer_model.cpp
+        src/map_viewer/models/layer_model.cpp
+        src/map_viewer/models/point_layer_model.cpp
+        src/map_viewer/models/corner_layer_model.cpp
+        src/map_viewer/models/vector_layer_model.cpp
+        src/map_viewer/models/door_layer_model.cpp
 
-        src/tools/map_viewer/qt/QInteractiveGraphicsView.hpp
-        src/tools/map_viewer/qt/QLayerListItem.hpp
-        src/tools/map_viewer/qt/QCornerParamDialog.hpp
-        src/tools/map_viewer/qt/QGridmapParamDialog.hpp
+        src/map_viewer/qt/QInteractiveGraphicsView.hpp
+        src/map_viewer/qt/QLayerListItem.hpp
+        src/map_viewer/qt/QCornerParamDialog.hpp
+        src/map_viewer/qt/QGridmapParamDialog.hpp
 
-        src/tools/map_viewer/util/rng_color.hpp
+        src/map_viewer/util/rng_color.hpp
 
-        src/tools/map_viewer/algorithms/corner_detection.cpp
-        src/tools/map_viewer/algorithms/rasterization.cpp
+        src/map_viewer/algorithms/corner_detection.cpp
+        src/map_viewer/algorithms/rasterization.cpp
 
         ${QT_UI}
 

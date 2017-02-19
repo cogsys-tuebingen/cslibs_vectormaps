@@ -1,5 +1,5 @@
 /// HEADER
-#include <cslibs_vectormaps/dxf_map.h>
+#include <cslibs_vectormaps/dxf/dxf_map.h>
 #include <cslibs_boost_geometry/algorithms.h>
 #include <boost/geometry/algorithms/difference.hpp>
 #include <boost/geometry/strategies/strategies.hpp>
