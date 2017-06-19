@@ -2,7 +2,7 @@
 
 <sdf version="1.4">
   <world name="default" xmlns:xacro="http://www.ros.org/wiki/xacro">
-    <xacro:property name="cslibs_gdal_res" value="$(find cslibs_gdal)/res" />
+    <xacro:property name="cslibs_vectormaps_res" value="$(find cslibs_vectormaps)/res" />
 
     <!-- A global light source -->
     <include>
@@ -13,8 +13,8 @@
       <uri>model://ground_plane</uri>
     </include>
     <plugin filename="libcslibs_gdal_gazebo_dxf_map_plugin.so" name="gazebo_dxf">
-      <map>${cslibs_gdal_res}/walls.dxf</map>
-      <mesh_common>${cslibs_gdal_res}/mesh_common.dae</mesh_common>
+      <map>${cslibs_vectormaps_res}/walls.dxf</map>
+      <mesh_common>${cslibs_vectormaps_res}/mesh_common.dae</mesh_common>
       <material>BlueTransparent</material>
       <height>2.0</height>
       <mesh_name>map</mesh_name>

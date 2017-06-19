@@ -19,11 +19,11 @@ public:
     using Index                 = std::array<std::size_t, 2>;
     using Point                 = cslibs_boost_geometry::types::Point2d;
     using Vector                = cslibs_boost_geometry::types::Vec2d;
-    using Vectors               = cslibs_boost_geometry::types::Line2dSet;
+    using Vectors               = cslibs_boost_geometry::types::LineSet2d;
     using VectorPtrs            = cslibs_boost_geometry::types::Line2dPtrSet;
     using Polygon               = cslibs_boost_geometry::types::Polygon2d;
-    using IntersectionResultSet = cslibs_boost_geometry::types::Intersection2dResultSet;
-    using IntersectionResult    = cslibs_boost_geometry::types::Intersection2dResult;
+    using IntersectionResultSet = cslibs_boost_geometry::types::IntersectionResultSet2d;
+    using IntersectionResult    = cslibs_boost_geometry::types::IntersectionResult2d;
 
     VectorMapGrid() = default;
     VectorMapGrid(const Point  minimum,
