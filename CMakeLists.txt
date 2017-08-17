@@ -8,10 +8,11 @@ find_package(GDAL   REQUIRED)
 find_package(gazebo QUIET)
 find_package(xacro  QUIET)
 find_package(Qt5 COMPONENTS Core Gui Widgets QUIET)
+find_package(Boost REQUIRED COMPONENTS system iostreams)
 
 catkin_package(
   INCLUDE_DIRS     include
-  LIBRARIES        ${PROJECT_NAME}
+  LIBRARIES        ${PROJECT_NAME}_dxf ${PROJECT_NAME}_maps
   CATKIN_DEPENDS   cslibs_boost_geometry
   DEPENDS          Boost GDAL
 )
@@ -32,14 +33,25 @@ include_directories(
     ${Qt5Core_INCLUDE_DIRS} ${Qt5Gui_INCLUDE_DIRS} ${Qt5Widgets_INCLUDE_DIRS}
 )
 
-add_library(${PROJECT_NAME}
+add_library(${PROJECT_NAME}_dxf
    src/dxf/dxf_map.cpp
-   src/vector/vector_map_grid.cpp
-   src/vector/vector_map_grid_orientation.cpp
-   src/vector/vector_map_grid_visibility.cpp
 )
 
-target_link_libraries(${PROJECT_NAME}
+target_link_libraries(${PROJECT_NAME}_dxf
+    ${catkin_LIBRARIES}
+    ${GDAL_LIBRARIES}
+    ${Boost_LIBRARIES}
+)
+
+add_library(${PROJECT_NAME}_maps
+    src/maps/grid_vector_map.cpp
+    src/maps/oriented_grid_vector_map.cpp
+    src/maps/oriented_visibility_grid_vector_map.cpp
+    src/maps/simple_grid_vector_map.cpp
+    src/maps/vector_map.cpp
+)
+
+target_link_libraries(${PROJECT_NAME}_maps
     ${catkin_LIBRARIES}
     ${GDAL_LIBRARIES}
     ${Boost_LIBRARIES}
@@ -91,7 +103,8 @@ if(${Qt5_FOUND})
     )
 
     target_link_libraries(${PROJECT_NAME}_map_viewer
-        ${PROJECT_NAME}
+        ${PROJECT_NAME}_dxf
+        ${PROJECT_NAME}_maps
         Qt5::Core Qt5::Gui Qt5::Widgets
         yaml-cpp
         ${catkin_LIBRARIES}
@@ -113,7 +126,7 @@ if(${gazebo_FOUND} AND ${xacro_FOUND})
     )
     target_link_libraries(${PROJECT_NAME}_gazebo_dxf_map_plugin
         ${GAZEBO_LIBRARIES}
-        ${PROJECT_NAME}
+        ${PROJECT_NAME}_dxf
     )
 
     xacro_add_xacro_file("${CMAKE_CURRENT_LIST_DIR}/gazebo/launch/empty.xacro"
@@ -129,7 +142,7 @@ if(${gazebo_FOUND} AND ${xacro_FOUND})
     target_link_libraries(${PROJECT_NAME}_dxf_to_gazebo_world
         ${GAZEBO_LIBRARIES}
         ${Boost_LIBRARIES}
-        ${PROJECT_NAME}
+        ${PROJECT_NAME}_dxf
         yaml-cpp
     )
 endif()

@@ -1,5 +1,5 @@
 if(${OpenMP})
-    message("utils_vectormaps - OpenMP support enabled!")
+    message("cslibs_vectormaps - OpenMP support enabled!")
 
     find_package(OpenMP REQUIRED)
 
@@ -8,5 +8,5 @@ if(${OpenMP})
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
 
 else()
-    message("utils_vectormaps - OpenMP support disabled!")
+    message("cslibs_vectormaps - OpenMP support disabled!")
 endif()
