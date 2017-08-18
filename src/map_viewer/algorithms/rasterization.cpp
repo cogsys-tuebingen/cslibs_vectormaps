@@ -13,7 +13,8 @@ Rasterization::Rasterization(const RasterizationParameter &parameters) :
 
 bool Rasterization::operator ()(const QLineFList &vectors,
                                 const QPointF &min,
-                                const QPointF &max)
+                                const QPointF &max,
+                                progress_t progress)
 {
     QPointF span = max - min;
     QPixmap canvas = QPixmap(span.x() / parameters_.resolution, span.y() / parameters_.resolution);
@@ -27,10 +28,15 @@ bool Rasterization::operator ()(const QLineFList &vectors,
     vangogh.setRenderHint(QPainter::SmoothPixmapTransform, false);
     vangogh.setPen(pen);
 
-    for(const QLineF &v : vectors) {
+    for(std::size_t i = 0 ; i < vectors.size() ; ++i) {
+        const QLineF &v = vectors.at(i);
         QLine line(((v.p1() - min) / parameters_.resolution).toPoint(), ((v.p2() - min) / parameters_.resolution).toPoint());
         vangogh.drawLine(line);
+        progress(static_cast<int>(std::floor((i + 1ul) / static_cast<double>(vectors.size()))));
     }
+
+    progress(-1);
+
     MapMetaExporter::exportYAML(parameters_.path.toStdString() + ".yaml", parameters_.origin, parameters_.resolution);
     return canvas.save(parameters_.path + ".ppm", "PPM");
 }

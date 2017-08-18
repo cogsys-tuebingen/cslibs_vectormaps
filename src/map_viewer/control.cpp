@@ -9,6 +9,7 @@
 
 #include "algorithms/corner_detection.h"
 #include "algorithms/rasterization.h"
+#include "algorithms/vectormap_conversion.h"
 #include "util/map_meta_exporter.hpp"
 
 #include <cslibs_vectormaps/dxf/dxf_map.h>
@@ -33,6 +34,8 @@ void Control::setup(Map *map,
             this, SLOT(runCornerDetection(const CornerDetectionParameter&)));
     connect(view, SIGNAL(runGridmapExport(const RasterizationParameter&)),
             this, SLOT(runGridmapExport(const RasterizationParameter&)));
+    connect(view, SIGNAL(runVectormapExport(const VectormapConversionParameter&)),
+            this, SLOT(runVectormapExport(const VectormapConversionParameter&)));
 }
 
 void Control::runCornerDetection(const CornerDetectionParameter &params)
@@ -65,6 +68,20 @@ void Control::runGridmapExport(const RasterizationParameter &params)
     worker_thread_.detach();
 }
 
+void Control::runVectormapExport(const VectormapConversionParameter &params)
+{
+    if(running_) {
+        notification("Already running a process!");
+        return;
+    }
+
+    running_.store(true);
+    auto execution = [params, this] () {
+        executeVectormapExport(params);
+    };
+    worker_thread_ = std::thread(execution);
+    worker_thread_.detach();
+}
 
 void Control::openDXF(const QString &path)
 {
@@ -150,12 +167,41 @@ void Control::executeGridmapExport(const RasterizationParameter &params)
         }
     }
 
-    openProgressDialog("Corner Detection");
+    openProgressDialog("Gridmap Export");
     progress(-1);
 
     Rasterization raster(params);
-    if(!raster(vectors, map_->getMin(), map_->getMax()))
+    if(!raster(vectors, map_->getMin(), map_->getMax(), [this](const int p){progress(p);}))
         notification("Rasterization Failed!");
+
+    running_.store(false);
+    closeProgressDialog();
+}
+
+void Control::executeVectormapExport(const VectormapConversionParameter &params)
+{
+    std::vector<LayerModel::Ptr> layers;
+    map_->getLayers(layers);
+
+    /// get all line segments from visible layers
+    VectorLayerModel::QLineFList vectors;
+    for(LayerModel::Ptr &l : layers) {
+        if(l->getVisibility()) {
+            VectorLayerModel::Ptr lv = LayerModel::as<VectorLayerModel>(l);
+            if(lv) {
+                VectorLayerModel::QLineFList v;
+                lv->getVectors(v);
+                vectors.insert(vectors.end(), v.begin(), v.end());
+            }
+        }
+    }
+
+    openProgressDialog("Vectormap Export");
+    progress(-1);
+
+    VectormapConversion vector_conversion(params);
+    if(!vector_conversion(vectors, map_->getMin(), map_->getMax(), [this](const int p){progress(p);}))
+        notification("Conversion Failed!");
 
     running_.store(false);
     closeProgressDialog();

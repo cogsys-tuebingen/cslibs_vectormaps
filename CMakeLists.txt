@@ -72,7 +72,8 @@ if(${Qt5_FOUND})
                 src/map_viewer/ui/map_viewer.ui
                 src/map_viewer/ui/map_viewer_list_item.ui
                 src/map_viewer/ui/map_viewer_corner_param_dialog.ui
-                src/map_viewer/ui/map_viewer_gridmap_param_dialog.ui)
+                src/map_viewer/ui/map_viewer_gridmap_param_dialog.ui
+                src/map_viewer/ui/map_viewer_vectormap_param_dialog.ui)
 
     add_executable(${PROJECT_NAME}_map_viewer
         src/map_viewer/map_viewer.cpp
@@ -87,16 +88,19 @@ if(${Qt5_FOUND})
         src/map_viewer/models/corner_layer_model.cpp
         src/map_viewer/models/vector_layer_model.cpp
         src/map_viewer/models/door_layer_model.cpp
+        src/map_viewer/models/polygon_layer_model.cpp
 
         src/map_viewer/qt/QInteractiveGraphicsView.hpp
         src/map_viewer/qt/QLayerListItem.hpp
         src/map_viewer/qt/QCornerParamDialog.hpp
         src/map_viewer/qt/QGridmapParamDialog.hpp
+        src/map_viewer/qt/QVectormapParamDialog.hpp
 
         src/map_viewer/util/rng_color.hpp
 
         src/map_viewer/algorithms/corner_detection.cpp
         src/map_viewer/algorithms/rasterization.cpp
+        src/map_viewer/algorithms/vectormap_conversion.cpp
 
         ${QT_UI}
 

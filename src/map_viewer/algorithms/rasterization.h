@@ -7,6 +7,7 @@
 #include <QString>
 #include <QImage>
 #include <QPixmap>
+#include <functional>
 
 namespace cslibs_vectormaps {
 struct RasterizationParameter {
@@ -26,12 +27,15 @@ class Rasterization
 {
 public:
     using QLineFList  = std::vector<QLineF> ;
+    using progress_t = std::function<void(int)>;
+
 
     Rasterization(const RasterizationParameter &parameters);
 
     bool operator ()(const QLineFList &vectors,
                      const QPointF    &min,
-                     const QPointF    &max);
+                     const QPointF    &max,
+                     progress_t       progress);
 private:
     RasterizationParameter parameters_;
 };
