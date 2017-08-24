@@ -110,6 +110,7 @@ void View::update()
 
     ui_->actionRun_corner_detection->setEnabled(true);
     ui_->actionExport_gridmap->setEnabled(true);
+    ui_->actionExport_vectormap->setEnabled(true);
 
     view_->show();
 }
