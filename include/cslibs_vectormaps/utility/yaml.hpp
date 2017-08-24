@@ -76,7 +76,9 @@ template<>
 struct convert<Polygon> {
     static Node encode(const Polygon& rhs) {
         Node node(YAML::NodeType::Sequence);
-        node["outer"] = rhs.outer();
+
+        if(!rhs.outer().empty())
+            node["outer"] = rhs.outer();
 
         const Polygon::inner_container_type &inners = rhs.inners();
         for(Polygon::inner_container_type::const_iterator
@@ -95,14 +97,19 @@ struct convert<Polygon> {
         }
 
         rhs = Polygon();
-        rhs.outer() = node["outer"].as<Polygon::ring_type>();
 
-        Polygon::inner_container_type &inners = rhs.inners();
-        for(YAML::Node::const_iterator it = node["inners"].begin() ;
-            it != node["inners"].end() ;
-            ++it) {
-            Polygon::ring_type r = it->as<Polygon::ring_type>();
-            inners.push_back(r);
+        if(node["outer"]) {
+            rhs.outer() = node["outer"].as<Polygon::ring_type>();
+        }
+
+        if(node["inners"]) {
+            Polygon::inner_container_type &inners = rhs.inners();
+            for(YAML::Node::const_iterator it = node["inners"].begin() ;
+                it != node["inners"].end() ;
+                ++it) {
+                Polygon::ring_type r = it->as<Polygon::ring_type>();
+                inners.push_back(r);
+            }
         }
         return true;
     }

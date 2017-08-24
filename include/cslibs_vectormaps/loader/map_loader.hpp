@@ -2,9 +2,9 @@
 #define MAP_LOADER_HPP
 
 /// COMPONENT
-#include "grid_vector_map.h"
-#include "simple_grid_vector_map.h"
-#include "oriented_grid_vector_map.h"
+#include <cslibs_vectormaps/maps/grid_vector_map.h>
+#include <cslibs_vectormaps/maps/simple_grid_vector_map.h>
+#include <cslibs_vectormaps/maps/oriented_grid_vector_map.h>
 
 /// SYSTEM
 #include <boost/iostreams/copy.hpp>
@@ -35,22 +35,21 @@ struct MapLoader {
 
         in_decompressing.push(in);
 
-        YAML::Node node  = YAML::Load(in_decompressing);
-        std::string type = node["map_type"].as<std::string>();
-
-        if (type == "simple_grid"){
-            map.reset(new SimpleGridVectorMap);
-        } else if (type == "oriented_grid") {
-            map.reset(new OrientedGridVectorMap);
-        }
-
         try {
+            YAML::Node node  = YAML::Load(in_decompressing);
+            std::string type = node["map_type"].as<std::string>();
 
+            if (type == "simple_grid"){
+                map.reset(new SimpleGridVectorMap);
+            } else if (type == "oriented_grid") {
+                map.reset(new OrientedGridVectorMap);
+            }
+
+            map->load(node);
         } catch(YAML::Exception &e) {
             std::cerr << "[MapLoader] : " << e.what() << std::endl;
             return false;
         }
-        map->load(node);
         return true;
     }
 };

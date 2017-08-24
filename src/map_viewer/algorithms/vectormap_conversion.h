@@ -6,11 +6,12 @@
 #include <QLineF>
 #include <functional>
 
+
 namespace cslibs_vectormaps {
 struct VectormapConversionParameter {
     QString path = "";
     QString type = "Grid";
-    double  angular_resolution = 10.0;
+    double  angular_resolution = 0.17453292519; // 10 deg
     double  linear_resolution = 2.0;
     double  range = 30.0;
 };
