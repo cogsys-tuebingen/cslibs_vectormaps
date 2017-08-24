@@ -11,6 +11,7 @@
 #include <boost/iostreams/filter/gzip.hpp>
 #include <boost/iostreams/filtering_streambuf.hpp>
 #include <boost/iostreams/filtering_stream.hpp>
+#include <boost/regex.hpp>
 
 #include <ostream>
 #include <istream>
@@ -19,10 +20,17 @@
 
 namespace cslibs_vectormaps {
 struct MapLoader {
+    static bool isCompressed(const std::string &path)
+    {
+        const static boost::regex e(".*\\.gzip");
+        return boost::regex_match(path, e);
+    }
+
     static bool load(const std::string &path,
-                     const bool         compressed,
                      VectorMap::Ptr    &map)
     {
+        const bool compressed = isCompressed(path);
+
         std::ifstream in(path.c_str(), std::ios_base::in | std::ios_base::binary);
         if(!in.is_open()) {
             std::cerr << "[MapLoader] : Can't load '" << path << "'!" << std::endl;
