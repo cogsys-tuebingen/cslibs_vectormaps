@@ -75,7 +75,7 @@ struct convert<Polygon::ring_type> {
 template<>
 struct convert<Polygon> {
     static Node encode(const Polygon& rhs) {
-        Node node(YAML::NodeType::Sequence);
+        Node node(YAML::NodeType::Map);
 
         if(!rhs.outer().empty())
             node["outer"] = rhs.outer();
