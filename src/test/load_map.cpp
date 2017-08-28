@@ -6,9 +6,9 @@ int main(int argc, char *argv[])
         return -1;
 
     cslibs_vectormaps::VectorMap::Ptr map;
-    cslibs_vectormaps::MapLoader::load(argv[1], map);
+    bool success = cslibs_vectormaps::MapLoader::load(argv[1], map);
 
-    if(map) {
+    if(success) {
         std::cerr << "Loading might '" << argv[1] << "' have worked!" << std::endl;
         std::cerr << map->size() / (1024.0 * 1024.0) << " MB" << std::endl;
     } else {
