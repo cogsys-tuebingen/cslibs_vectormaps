@@ -633,7 +633,7 @@ double OrientedGridVectorMap::intersectScanRay(const Vector &ray,
                                                const unsigned int row,
                                                const unsigned int col,
                                                const double angle,
-                                               const double max_range)
+                                               const double max_range) const
 {
     const VectorPtrs &cell = grid_.at(grid_.dimensions.index(row, col, angle2index(angle)));
     return algorithms::nearestIntersectionDistance<double, types::Point2d>(ray, cell, max_range);
@@ -646,7 +646,7 @@ void OrientedGridVectorMap::intersectScanRay(const Vector &ray,
                                              double &distance,
                                              double &angle,
                                              const double max_range,
-                                             const double default_angle)
+                                             const double default_angle) const
 {
     const VectorPtrs &cell = grid_.at(grid_.dimensions.index(row, col, angle2index(ray_angle)));
     algorithms::nearestIntersectionDistance<double, types::Point2d>(ray, cell,
