@@ -13,37 +13,18 @@ class VectorMap
 {
 public:
     /// SOME TYPE DEFINITIONS FOR EASIER USAGE
-    typedef boost::shared_ptr<VectorMap> Ptr;
+    using Ptr = boost::shared_ptr<VectorMap>;
 
-    typedef cslibs_boost_geometry::types::Dim2d
-    Dimension;
-
-    typedef cslibs_boost_geometry::types::Point2d
-    Point;
-
-    typedef cslibs_boost_geometry::types::Line2d
-    Vector;
-
-    typedef cslibs_boost_geometry::types::Line2dSet
-    Vectors;
-
-    typedef cslibs_boost_geometry::types::Line2dPtrSet
-    VectorPtrs;
-
-    typedef cslibs_boost_geometry::types::Polygon2d
-    Polygon;
-
-    typedef cslibs_boost_geometry::types::Intersection2dResultSet
-    IntersectionSet;
-
-    typedef cslibs_boost_geometry::types::Intersection2dResult
-    ValidPoints;
-
-    typedef cslibs_boost_geometry::types::Box2d
-    BoundingBox;
-
-    typedef std::map<cslibs_boost_geometry::types::Line2d*, unsigned int>
-    PtrIndexMap;
+    using Dimension         = cslibs_boost_geometry::types::Dim2d;
+    using Point             = cslibs_boost_geometry::types::Point2d;
+    using Vector            = cslibs_boost_geometry::types::Line2d;
+    using Vectors           = cslibs_boost_geometry::types::Line2dSet;
+    using VectorPtrs        = cslibs_boost_geometry::types::Line2dPtrSet;
+    using Polygon           = cslibs_boost_geometry::types::Polygon2d;
+    using IntersectionSet   = cslibs_boost_geometry::types::Intersection2dResultSet;
+    using ValidPoints       = cslibs_boost_geometry::types::Intersection2dResult;
+    using BoundingBox       = cslibs_boost_geometry::types::Box2d;
+    using PtrIndexMap       = std::map<cslibs_boost_geometry::types::Line2d*, unsigned int>;
 
 public:
     VectorMap(const BoundingBox &bounding,

@@ -34,7 +34,7 @@ bool DXFMap::open(const std::string &path)
         std::cerr << "[DXFVectorMap] : Failed to open file '"
                   << path
                   << "'!"
-                  << std::endl;
+                  << "\n";
         return false;
     }
 
@@ -42,7 +42,7 @@ bool DXFMap::open(const std::string &path)
     if(dxf_layer_ == NULL) {
         std::cerr << "[DXFVectorMap] : Failed to load "
                   << "'entities' layer!"
-                  << std::endl;
+                  << "\n";
         return false;
     }
 
@@ -78,7 +78,7 @@ void DXFMap::getPolygon(Polygon &polygon,
 
     if(bounding_polygon_it == polygons.end()) {
         if(debug_)
-            std::cerr << "Couldn't find a bounding polygon!" << std::endl;
+            std::cerr << "Couldn't find a bounding polygon!" << "\n";
         polygon = Polygon();
         return;
     }
@@ -179,11 +179,11 @@ void DXFMap::printInfo()
     std::cout << "[DXFVectorMap] lower bound : "
               << "[" << bounding_.min_corner().x()
               << "," << bounding_.min_corner().y()
-              << "]" << std::endl;
+              << "]" << "\n";
     std::cout << "[DXFVectorMap] upper bound : "
               << "[" << bounding_.max_corner().x()
               << "," << bounding_.max_corner().y()
-              << "]" << std::endl;
+              << "]" << "\n";
 
 }
 
@@ -296,7 +296,7 @@ inline void geometryToVectors(OGRGeometry     *geometry,
     switch(type) {
     case wkbPoint:
         if(debug)
-            std::cerr << "Single points will not be inserted into vector map!" << std::endl;
+            std::cerr << "Single points will not be inserted into vector map!" << "\n";
         break;
     case wkbLineString:
         lineStringToVectors((OGRLineString*) geometry, vectors);
@@ -309,11 +309,11 @@ inline void geometryToVectors(OGRGeometry     *geometry,
         break;
     case wkbPolygon:
         if(debug)
-            std::cerr << "[DXFVectorMap] : Polygon will not be inserted into vector map!" << std::endl;
+            std::cerr << "[DXFVectorMap] : Polygon will not be inserted into vector map!" << "\n";
         break;
     default:
         if(debug)
-            std::cerr << "[DXFVectorMap] : Unknown geometry type!" << std::endl;
+            std::cerr << "[DXFVectorMap] : Unknown geometry type!" << "\n";
         break;
     }
 }
@@ -326,7 +326,7 @@ inline void geometryToPolygons(OGRGeometry      *geometry,
     switch(type) {
     case wkbPoint:
         if(debug)
-            std::cerr << "Single points will not be inserted into vector map!" << std::endl;
+            std::cerr << "Single points will not be inserted into vector map!" << "\n";
         break;
     case wkbLineString:
         lineStringToPolygon((OGRLineString*) geometry, polygons);
@@ -339,11 +339,11 @@ inline void geometryToPolygons(OGRGeometry      *geometry,
         break;
     case wkbPolygon:
         if(debug)
-            std::cerr << "[DXFVectorMap] : Polygon will not be inserted into vector map!" << std::endl;
+            std::cerr << "[DXFVectorMap] : Polygon will not be inserted into vector map!" << "\n";
         break;
     default:
         if(debug)
-            std::cerr << "[DXFVectorMap] : Unknown geometry type!" << std::endl;
+            std::cerr << "[DXFVectorMap] : Unknown geometry type!" << "\n";
         break;
     }
 }
@@ -357,7 +357,7 @@ bool DXFMap::retrieveBounding()
     if(dxf_layer_->GetExtent(&env) != OGRERR_NONE) {
         std::cerr << "[DXFVectorMap] : Error retrieving "
                   << "dimensions of map!"
-                  << std::endl;
+                  << "\n";
         return false;
     }
 
@@ -382,7 +382,7 @@ void DXFMap::retrieveVectors(Vectors &vectors,
     dxf_layer_->ResetReading();
     OGRErr err = dxf_layer_->SetAttributeFilter(attrib_filter.c_str());
     if(err != 0) {
-        std::cerr << "[DXFVectorMap] : Error attribute filter '"<< err << "'!" << std::endl;
+        std::cerr << "[DXFVectorMap] : Error attribute filter '"<< err << "'!" << "\n";
     }
 
 
@@ -404,7 +404,7 @@ void DXFMap::retrievePolygons(Polygons &polygons,
     dxf_layer_->ResetReading();
     OGRErr err = dxf_layer_->SetAttributeFilter(attrib_filter.c_str());
     if(err != 0) {
-        std::cerr << "[DXFVectorMap] : Error attribute filter '"<< err << "'!" << std::endl;
+        std::cerr << "[DXFVectorMap] : Error attribute filter '"<< err << "'!" << "\n";
     }
 
     OGRFeature *feature(NULL);

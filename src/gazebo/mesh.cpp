@@ -58,89 +58,89 @@ inline void writeMesh(const Mesh &mesh,
                       std::ofstream &out)
 {
     out << "<geometry id=\"Wall-mesh\" name=\"Wall\" >"
-        << std::endl;
+        << "\n";
     out << "<mesh>"
-        << std::endl;
+        << "\n";
 
     /// write mesh positions
     out << "<source id=\"Wall-mesh-positions\">"
-        << std::endl;
+        << "\n";
     out << "<float_array id=\"Wall-mesh-positions-array\" count=\"" << pts.size() * 3 << "\">"
-        << std::endl;
+        << "\n";
 
     for(MeshPoints::const_iterator it = pts.begin() ; it != pts.end() ; ++it) {
         out << it->data[0] << " " << it->data[1] << " " << it->data[2] << " ";
     }
     out << "</float_array>"
-        << std::endl;
+        << "\n";
 
     out << "<technique_common>"
-        << std::endl;
+        << "\n";
     out << "<accessor source=\"#Wall-mesh-positions-array\" count=\"" << pts.size() << "\" stride=\"3\">"
-        << std::endl;
+        << "\n";
     out << "<param name=\"X\" type=\"float\"/>"
-        << std::endl;
+        << "\n";
     out << "<param name=\"Y\" type=\"float\"/>"
-        << std::endl;
+        << "\n";
     out << "<param name=\"Z\" type=\"float\"/>"
-        << std::endl;
+        << "\n";
     out << "</accessor>"
-        << std::endl;
+        << "\n";
     out << "</technique_common>"
-        << std::endl;
+        << "\n";
     out << "</source>"
-        << std::endl;
+        << "\n";
 
     /// write normals
     out << "<source id=\"Wall-mesh-normals\">"
-        << std::endl;
+        << "\n";
     out << "<float_array id=\"Wall-mesh-normals-array\" count=\"" << mesh.size() * 3 * 2<< "\">"
-        << std::endl;
+        << "\n";
 
     for(Mesh::const_iterator it = mesh.begin() ; it != mesh.end() ; ++it) {
         out << it->normal[0] << " " << it->normal[1] << " " << it->normal[2] << " ";
         out << it->normal[0] * (-1) << " " << it->normal[1] * (-1) << " " << it->normal[2] * (-1) << " ";
     }
     out << "</float_array>"
-        << std::endl;
+        << "\n";
 
     out << "<technique_common>"
-        << std::endl;
+        << "\n";
     out << "<accessor source=\"#Wall-mesh-normals-array\" count=\"" << mesh.size() * 2 << "\" stride=\"3\">"
-        << std::endl;
+        << "\n";
     out << "<param name=\"X\" type=\"float\"/>"
-        << std::endl;
+        << "\n";
     out << "<param name=\"Y\" type=\"float\"/>"
-        << std::endl;
+        << "\n";
     out << "<param name=\"Z\" type=\"float\"/>"
-        << std::endl;
+        << "\n";
     out << "</accessor>"
-        << std::endl;
+        << "\n";
     out << "</technique_common>"
-        << std::endl;
+        << "\n";
     out << "</source>"
-        << std::endl;
+        << "\n";
 
     /// write vertices
     out << "<vertices id=\"Wall-mesh-vertices\">"
-        << std::endl;
+        << "\n";
     out << "<input semantic=\"POSITION\" source=\"#Wall-mesh-positions\"/>"
-        << std::endl;
+        << "\n";
     out << "</vertices>"
-        << std::endl;
+        << "\n";
     out << "<polylist count=\"" << mesh.size() * 2 << "\" material=\"Material_001-material\">"
-        << std::endl;
+        << "\n";
     out << "<input semantic=\"VERTEX\" source=\"#Wall-mesh-vertices\" offset=\"0\"/>"
-        << std::endl;
+        << "\n";
     out << "<input semantic=\"NORMAL\" source=\"#Wall-mesh-normals\" offset=\"1\"/>"
-        << std::endl;
+        << "\n";
 
     out << "<vcount>";
     for(unsigned int i = 0 ; i < mesh.size() * 2; i++) {
         out << 3 << " ";
     }
     out <<"</vcount>"
-       << std::endl;
+       << "\n";
     out << "<p>";
     for(unsigned int i = 0 ; i < mesh.size() ; i++) {
         out << mesh[i].index[0] << " " << 2 * i << " " ;
@@ -151,28 +151,28 @@ inline void writeMesh(const Mesh &mesh,
         out << mesh[i].index[0] << " " << 2 * i + 1 << " " ;
     }
     out << "</p>"
-        << std::endl;
+        << "\n";
     out << "</polylist>"
-        << std::endl;
+        << "\n";
     out << "</mesh>"
-        << std::endl;
+        << "\n";
     out << "<extra><technique profile=\"MAYA\"><double_sided>1</double_sided></technique></extra>"
-        << std::endl;
+        << "\n";
     out << "</geometry>"
-        << std::endl;
+        << "\n";
 }
 
 inline void insertToScene(std::ofstream &out)
 {
-    out << "<node id=\"Wall\" name=\"Wall\" type=\"NODE\">" << std::endl;
-    out << "<instance_geometry url=\"#Wall-mesh\">" << std::endl;
-    out << "<bind_material>" << std::endl;
-    out << "<technique_common>" << std::endl;
-    out << "<instance_material symbol=\"Material_001-material\" target=\"#Material_001-material\"/>" << std::endl;
-    out << "</technique_common>" << std::endl;
-    out << "</bind_material>" << std::endl;
-    out << "</instance_geometry>" << std::endl;
-    out << "</node>" << std::endl;
+    out << "<node id=\"Wall\" name=\"Wall\" type=\"NODE\">" << "\n";
+    out << "<instance_geometry url=\"#Wall-mesh\">" << "\n";
+    out << "<bind_material>" << "\n";
+    out << "<technique_common>" << "\n";
+    out << "<instance_material symbol=\"Material_001-material\" target=\"#Material_001-material\"/>" << "\n";
+    out << "</technique_common>" << "\n";
+    out << "</bind_material>" << "\n";
+    out << "</instance_geometry>" << "\n";
+    out << "</node>" << "\n";
 }
 
 inline void writeCollada(const Mesh       &mesh,
@@ -181,28 +181,28 @@ inline void writeCollada(const Mesh       &mesh,
                          std::ofstream    &out)
 {
     out << "<?xml version=\"1.0\" encoding=\"utf-8\"?>"
-        << std::endl;
+        << "\n";
     out << "<COLLADA xmlns=\"http://www.collada.org/2005/11/COLLADASchema\" version=\"1.4.1\">"
-        << std::endl;
+        << "\n";
     copy(res, out);
     out << "<library_geometries>"
-        << std::endl;
+        << "\n";
     writeMesh(mesh, pts, out);
     out << "</library_geometries>"
-        << std::endl;
+        << "\n";
     out << "<library_visual_scenes>"
-        << std::endl;
+        << "\n";
     out << "<visual_scene id=\"Scene\" name=\"Scene\">"
-        << std::endl;
+        << "\n";
     insertToScene(out);
     out << "</visual_scene>"
-        << std::endl;
+        << "\n";
     out << "</library_visual_scenes>"
-        << std::endl;
+        << "\n";
     out << "<scene><instance_visual_scene url=\"#Scene\"/></scene>"
-        << std::endl;
+        << "\n";
     out << "</COLLADA>"
-        << std::endl;
+        << "\n";
 
 }
 }
@@ -320,45 +320,45 @@ bool Mesh::generate(const DXFMap::Vectors &vectors,
     std::ofstream out(save_path.c_str());
 
     out << "<sdf version='1.4'>"
-        << std::endl;
+        << "\n";
     out << "<model name ='map'>"
-        << std::endl;
+        << "\n";
     out << "<static>true</static>"
-        << std::endl;
+        << "\n";
     out << "<pose>0 0 0 0 0 0</pose>"
-        << std::endl;
+        << "\n";
     out << "<link name ='world'>"
-        << std::endl;
+        << "\n";
     out << "<pose>0 0 0 0 0 0</pose>"
-        << std::endl;
+        << "\n";
     out << "<collision name ='collision'>"
-        << std::endl;
+        << "\n";
     out << "<geometry>"
-        << std::endl;
+        << "\n";
     out << "<mesh><uri>file://" << mesh_path << "</uri></mesh>"
-        << std::endl;
+        << "\n";
     out << "</geometry>"
-        << std::endl;
+        << "\n";
     out << "</collision>"
-        << std::endl;
+        << "\n";
     out << "<visual name ='visual'>"
-        << std::endl;
+        << "\n";
     out << "<geometry>"
-        << std::endl;
+        << "\n";
     out << "<mesh><uri>file://" << mesh_path << "</uri></mesh>"
-        << std::endl;
+        << "\n";
     out << "</geometry>"
-        << std::endl;
+        << "\n";
     out << "<material><script><name>Gazebo/" + material + "</name></script></material>"
-        << std::endl;
+        << "\n";
     out << "</visual>"
-        << std::endl;
+        << "\n";
     out << "</link>"
-        << std::endl;
+        << "\n";
     out << "</model>"
-        << std::endl;
+        << "\n";
     out << "</sdf>"
-        << std::endl;
+        << "\n";
     out.close();
 
     return true;
@@ -388,45 +388,45 @@ bool Mesh::generate(const DXFMap::Vectors &vectors,
                        height);
 
     obj_string << "<sdf version='1.4'>"
-               << std::endl;
+               << "\n";
     obj_string << "<model name ='map'>"
-               << std::endl;
+               << "\n";
     obj_string << "<static>true</static>"
-               << std::endl;
+               << "\n";
     obj_string << "<pose>0 0 0 0 0 0</pose>"
-               << std::endl;
+               << "\n";
     obj_string << "<link name ='world'>"
-               << std::endl;
+               << "\n";
     obj_string << "<pose>0 0 0 0 0 0</pose>"
-               << std::endl;
+               << "\n";
     obj_string << "<collision name ='collision'>"
-               << std::endl;
+               << "\n";
     obj_string << "<geometry>"
-               << std::endl;
+               << "\n";
     obj_string << "<mesh><uri>file://" << fs_mesh_path.string() << "</uri></mesh>"
-               << std::endl;
+               << "\n";
     obj_string << "</geometry>"
-               << std::endl;
+               << "\n";
     obj_string << "</collision>"
-               << std::endl;
+               << "\n";
     obj_string << "<visual name ='visual'>"
-               << std::endl;
+               << "\n";
     obj_string << "<geometry>"
-               << std::endl;
+               << "\n";
     obj_string << "<mesh><uri>file://" << fs_mesh_path.string() << "</uri></mesh>"
-               << std::endl;
+               << "\n";
     obj_string << "</geometry>"
-               << std::endl;
+               << "\n";
     obj_string << "<material><script><name>Gazebo/" + material + "</name></script></material>"
-               << std::endl;
+               << "\n";
     obj_string << "</visual>"
-               << std::endl;
+               << "\n";
     obj_string << "</link>"
-               << std::endl;
+               << "\n";
     obj_string << "</model>"
-               << std::endl;
+               << "\n";
     obj_string << "</sdf>"
-               << std::endl;
+               << "\n";
 
     model->SetFromString(obj_string.str());
 

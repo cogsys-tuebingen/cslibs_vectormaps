@@ -32,7 +32,7 @@ bool VectormapConversion::operator () (const QLineFList &vectors,
                                             parameters_.angular_resolution,
                                             true  /* Debug */));
     } else {
-        std::cerr << "[VectorMapConversion]: Unknown map type '" << parameters_.type.toStdString() << "'!" << std::endl;
+        std::cerr << "[VectorMapConversion]: Unknown map type '" << parameters_.type.toStdString() << "'!" << "\n";
         return false;
     }
 

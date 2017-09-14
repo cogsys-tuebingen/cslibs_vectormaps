@@ -28,7 +28,7 @@ Renderer::~Renderer()
     try{
         worker_thread_.join();
     } catch(const std::exception &e) {
-        std::cerr << e.what() << std::endl;
+        std::cerr << e.what() << "\n";
     }
 
     delete scene_;

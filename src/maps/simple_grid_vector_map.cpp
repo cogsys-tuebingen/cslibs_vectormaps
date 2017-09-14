@@ -33,7 +33,7 @@ double SimpleGridVectorMap::minDistanceNearbyStructure(const Point &pos) const
     if(tools::pointOutsideMap(pos, min_corner_, max_corner_)) {
         if(debug_) {
             std::cerr << "[SimpleGridVectorMap] : Position to test "
-                      << "not within grid structured area!" << std::endl;
+                      << "not within grid structured area!" << "\n";
         }
         return false;
     }
@@ -65,7 +65,7 @@ bool SimpleGridVectorMap::structureNearby(const Point &pos,
     if(tools::pointOutsideMap(pos, min_corner_, max_corner_)) {
         if(debug_) {
             std::cerr << "[SimpleGridVectorMap] : Position to test "
-                      << "not within grid structured area!" << std::endl;
+                      << "not within grid structured area!" << "\n";
         }
         return false;
     }
@@ -92,7 +92,7 @@ bool SimpleGridVectorMap::retrieveFiltered(const Point &pos,
     if(tools::pointOutsideMap(pos, min_corner_, max_corner_)) {
         if(debug_) {
             std::cerr << "[SimpleGridVectorMap] : Position to test "
-                      << "not within grid structured area!" << std::endl;
+                      << "not within grid structured area!" << "\n";
         }
         return false;
     }
@@ -131,7 +131,7 @@ bool SimpleGridVectorMap::retrieve(const Point &pos,
     if(tools::pointOutsideMap(pos, min_corner_, max_corner_)) {
         if(debug_) {
             std::cerr << "[SimpleGridVectorMap] : Position to test "
-                      << "not within grid structured area!" << std::endl;
+                      << "not within grid structured area!" << "\n";
         }
         return false;
     }
@@ -187,8 +187,8 @@ unsigned int SimpleGridVectorMap::handleInsertion()
     unsigned int assigned = 0;
 
     if(debug_) {
-        std::cerr << "rows: " << rows_ << std::endl;
-        std::cerr << "cols: " << cols_ << std::endl;
+        std::cerr << "rows: " << rows_ << "\n";
+        std::cerr << "cols: " << cols_ << "\n";
     }
 
     if(valid_area_.outer().empty()) {
@@ -235,7 +235,7 @@ unsigned int SimpleGridVectorMap::handleInsertion()
                         }
                     } else {
                         if(debug_) {
-                            std::cout << "Cell out of valid area!" << std::endl;
+                            std::cout << "Cell out of valid area!" << "\n";
                         }
                     }
                 }

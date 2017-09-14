@@ -56,6 +56,10 @@ public:
         range = ui_->doubleSpinBox_range->value();
         type = ui_->comboBox_type->currentText();
         path = ui_->lineEdit_path->text();
+        if(!path.endsWith(QString(".gzip")) &&
+                !path.endsWith(QString(".yaml"))) {
+            path += QString(".yaml");
+        }
     }
 
     inline double toRad(const double &deg) const

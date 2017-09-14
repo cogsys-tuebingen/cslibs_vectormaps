@@ -8,13 +8,13 @@ find_package(GDAL   REQUIRED)
 find_package(gazebo QUIET)
 find_package(xacro  QUIET)
 find_package(Qt5 COMPONENTS Core Gui Widgets QUIET)
-find_package(Boost REQUIRED COMPONENTS system iostreams)
+find_package(Boost REQUIRED COMPONENTS system iostreams regex)
 
 catkin_package(
   INCLUDE_DIRS     include
   LIBRARIES        ${PROJECT_NAME}_dxf ${PROJECT_NAME}_maps
   CATKIN_DEPENDS   cslibs_boost_geometry
-  DEPENDS          Boost GDAL
+  DEPENDS          Boost GDAL yaml-cpp
 )
 
 # C++ 11
@@ -55,7 +55,20 @@ target_link_libraries(${PROJECT_NAME}_maps
     ${catkin_LIBRARIES}
     ${GDAL_LIBRARIES}
     ${Boost_LIBRARIES}
+    yaml-cpp
 )
+
+add_executable(${PROJECT_NAME}_load_map
+    src/test/load_map.cpp
+)
+
+target_link_libraries(${PROJECT_NAME}_load_map
+    ${catkin_LIBRARIES}
+    ${GDAL_LIBRARIES}
+    ${Boost_LIBRARIES}
+    ${PROJECT_NAME}_maps
+)
+
 
 if(${Qt5_FOUND})
     set(CMAKE_EXE_LINKER_FLAGS "-lpthread ${CMAKE_EXE_LINKER_FLAGS}")
@@ -110,7 +123,6 @@ if(${Qt5_FOUND})
         ${PROJECT_NAME}_dxf
         ${PROJECT_NAME}_maps
         Qt5::Core Qt5::Gui Qt5::Widgets
-        yaml-cpp
         ${catkin_LIBRARIES}
     )
 

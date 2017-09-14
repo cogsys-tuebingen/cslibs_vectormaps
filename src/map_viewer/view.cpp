@@ -56,7 +56,7 @@ View::View() :
     renderer_->setDefaultPen(pen);
 
     connect(ui_->actionOpen, SIGNAL(triggered()), this, SLOT(actionOpen()));
-    connect(ui_->actionExport_gridmap, SIGNAL(triggered()), this, SLOT(actionExportGridmap()));
+    connect(ui_->actionExport_gridmap, SIGNAL(triggered()), this, SLOT(actionExport_gridmap()));
     connect(ui_->actionExport_vectormap, SIGNAL(triggered()), this, SLOT(actionExport_vectormap()));
     connect(ui_->buttonHideLayerList, SIGNAL(clicked(bool)), this, SLOT(hideLayerList()));
     connect(ui_->actionRun_corner_detection, SIGNAL(triggered()), this, SLOT(actionRun_corner_detection()));
@@ -110,6 +110,7 @@ void View::update()
 
     ui_->actionRun_corner_detection->setEnabled(true);
     ui_->actionExport_gridmap->setEnabled(true);
+    ui_->actionExport_vectormap->setEnabled(true);
 
     view_->show();
 }
@@ -124,7 +125,7 @@ void View::notification(const QString &message)
 void View::openProgressDialog(const QString &title)
 {
     if(progress_) {
-        std::cerr << "Progress Dialog is already open!" << std::endl;
+        std::cerr << "Progress Dialog is already open!" << "\n";
         return;
     }
 
@@ -196,6 +197,7 @@ void View::actionExport_vectormap()
                          params.range,
                          params.type,
                          params.path);
+        parameters_->setVectormapConversionParamters(params);
         runVectormapExport(params);
     }
 }
