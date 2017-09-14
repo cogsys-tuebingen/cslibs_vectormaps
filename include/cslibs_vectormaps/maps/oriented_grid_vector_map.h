@@ -49,7 +49,7 @@ public:
                             const unsigned int row,
                             const unsigned int col,
                             const double angle,
-                            const double max_range = 0.0);
+                            const double max_range = 0.0) const;
 
     void intersectScanRay(const Vector &ray,
                           const unsigned int row,
@@ -58,7 +58,7 @@ public:
                           double &distance,
                           double &angle,
                           const double max_range = 0.0,
-                          const double default_angle = 0.0);
+                          const double default_angle = 0.0) const;
 
     double minDistanceNearbyStructure(const Point &pos,
                                       const unsigned int row,
