@@ -33,7 +33,7 @@ struct MapLoader {
 
         std::ifstream in(path.c_str(), std::ios_base::in | std::ios_base::binary);
         if(!in.is_open()) {
-            std::cerr << "[MapLoader] : Can't load '" << path << "'!" << std::endl;
+            std::cerr << "[MapLoader] : Can't load '" << path << "'!" << "\n";
             return false;
         }
 
@@ -55,7 +55,7 @@ struct MapLoader {
 
             map->load(node);
         } catch(YAML::Exception &e) {
-            std::cerr << "[MapLoader] : " << e.what() << std::endl;
+            std::cerr << "[MapLoader] : " << e.what() << "\n";
             return false;
         }
         return true;

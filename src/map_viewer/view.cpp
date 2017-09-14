@@ -125,7 +125,7 @@ void View::notification(const QString &message)
 void View::openProgressDialog(const QString &title)
 {
     if(progress_) {
-        std::cerr << "Progress Dialog is already open!" << std::endl;
+        std::cerr << "Progress Dialog is already open!" << "\n";
         return;
     }
 

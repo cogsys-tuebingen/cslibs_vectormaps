@@ -9,10 +9,10 @@ int main(int argc, char *argv[])
     bool success = cslibs_vectormaps::MapLoader::load(argv[1], map);
 
     if(success) {
-        std::cerr << "Loading might '" << argv[1] << "' have worked!" << std::endl;
-        std::cerr << map->size() / (1024.0 * 1024.0) << " MB" << std::endl;
+        std::cerr << "Loading might '" << argv[1] << "' have worked!" << "\n";
+        std::cerr << map->size() / (1024.0 * 1024.0) << " MB" << "\n";
     } else {
-        std::cerr << "You stink and loading the map horribly failed!" << std::endl;
+        std::cerr << "You stink and loading the map horribly failed!" << "\n";
         return -1;
     }
 

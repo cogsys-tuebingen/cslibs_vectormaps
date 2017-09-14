@@ -36,7 +36,7 @@ void DXFMapGazebo::Load(physics::WorldPtr _parent, sdf::ElementPtr _sdf)
 
     cslibs_vectormaps::dxf::DXFMap map;
     if(!map.open(map_path)) {
-        gzerr << "'" << map_path << "' not found!" << std::endl;
+        gzerr << "'" << map_path << "' not found!" << "\n";
         return;
     }
 
@@ -46,7 +46,7 @@ void DXFMapGazebo::Load(physics::WorldPtr _parent, sdf::ElementPtr _sdf)
     Mesh mesh(mesh_material,
               mesh_height);
     if(!mesh.generate(vs, mesh_common_path)) {
-        gzerr << "Failed to generate mesh!" << std::endl;
+        gzerr << "Failed to generate mesh!" << "\n";
     }
 
     if(mesh_name == "")

@@ -39,7 +39,7 @@ bool readConfig(const std::string filename,
         mesh_name = config["mesh_name"].as<std::string>();
         mesh_height = config["mesh_height"].as<double>();
     } catch (const YAML::Exception &e) {
-        std::cerr << e.what() << std::endl;
+        std::cerr << e.what() << "\n";
         return false;
     }
     return true;
@@ -52,7 +52,7 @@ int main(int argc, char* argv[])
 
     std::string map_path  = "/home/rauscher/ws/tmp/src/utils/cslibs_vectormaps/res/ek.dxf";
     if(argc < 2) {
-        std::cerr << "dxf_to_world <map.dxf> [config.yaml]" << std::endl;
+        std::cerr << "dxf_to_world <map.dxf> [config.yaml]" << "\n";
         return 0;
     }
 
@@ -74,25 +74,25 @@ int main(int argc, char* argv[])
                        mesh_material,
                        mesh_name,
                        mesh_height)) {
-            std::cerr << "Couldn't load config properly!" << std::endl;
+            std::cerr << "Couldn't load config properly!" << "\n";
             return 1;
         }
 
-        std::cout << "Lodaded params: " << std::endl;
-        std::cout << "output_path\t" << output_path << std::endl;
-        std::cout << "mesh_common_path\t" << mesh_common_path << std::endl;
-        std::cout << "mesh_material\t" << mesh_material << std::endl;
-        std::cout << "mesh_name\t" << mesh_name << std::endl;
-        std::cout << "mesh_height\t" << mesh_height << std::endl;
+        std::cout << "Lodaded params: " << "\n";
+        std::cout << "output_path\t" << output_path << "\n";
+        std::cout << "mesh_common_path\t" << mesh_common_path << "\n";
+        std::cout << "mesh_material\t" << mesh_material << "\n";
+        std::cout << "mesh_name\t" << mesh_name << "\n";
+        std::cout << "mesh_height\t" << mesh_height << "\n";
     }
 
 
 
 
-    std::cout << "Starting to convert " << map_path << " ... " << std::endl;;
+    std::cout << "Starting to convert " << map_path << " ... " << "\n";;
     cslibs_vectormaps::dxf::DXFMap map;
     if(!map.open(map_path)) {
-        gzerr << "'" << map_path << "' not found!" << std::endl;
+        gzerr << "'" << map_path << "' not found!" << "\n";
         return 0;
     }
 
@@ -102,11 +102,11 @@ int main(int argc, char* argv[])
     Mesh mesh(mesh_material,
               mesh_height);
     if(!mesh.generate(vs, mesh_common_path, output_path)) {
-        gzerr << "Failed to generate mesh!" << std::endl;
+        gzerr << "Failed to generate mesh!" << "\n";
     }
 
-    std::cout << "Finished !" << std::endl;
-    std::cout << "Saved world to: " << output_path << std::endl;
+    std::cout << "Finished !" << "\n";
+    std::cout << "Saved world to: " << output_path << "\n";
 
     return 0;
 }

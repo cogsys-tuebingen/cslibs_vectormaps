@@ -40,7 +40,7 @@ unsigned int OrientedGridVectorMap::handleInsertion()
     
     Point min, max, pmin, pmax, center, current_center;
     
-    std::cout << "generating index" << std::endl;
+    std::cout << "generating index" << "\n";
     
     if(valid_area_.outer().empty()) {
 #pragma omp parallel for private(min, max, pmin, pmax, center, current_center) reduction(+:assigned)
@@ -185,7 +185,7 @@ unsigned int OrientedGridVectorMap::handleInsertion()
                     }
                 } else {
                     if(debug_) {
-                        std::cout << "Cell out of valid area!" << std::endl;
+                        std::cout << "Cell out of valid area!" << "\n";
                     }
                 }
 
@@ -248,7 +248,7 @@ int OrientedGridVectorMap::removeHiddenLines(const Point& center,
         }
     }
 
-    //    std::cerr << "necessary: " << necessary_lines.size() << "\tvisible: " << visible_lines.size() << std::endl;
+    //    std::cerr << "necessary: " << necessary_lines.size() << "\tvisible: " << visible_lines.size() << "\n";
 
     int dropped = 0;
     for(std::list<cslibs_boost_geometry::types::Line2d*>::iterator
@@ -425,7 +425,7 @@ double OrientedGridVectorMap::minDistanceNearbyStructure(const Point &pos) const
     if(tools::pointOutsideMap(pos, min_corner_, max_corner_)) {
         if(debug_) {
             std::cerr << "[OrientedGridVectorMap] : Position to test "
-                      << "not within grid structured area!" << std::endl;
+                      << "not within grid structured area!" << "\n";
         }
         return false;
     }
@@ -461,7 +461,7 @@ bool OrientedGridVectorMap::structureNearby(const Point &pos,
     if(tools::pointOutsideMap(pos, min_corner_, max_corner_)) {
         if(debug_) {
             std::cerr << "[OrientedGridVectorMap] : Position to test "
-                      << "not within grid structured area!" << std::endl;
+                      << "not within grid structured area!" << "\n";
         }
         return false;
     }
@@ -495,7 +495,7 @@ bool OrientedGridVectorMap::retrieveFiltered(const Point &pos,
     if(tools::pointOutsideMap(pos, min_corner_, max_corner_)) {
         if(debug_) {
             std::cerr << "[OrientedGridVectorMap] : Position to test "
-                      << "not within grid structured area!" << std::endl;
+                      << "not within grid structured area!" << "\n";
         }
         return false;
     }
@@ -537,7 +537,7 @@ bool OrientedGridVectorMap::retrieve(const Point &pos,
     if(tools::pointOutsideMap(pos, min_corner_, max_corner_)) {
         if(debug_) {
             std::cerr << "[OrientedGridVectorMap] : Position to test "
-                      << "not within grid structured area!" << std::endl;
+                      << "not within grid structured area!" << "\n";
         }
         return false;
     }
@@ -569,7 +569,7 @@ bool OrientedGridVectorMap::retrieve(const double x,
     if(tools::coordinatesOutsideMap(x, y, min_corner_, max_corner_)) {
         if(debug_) {
             std::cerr << "[OrientedGridVectorMap] : Position to test "
-                      << "not within grid structured area!" << std::endl;
+                      << "not within grid structured area!" << "\n";
         }
         return false;
     }
@@ -663,7 +663,7 @@ bool OrientedGridVectorMap::retrieveFiltered(const Point &pos,
     if(tools::pointOutsideMap(pos, min_corner_, max_corner_)) {
         if(debug_) {
             std::cerr << "[OrientedGridVectorMap] : Position to test "
-                      << "not within grid structured area!" << std::endl;
+                      << "not within grid structured area!" << "\n";
         }
         return false;
     }
@@ -708,7 +708,7 @@ bool OrientedGridVectorMap::retrieve(const Point &pos,
     if(tools::pointOutsideMap(pos, min_corner_, max_corner_)) {
         if(debug_) {
             std::cerr << "[OrientedGridVectorMap] : Position to test "
-                      << "not within grid structured area!" << std::endl;
+                      << "not within grid structured area!" << "\n";
         }
         return false;
     }
@@ -742,7 +742,7 @@ int OrientedGridVectorMap::intersectScanPattern (
         if(debug_) {
             std::cerr << "[OrientedGridVectorMap] : Position "
                       << "(" << pos.x() << "|" << pos.y() << ")"
-                      << " to test not within grid structured area!" << std::endl;
+                      << " to test not within grid structured area!" << "\n";
         }
         return -1;
     }
@@ -787,7 +787,7 @@ int OrientedGridVectorMap::intersectScanPattern (
         if(debug_) {
             std::cerr << "[OrientedGridVectorMap] : Position "
                       << "(" << pos.x() << "|" << pos.y() << ")"
-                      << " to test not within grid structured area!" << std::endl;
+                      << " to test not within grid structured area!" << "\n";
         }
         return -1;
     }
@@ -829,7 +829,7 @@ void OrientedGridVectorMap::intersectScanPattern(const Point   &pos,
     if(tools::pointOutsideMap(pos, min_corner_, max_corner_)) {
         if(debug_) {
             std::cerr << "[OrientedGridVectorMap] : Position to test "
-                      << "not within grid structured area!" << std::endl;
+                      << "not within grid structured area!" << "\n";
         }
         return;
     }

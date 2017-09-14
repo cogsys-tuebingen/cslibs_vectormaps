@@ -146,7 +146,7 @@ bool removeOneIntersection(VectorMap::Vectors& cs)
 
             if(b == a) {
                 cs.erase(cs.begin() + i);
-                std::cerr << "erase" << std::endl;
+                std::cerr << "erase" << "\n";
                 return true;
             }
 
@@ -175,7 +175,7 @@ bool removeOneIntersection(VectorMap::Vectors& cs)
                 cs.push_back(a2);
                 cs.push_back(b1);
                 cs.push_back(b2);
-                std::cerr << "split" << std::endl;
+                std::cerr << "split" << "\n";
                 return true;
             }
         }
@@ -401,7 +401,7 @@ unsigned int OrientedVisibilityGridVectorMap::handleInsertion()
     std::size_t rows = grid_.dimensions.size(0);
     std::size_t cols = grid_.dimensions.size(1);
 
-    std::cerr << "generate ground state" << std::endl;
+    std::cerr << "generate ground state" << "\n";
     for(Vectors::iterator
         line_it = data_.begin() ;
         line_it != data_.end() ;
@@ -440,7 +440,7 @@ unsigned int OrientedVisibilityGridVectorMap::handleInsertion()
     }
 
     int line_count = 0;
-    std::cerr << "optimize using visibility" << std::endl;
+    std::cerr << "optimize using visibility" << "\n";
     for(Vectors::iterator
         line_it = data_.begin() ;
         line_it != data_.end() ;
@@ -449,7 +449,7 @@ unsigned int OrientedVisibilityGridVectorMap::handleInsertion()
         // TODO: make const!
         Vector& caster = *line_it;
 
-        std::cerr << "analyzing line " << line_count << " / " << data_.size()<< std::endl;
+        std::cerr << "analyzing line " << line_count << " / " << data_.size()<< "\n";
         ++line_count;
 
         for(Vectors::iterator
@@ -566,7 +566,7 @@ double OrientedVisibilityGridVectorMap::minDistanceNearbyStructure(const Point &
     if(tools::pointOutsideMap(pos, min_corner_, max_corner_)) {
         if(debug_) {
             std::cerr << "[OrientedVisibilityGridVectorMap] : Position to test "
-                      << "not within grid structured area!" << std::endl;
+                      << "not within grid structured area!" << "\n";
         }
         return false;
     }
@@ -601,7 +601,7 @@ bool OrientedVisibilityGridVectorMap::structureNearby(const Point &pos,
     if(tools::pointOutsideMap(pos, min_corner_, max_corner_)) {
         if(debug_) {
             std::cerr << "[OrientedVisibilityGridVectorMap] : Position to test "
-                      << "not within grid structured area!" << std::endl;
+                      << "not within grid structured area!" << "\n";
         }
         return false;
     }
@@ -634,7 +634,7 @@ bool OrientedVisibilityGridVectorMap::retrieveFiltered(const Point &pos,
     if(tools::pointOutsideMap(pos, min_corner_, max_corner_)) {
         if(debug_) {
             std::cerr << "[OrientedVisibilityGridVectorMap] : Position to test "
-                      << "not within grid structured area!" << std::endl;
+                      << "not within grid structured area!" << "\n";
         }
         return false;
     }
@@ -676,7 +676,7 @@ bool OrientedVisibilityGridVectorMap::retrieve(const Point &pos,
     if(tools::pointOutsideMap(pos, min_corner_, max_corner_)) {
         if(debug_) {
             std::cerr << "[OrientedVisibilityGridVectorMap] : Position to test "
-                      << "not within grid structured area!" << std::endl;
+                      << "not within grid structured area!" << "\n";
         }
         return false;
     }
@@ -708,7 +708,7 @@ bool OrientedVisibilityGridVectorMap::retrieve(const double x,
     if(tools::coordinatesOutsideMap(x, y, min_corner_, max_corner_)) {
         if(debug_) {
             std::cerr << "[OrientedVisibilityGridVectorMap] : Position to test "
-                      << "not within grid structured area!" << std::endl;
+                      << "not within grid structured area!" << "\n";
         }
         return false;
     }
@@ -765,7 +765,7 @@ bool OrientedVisibilityGridVectorMap::retrieveFiltered(const Point &pos,
     if(tools::pointOutsideMap(pos, min_corner_, max_corner_)) {
         if(debug_) {
             std::cerr << "[OrientedVisibilityGridVectorMap] : Position to test "
-                      << "not within grid structured area!" << std::endl;
+                      << "not within grid structured area!" << "\n";
         }
         return false;
     }
@@ -810,7 +810,7 @@ bool OrientedVisibilityGridVectorMap::retrieve(const Point &pos,
     if(tools::pointOutsideMap(pos, min_corner_, max_corner_)) {
         if(debug_) {
             std::cerr << "[OrientedVisibilityGridVectorMap] : Position to test "
-                      << "not within grid structured area!" << std::endl;
+                      << "not within grid structured area!" << "\n";
         }
         return false;
     }
@@ -844,7 +844,7 @@ int OrientedVisibilityGridVectorMap::intersectScanPattern (
         if(debug_) {
             std::cerr << "[OrientedVisibilityGridVectorMap] : Position "
                       << "(" << pos.x() << "|" << pos.y() << ")"
-                      << " to test not within grid structured area!" << std::endl;
+                      << " to test not within grid structured area!" << "\n";
         }
         return -1;
     }
@@ -887,7 +887,7 @@ int OrientedVisibilityGridVectorMap::intersectScanPattern (
         if(debug_) {
             std::cerr << "[OrientedVisibilityGridVectorMap] : Position "
                       << "(" << pos.x() << "|" << pos.y() << ")"
-                      << " to test not within grid structured area!" << std::endl;
+                      << " to test not within grid structured area!" << "\n";
         }
         return -1;
     }
@@ -925,7 +925,7 @@ void OrientedVisibilityGridVectorMap::intersectScanPattern(const Point   &pos,
     if(tools::pointOutsideMap(pos, min_corner_, max_corner_)) {
         if(debug_) {
             std::cerr << "[OrientedVisibilityGridVectorMap] : Position to test "
-                      << "not within grid structured area!" << std::endl;
+                      << "not within grid structured area!" << "\n";
         }
         return;
     }

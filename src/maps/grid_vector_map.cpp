@@ -102,7 +102,7 @@ bool GridVectorMap::cellIndeces(const Point& pos,
         if(debug_) {
             std::cerr << "[GridVectorMap] : Position "
                       << "(" << pos.x() << "|" << pos.y() << ")"
-                      << " to test not within grid structured area!" << std::endl;
+                      << " to test not within grid structured area!" << "\n";
         }
         return false;
     }
@@ -122,7 +122,7 @@ bool GridVectorMap::cellIndeces(const double x,
         if(debug_) {
             std::cerr << "[GridVectorMap] : Position "
                       << "(" << x << "|" << y << ")"
-                      << " to test not within grid structured area!" << std::endl;
+                      << " to test not within grid structured area!" << "\n";
         }
         return false;
     }
