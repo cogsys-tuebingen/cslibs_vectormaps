@@ -6,7 +6,7 @@
 
 /// SYSTEM
 #include <gdal/ogrsf_frmts.h>
-#include <boost/shared_ptr.hpp>
+#include <map>
 
 namespace cslibs_vectormaps {
 namespace dxf {
@@ -18,34 +18,20 @@ class DXFMap
 {
 public:
     /// TYPEDEFS FOR SHORTENING OF SIGNATURES
-    typedef cslibs_boost_geometry::types::Dim2d
-    Dimension;
+    using Ptr               = std::shared_ptr<DXFMap>;
+    using Dimension         = cslibs_boost_geometry::types::Dim2d;
+    using Point             = cslibs_boost_geometry::types::Point2d;
+    using Points            = std::vector<Point>;
+    using Vector            = cslibs_boost_geometry::types::Line2d;
+    using Vectors           = cslibs_boost_geometry::types::Line2dSet;
+    using VectorPtrs        = cslibs_boost_geometry::types::Line2dPtrSet;
+    using Polygon           = cslibs_boost_geometry::types::Polygon2d;
+    using Polygons          = std::vector<Polygon>;
 
-    typedef cslibs_boost_geometry::types::Point2d
-    Point;
-
-    typedef cslibs_boost_geometry::types::PointSet2d
-    Points;
-
-    typedef cslibs_boost_geometry::types::Line2d
-    Vector;
-
-    typedef cslibs_boost_geometry::types::Line2dSet
-    Vectors;
-
-    typedef cslibs_boost_geometry::types::Polygon2d
-    Polygon;
-
-    typedef std::vector<cslibs_boost_geometry::types::Polygon2d>
-    Polygons;
-
-    typedef cslibs_boost_geometry::types::Box2d
-    BoundingBox;
-
-    /**
-     * @brief A shared pointer definition for the class.
-     */
-    typedef boost::shared_ptr<DXFMap> Ptr;
+    using IntersectionSet   = cslibs_boost_geometry::types::Intersection2dResultSet;
+    using ValidPoints       = cslibs_boost_geometry::types::Intersection2dResult;
+    using BoundingBox       = cslibs_boost_geometry::types::Box2d;
+    using PtrIndexMap       = std::map<cslibs_boost_geometry::types::Line2d*, unsigned int>;
 
     /**
      * @brief DXFVectorMap constructor.
