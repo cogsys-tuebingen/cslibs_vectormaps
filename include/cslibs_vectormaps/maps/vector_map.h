@@ -24,7 +24,6 @@ public:
     using IntersectionSet   = cslibs_boost_geometry::types::Intersection2dResultSet;
     using ValidPoints       = cslibs_boost_geometry::types::Intersection2dResult;
     using BoundingBox       = cslibs_boost_geometry::types::Box2d;
-    using PtrIndexMap       = std::map<cslibs_boost_geometry::types::Line2d*, unsigned int>;
 
 public:
     VectorMap(const BoundingBox &bounding,
@@ -83,9 +82,6 @@ protected:
     Polygon         valid_area_;
 
     Vectors         data_;
-    PtrIndexMap     data_ptr_to_index_;
-
-    void            buildPtrIndexMap();
 
     virtual unsigned int handleInsertion () = 0;
     virtual void doLoad(const YAML::Node &node);
