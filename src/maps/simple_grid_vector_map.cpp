@@ -72,18 +72,17 @@ bool SimpleGridVectorMap::structureNearby(const Point &pos,
 
     unsigned int row = GridVectorMap::row(pos);
     unsigned int col = GridVectorMap::col(pos);
-    bool hit = false;
     const VectorPtrs &cell = grid_.at(grid_.dimensions.index(row, col));
     for(VectorPtrs::const_iterator it =
         cell.begin() ;
         it != cell.end() ;
         ++it) {
         double dist = algorithms::distance<double,Point>(pos, **it);
-        if(dist > 0.0)
-            hit |= (dist < thresh);
+        if(dist > 0.0 && dist < thresh)
+            return true;
     }
 
-    return hit;
+    return false;
 }
 
 bool SimpleGridVectorMap::retrieveFiltered(const Point &pos,

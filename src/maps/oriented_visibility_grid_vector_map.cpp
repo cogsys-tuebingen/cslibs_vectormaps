@@ -609,7 +609,6 @@ bool OrientedVisibilityGridVectorMap::structureNearby(const Point &pos,
     unsigned int row = GridVectorMap::row(pos);
     unsigned int col = GridVectorMap::col(pos);
 
-    bool hit = false;
     double dist(0.0);
     for(unsigned int theta = 0 ; theta < grid_.dimensions.size(2) ; ++theta) {
         const VectorPtrs &cell = grid_.at(grid_.dimensions.index(row, col, theta));
@@ -619,12 +618,12 @@ bool OrientedVisibilityGridVectorMap::structureNearby(const Point &pos,
             ++it) {
 
             dist = algorithms::distance<double,Point>(pos, **it);
-            if(dist > 0.0)
-                hit |= (dist < thresh);
+            if(dist > 0.0 && dist < thresh)
+                return true;
         }
     }
 
-    return hit;
+    return false;
 }
 
 bool OrientedVisibilityGridVectorMap::retrieveFiltered(const Point &pos,
@@ -854,16 +853,14 @@ int OrientedVisibilityGridVectorMap::intersectScanPattern (
     unsigned int col = GridVectorMap::col(pos);
 
     int intersection_count = 0;
-    double dx(0.0), dy(0.0), angle(0.0);
-    unsigned int theta(0);
     ValidPoints result;
 
     for(Vectors::const_iterator it = pattern.begin(); it != pattern.end(); ++it) {
         const Vector& line = *it;
-        dx = line.second.x() - line.first.x();
-        dy = line.second.y() - line.first.y();
-        angle = atan2(dy, dx);
-        theta = angle2index(angle);
+        double dx = line.second.x() - line.first.x();
+        double dy = line.second.y() - line.first.y();
+        double angle = atan2(dy, dx);
+        unsigned int theta = angle2index(angle);
         const VectorPtrs &cell = grid_.at(grid_.dimensions.index(row, col, theta));
 
         result.result.clear();
@@ -897,13 +894,12 @@ int OrientedVisibilityGridVectorMap::intersectScanPattern (
     unsigned int col = GridVectorMap::col(pos);
 
     int intersection_count = 0;
-    unsigned int theta(0);
     ValidPoints result;
     Vectors::const_iterator it                   = pattern.begin();
     std::vector<double>::const_iterator it_angle = angles.begin();
     for(; it != pattern.end(); ++it, ++it_angle) {
         const Vector& line = *it;
-        theta = angle2index(*it_angle);
+        unsigned int theta = angle2index(*it_angle);
         const VectorPtrs &cell = grid_.at(grid_.dimensions.index(row, col, theta));
 
         result.result.clear();
@@ -933,16 +929,14 @@ void OrientedVisibilityGridVectorMap::intersectScanPattern(const Point   &pos,
     // find the cell of point pos
     unsigned int row = GridVectorMap::row(pos);
     unsigned int col = GridVectorMap::col(pos);
-    double dx(0.0), dy(0.0), angle(0.0);
-    unsigned int theta(0.0);
 
     ranges.resize(pattern.size());
     for(unsigned int i = 0 ; i < pattern.size() ; ++i) {
         const Vector& line = pattern.at(i);
-        dx = line.second.x() - line.first.x();
-        dy = line.second.y() - line.first.y();
-        angle = atan2(dy, dx);
-        theta = angle2index(angle);
+        double dx = line.second.x() - line.first.x();
+        double dy = line.second.y() - line.first.y();
+        double angle = atan2(dy, dx);
+        unsigned int theta = angle2index(angle);
         const VectorPtrs &cell = grid_.at(grid_.dimensions.index(row, col, theta));
 
         ranges.at(i) = algorithms::nearestIntersectionDistance<float, types::Point2d>(line, cell, default_measurement);
