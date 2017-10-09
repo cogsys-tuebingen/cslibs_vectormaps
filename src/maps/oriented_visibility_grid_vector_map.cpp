@@ -567,7 +567,7 @@ double OrientedVisibilityGridVectorMap::minSquaredDistanceNearbyStructure(const 
     const VectorPtrs &cell = grid_.at(grid_.dimensions.index(row, col, theta));
 
     for(auto line : cell) {
-        double squared_dist = boost::geometry::distance(pos, *line);
+        double squared_dist = boost::geometry::comparable_distance(pos, *line);
         if(squared_dist < min_squared_dist)
             min_squared_dist = squared_dist;
     }
@@ -619,7 +619,7 @@ double OrientedVisibilityGridVectorMap::minSquaredDistanceNearbyStructure(const 
     if(tools::pointOutsideMap(pos, min_corner_, max_corner_)) {
         if(debug_) {
             std::cerr << "[OrientedVisibilityGridVectorMap] : Position to test "
-                      << "not within grid structured area!" << "\n";
+                         "not within grid structured area!\n";
         }
         return false;
     }
