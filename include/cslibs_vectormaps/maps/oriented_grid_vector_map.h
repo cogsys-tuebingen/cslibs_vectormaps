@@ -108,8 +108,9 @@ protected:
     double      angular_resolution_;
     std::size_t theta_bins_;
     double      theta_bins_inv_;
+    std::vector<Polygon> fovs_;
 
-    virtual unsigned int handleInsertion ();
+    virtual unsigned int handleInsertion();
 
     bool        isInView(Vector& line, Point center, std::size_t t);
     void        findPossibleLines(const Point &center, const BoundingBox &cell_bounding, VectorPtrs &necessary_lines);

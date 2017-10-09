@@ -24,6 +24,41 @@ OrientedGridVectorMap::OrientedGridVectorMap(const BoundingBox &bounding,
     grid_.setDimensions(dimensions);
     theta_bins_     =  grid_.dimensions.size(2);
     theta_bins_inv_ = 1.0 / theta_bins_;
+
+    fovs_.resize(theta_bins_);
+
+    // calculate all possible fovs
+    for(std::size_t bin = 0; bin < theta_bins_; ++bin) {
+        // allow for some leeway
+        double low = index2lowerAngle(bin) - theta_bins_inv_ * 0.5 * M_PI;
+        double up  = index2upperAngle(bin) + theta_bins_inv_ * 0.5 * M_PI;
+
+        // need to check the four corners to guarantee seeing every vector
+        double o = resolution / 2;
+        Point corner[4];
+        corner[0] = Point(-o, -o);
+        corner[1] = Point(+o, -o);
+        corner[2] = Point(+o, +o);
+        corner[3] = Point(-o, +o);
+
+        double r = 10 * range;
+        Point ray_up(r * std::cos(up), r * std::sin(up));
+        Point ray_low(r * std::cos(low), r * std::sin(low));
+
+        Polygon polygon;
+        for(unsigned int c = 0 ; c < 4; ++c) {
+            boost::geometry::append(polygon.outer(),
+                                    corner[c]);
+            boost::geometry::append(polygon.outer(),
+                                    Point(corner[c].x() + ray_up.x(),
+                                          corner[c].y() + ray_up.y()));
+            boost::geometry::append(polygon.outer(),
+                                    Point(corner[c].x() + ray_low.x(),
+                                          corner[c].y() + ray_low.y()));
+        }
+
+        boost::geometry::convex_hull(polygon, fovs_[bin]);
+    }
 }
 
 OrientedGridVectorMap::OrientedGridVectorMap() :
@@ -334,52 +369,11 @@ void OrientedGridVectorMap::findVisibleLinesByRaycasting(const Point& center,
 
 bool OrientedGridVectorMap::isInView(Vector& line, Point center, std::size_t t)
 {
-    static bool lazy_initialized = false;
-    static std::map<std::size_t, Polygon> fovs;
-
-    if(!lazy_initialized) {
-        lazy_initialized = true;
-
-        // calculate all possible fovs
-        for(std::size_t bin = 0; bin < theta_bins_; ++bin) {
-            // allow for some leeway
-            double low = index2lowerAngle(bin) - theta_bins_inv_ * 0.5 * M_PI;
-            double up  = index2upperAngle(bin) + theta_bins_inv_ * 0.5 * M_PI;
-
-            // need to check the four corners too garantuee seeing every vector
-            double o = resolution_ / 2;
-            Point corner[4];
-            corner[0] = Point(- o, - o);
-            corner[1] = Point(+ o, - o);
-            corner[2] = Point(+ o, + o);
-            corner[3] = Point(- o, + o);
-
-            double r = 10 * range();
-            Point ray_up(r * std::cos(up), r * std::sin(up));
-            Point ray_low(r * std::cos(low), r* std::sin(low));
-
-            Polygon polygon;
-            for(unsigned int c = 0 ; c < 4; ++c) {
-                boost::geometry::append(polygon.outer(),
-                                        corner[c]);
-                boost::geometry::append(polygon.outer(),
-                                        Point(corner[c].x() + ray_up.x(),
-                                              corner[c].y() + ray_up.y()));
-                boost::geometry::append(polygon.outer(),
-                                        Point(corner[c].x() + ray_low.x(),
-                                              corner[c].y() + ray_low.y()));
-            }
-
-            boost::geometry::convex_hull(polygon, fovs[bin]);
-        }
-    }
-
     // take the general fov and shift it to center
-    Polygon fov = fovs[t];
+    Polygon fov = fovs_[t];
 
-    typename VectorMap::Polygon::ring_type &ring = fov.outer();
-    for(VectorMap::Polygon::ring_type::iterator it = ring.begin(); it != ring.end(); ++it) {
-        VectorMap::Point& pt = *it;
+    VectorMap::Polygon::ring_type &ring = fov.outer();
+    for(VectorMap::Point& pt : ring) {
         pt.x(pt.x() + center.x());
         pt.y(pt.y() + center.y());
     }
