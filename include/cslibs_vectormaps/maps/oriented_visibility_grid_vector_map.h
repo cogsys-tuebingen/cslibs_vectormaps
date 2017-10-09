@@ -87,9 +87,16 @@ public:
                                       const unsigned int col,
                                       const double angle) const;
 
+    double minSquaredDistanceNearbyStructure(const Point &pos,
+                                             const unsigned int row,
+                                             const unsigned int col,
+                                             const double angle) const;
+
     unsigned int thetaBins() const;
 
     virtual double minDistanceNearbyStructure(const Point &pos) const;
+
+    virtual double minSquaredDistanceNearbyStructure(const Point &pos) const;
 
     virtual bool   structureNearby(const Point &pos,
                                    const double thresh = 0.15) const;

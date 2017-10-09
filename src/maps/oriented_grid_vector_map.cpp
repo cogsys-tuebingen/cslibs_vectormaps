@@ -412,6 +412,24 @@ double OrientedGridVectorMap::minDistanceNearbyStructure(const Point &pos,
     return min_dist;
 }
 
+double OrientedGridVectorMap::minSquaredDistanceNearbyStructure(const Point &pos,
+                                                                const unsigned int row,
+                                                                const unsigned int col,
+                                                                const double angle) const
+{
+    unsigned int theta = angle2index(angle);
+    double min_squared_dist = std::numeric_limits<double>::max();
+    auto cell = grid_.at(grid_.dimensions.index(row, col, theta));
+
+    for(auto line : cell) {
+        double squared_dist = boost::geometry::comparable_distance(pos, *line);
+        if(squared_dist < min_squared_dist)
+            min_squared_dist = squared_dist;
+    }
+
+    return min_squared_dist;
+}
+
 unsigned int OrientedGridVectorMap::thetaBins() const
 {
     return theta_bins_;
@@ -449,6 +467,36 @@ double OrientedGridVectorMap::minDistanceNearbyStructure(const Point &pos) const
         return -1.0;
     else
         return min_dist;
+}
+
+double OrientedGridVectorMap::minSquaredDistanceNearbyStructure(const Point &pos) const
+{
+    if(tools::pointOutsideMap(pos, min_corner_, max_corner_)) {
+        if(debug_) {
+            std::cerr << "[OrientedGridVectorMap] : Position to test "
+                         "not within grid structured area!\n";
+        }
+        return false;
+    }
+
+    unsigned int row = GridVectorMap::row(pos);
+    unsigned int col = GridVectorMap::col(pos);
+
+    double min_squared_dist = std::numeric_limits<double>::max();
+
+    for(unsigned int theta = 0 ; theta < grid_.dimensions.size(2) ; ++theta) {
+        const VectorPtrs &cell = grid_.at(grid_.dimensions.index(row, col, theta));
+        for(auto line : cell) {
+            double squared_dist = boost::geometry::comparable_distance(pos, *line);
+            if(squared_dist < min_squared_dist)
+                min_squared_dist = squared_dist;
+        }
+    }
+
+    if(min_squared_dist == std::numeric_limits<double>::max())
+        return -1.0;
+    else
+        return min_squared_dist;
 }
 
 bool OrientedGridVectorMap::structureNearby(const Point &pos,

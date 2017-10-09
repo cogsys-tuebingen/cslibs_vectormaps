@@ -4,6 +4,7 @@
 /// COMPONENT
 #include <cslibs_boost_geometry/algorithms.hpp>
 #include <cslibs_vectormaps/utility/tools.hpp>
+#include <boost/geometry/algorithms/comparable_distance.hpp>
 
 using namespace cslibs_vectormaps;
 using namespace cslibs_boost_geometry;
@@ -57,6 +58,34 @@ double SimpleGridVectorMap::minDistanceNearbyStructure(const Point &pos) const
     }
 
     return min_dist;
+}
+
+double SimpleGridVectorMap::minSquaredDistanceNearbyStructure(const Point &pos) const
+{
+    if(tools::pointOutsideMap(pos, min_corner_, max_corner_)) {
+        if(debug_) {
+            std::cerr << "[SimpleGridVectorMap] : Position to test "
+                         "not within grid structured area!\n";
+        }
+        return false;
+    }
+
+    unsigned int row = GridVectorMap::row(pos);
+    unsigned int col = GridVectorMap::col(pos);
+
+    double min_squared_dist = std::numeric_limits<double>::max();
+    const VectorPtrs &cell = grid_.at(grid_.dimensions.index(row, col));
+
+    if(cell.size() == 0)
+        return -1.0;
+
+    for(auto line : cell) {
+        double squared_dist = boost::geometry::comparable_distance(pos, *line);
+        if(min_squared_dist > squared_dist)
+            min_squared_dist = squared_dist;
+    }
+
+    return min_squared_dist;
 }
 
 bool SimpleGridVectorMap::structureNearby(const Point &pos,

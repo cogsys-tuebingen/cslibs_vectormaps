@@ -22,6 +22,8 @@ public:
 
     virtual double minDistanceNearbyStructure(const Point &pos) const;
 
+    virtual double minSquaredDistanceNearbyStructure(const Point &pos) const;
+
     virtual bool   retrieveFiltered(const Point &pos,
                                     Vectors &lines) const;
 
