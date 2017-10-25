@@ -199,7 +199,7 @@ void GridVectorMap::doSave(YAML::Node &node)
             cell_it  = cell.begin() ;
             cell_it != cell.end() ;
             ++cell_it) {
-            cell_indeces.push_back(data_ptr_to_index_.at(*cell_it));
+            cell_indeces.push_back(static_cast<unsigned>(*cell_it - data_.data()));
         }
     }
 

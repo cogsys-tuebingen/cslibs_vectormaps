@@ -65,9 +65,16 @@ public:
                                       const unsigned int col,
                                       const double angle) const;
 
+    double minSquaredDistanceNearbyStructure(const Point &pos,
+                                             const unsigned int row,
+                                             const unsigned int col,
+                                             const double angle) const;
+
     unsigned int thetaBins() const;
 
     virtual double minDistanceNearbyStructure(const Point &pos) const;
+
+    virtual double minSquaredDistanceNearbyStructure(const Point &pos) const;
 
     virtual bool   structureNearby(const Point &pos,
                                    const double thresh = 0.15) const;
@@ -101,8 +108,9 @@ protected:
     double      angular_resolution_;
     std::size_t theta_bins_;
     double      theta_bins_inv_;
+    std::vector<Polygon> fovs_;
 
-    virtual unsigned int handleInsertion ();
+    virtual unsigned int handleInsertion();
 
     bool        isInView(Vector& line, Point center, std::size_t t);
     void        findPossibleLines(const Point &center, const BoundingBox &cell_bounding, VectorPtrs &necessary_lines);

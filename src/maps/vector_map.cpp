@@ -44,8 +44,6 @@ unsigned int VectorMap::insert(const Vectors &set, const Polygon &valid)
     data_.assign(set.begin(), set.end());
     valid_area_ = valid;
 
-    buildPtrIndexMap();
-
     return handleInsertion();
 }
 
@@ -152,14 +150,6 @@ VectorMap::BoundingBox VectorMap::bounding() const
     return BoundingBox(min_corner_, max_corner_);
 }
 
-void VectorMap::buildPtrIndexMap()
-{
-    data_ptr_to_index_.clear();
-    for(unsigned int i = 0 ; i < data_.size() ; ++i) {
-        data_ptr_to_index_.insert(std::make_pair(&data_.at(i), i));
-    }
-}
-
 void VectorMap::doLoad(const YAML::Node &node)
 {
     assert(node.IsMap());
@@ -171,7 +161,6 @@ void VectorMap::doLoad(const YAML::Node &node)
     valid_area_ = node["valid_area"].as<Polygon>();
     YAML::Binary binary = node["data"].as<YAML::Binary>();
     deserialize(binary, data_);
-    buildPtrIndexMap();
 }
 
 void VectorMap::doSave(YAML::Node &node)
