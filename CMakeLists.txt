@@ -132,7 +132,7 @@ if(${gazebo_FOUND} AND ${xacro_FOUND})
     find_package(Boost  REQUIRED system filesystem)
 
     include_directories(
-        ${Eigen3_INCLUDE_DIRS}
+        ${Eigen3_INCLUDE_DIR}
         ${Boost_INCLUDE_DIRS}
     )
 
