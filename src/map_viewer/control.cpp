@@ -50,7 +50,6 @@ void Control::runCornerDetection(const CornerDetectionParameter &params)
         executeCornerDetection(params);
     };
     worker_thread_ = std::thread(execution);
-    worker_thread_.detach();
 }
 
 void Control::runGridmapExport(const RasterizationParameter &params)
@@ -65,7 +64,6 @@ void Control::runGridmapExport(const RasterizationParameter &params)
         executeGridmapExport(params);
     };
     worker_thread_ = std::thread(execution);
-    worker_thread_.detach();
 }
 
 void Control::runVectormapExport(const VectormapConversionParameter &params)
@@ -80,7 +78,6 @@ void Control::runVectormapExport(const VectormapConversionParameter &params)
         executeVectormapExport(params);
     };
     worker_thread_ = std::thread(execution);
-    worker_thread_.detach();
 }
 
 void Control::openDXF(const QString &path)

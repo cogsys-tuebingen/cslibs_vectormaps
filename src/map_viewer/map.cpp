@@ -62,7 +62,6 @@ void Map::load(const dxf::DXFMap::Ptr &map)
     std::unique_lock<std::mutex> l(layers_mutex_);
     auto execution = [this,&l,map](){doLoad(map);};
     worker_thread_ = std::thread(execution);
-    worker_thread_.detach();
 
 }
 
