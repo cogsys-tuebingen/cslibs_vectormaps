@@ -2,7 +2,6 @@
 #define GRID_VECTOR_MAP_H
 
 #include "vector_map.h"
-#include <cslibs_vectormaps/utility/generic_grid_dynamic.hpp>
 
 namespace cslibs_vectormaps {
 class GridVectorMap : public VectorMap
@@ -24,11 +23,6 @@ public:
     unsigned int cols()       const;
     unsigned int elements()   const;
 
-    unsigned int cellEntries(const unsigned int row,
-                             const unsigned int col) const;
-
-    unsigned int cellEntries(const Point &pos) const;
-
     bool cellIndeces(const Point &pos,
                      unsigned int &row,
                      unsigned int &col) const;
@@ -45,11 +39,10 @@ protected:
     unsigned int               rows_;
     unsigned int               cols_;
 
-    data_structures::DynamicGenericGrid<VectorPtrs>
-    grid_;
+    std::vector<VectorPtrs>    grid_;
 
     virtual void doLoad(const YAML::Node &node);
-    virtual void doSave(YAML::Node &node);
+    virtual void doSave(YAML::Node &node) const;
 
     inline unsigned int row(const double y) const
     {
