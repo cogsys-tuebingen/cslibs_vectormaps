@@ -900,6 +900,12 @@ void OrientedGridVectorMap::doLoad(const YAML::Node &node)
     angular_resolution_ = node["angular_resolution"].as<double>();
     theta_bins_         = node["theta_bins"].as<double>();
     theta_bins_inv_     = node["theta_bins_inv"].as<double>();
+
+    data_structures::Dimensions d;
+    d.add(data_structures::Dimension(rows_));
+    d.add(data_structures::Dimension(cols_));
+    d.add(data_structures::Dimension(theta_bins_));
+    grid_.setDimensions(d);
 }
 
 void OrientedGridVectorMap::doSave(YAML::Node &node) const

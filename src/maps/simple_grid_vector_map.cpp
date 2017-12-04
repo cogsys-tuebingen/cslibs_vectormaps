@@ -279,6 +279,11 @@ unsigned int SimpleGridVectorMap::handleInsertion()
 void SimpleGridVectorMap::doLoad(const YAML::Node &node)
 {
     GridVectorMap::doLoad(node);
+
+    data_structures::Dimensions d;
+    d.add(data_structures::Dimension(rows_));
+    d.add(data_structures::Dimension(cols_));
+    grid_.setDimensions(d);
 }
 
 void SimpleGridVectorMap::doSave(YAML::Node &node) const
