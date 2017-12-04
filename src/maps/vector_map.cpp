@@ -14,6 +14,7 @@
 #include <ostream>
 #include <istream>
 #include <fstream>
+#include <iostream>
 
 using namespace cslibs_vectormaps;
 using namespace serialization;

@@ -11,6 +11,7 @@
 #include <boost/geometry/algorithms/intersection.hpp>
 #include <boost/geometry/algorithms/union.hpp>
 #include <boost/geometry/algorithms/comparable_distance.hpp>
+#include <boost/geometry/geometry.hpp>
 
 using namespace cslibs_vectormaps;
 using namespace cslibs_boost_geometry;

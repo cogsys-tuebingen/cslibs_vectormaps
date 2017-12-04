@@ -5,6 +5,8 @@
 #include <boost/geometry/strategies/strategies.hpp>
 #include <boost/geometry/geometries/ring.hpp>
 
+#include <iostream>
+
 using namespace cslibs_vectormaps;
 using namespace dxf;
 
