@@ -3,6 +3,8 @@
 
 #include "grid_vector_map.h"
 
+#include <cslibs_vectormaps/utility/grid_dimensions.hpp>
+
 namespace cslibs_vectormaps {
 class OrientedVisibilityGridVectorMap : public GridVectorMap
 {
@@ -131,6 +133,7 @@ private:
     double      angular_resolution_;
     std::size_t theta_bins_;
     double      theta_bins_inv_;
+    data_structures::GridDimensions<3> grid_dimensions_;
 
     virtual unsigned int handleInsertion();
 

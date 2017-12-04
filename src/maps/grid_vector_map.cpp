@@ -4,7 +4,6 @@
 #include <cslibs_vectormaps/utility/serialization.hpp>
 
 using namespace cslibs_vectormaps;
-using namespace data_structures;
 using namespace serialization;
 
 GridVectorMap::GridVectorMap(const BoundingBox &bounding,
@@ -107,15 +106,15 @@ void GridVectorMap::doLoad(const YAML::Node &node)
     deserialize(size_binary, cell_sizes);
     deserialize(index_binary, cell_indeces);
 
-    grid_.data_.resize(cell_sizes.size());
+    grid_.resize(cell_sizes.size());
 
     std::vector<unsigned int>::iterator it = cell_indeces.begin();
     for(unsigned int i = 0 ; i < cell_sizes.size() ; ++i) {
         unsigned int size = cell_sizes[i];
-        VectorPtrs &grid_cell = grid_.data_.at(i);
+        VectorPtrs &grid_cell = grid_[i];
         grid_cell.resize(size);
         for(unsigned int j = 0 ; j < size ; ++j, ++it)
-            grid_cell[j] = &data_.at(*it);
+            grid_cell[j] = &data_[*it];
     }
 }
 
@@ -133,8 +132,8 @@ void GridVectorMap::doSave(YAML::Node &node) const
     std::vector<unsigned int> cell_indeces;
 
     for(std::vector<VectorPtrs>::const_iterator
-        it  = grid_.data_.begin() ;
-        it != grid_.data_.end() ;
+        it  = grid_.begin() ;
+        it != grid_.end() ;
         ++it) {
         const VectorPtrs &cell = *it;
         cells_sizes.push_back(cell.size());

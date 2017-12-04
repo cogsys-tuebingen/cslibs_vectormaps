@@ -3,6 +3,8 @@
 
 #include "grid_vector_map.h"
 
+#include <cslibs_vectormaps/utility/grid_dimensions.hpp>
+
 namespace cslibs_vectormaps {
 class SimpleGridVectorMap : public GridVectorMap
 {
@@ -44,6 +46,8 @@ protected:
     virtual void doLoad(const YAML::Node &node);
     virtual void doSave(YAML::Node &node) const;
 
+private:
+    data_structures::GridDimensions<2> grid_dimensions_;
 };
 }
 
