@@ -800,7 +800,7 @@ double OrientedVisibilityGridVectorMap::intersectScanRay(const Vector &ray,
                                                          const unsigned int row,
                                                          const unsigned int col,
                                                          const double angle,
-                                                         const double max_range)
+                                                         const double max_range) const
 {
     const VectorPtrs &cell = grid_.at(grid_.dimensions.index(row, col, angle2index(angle)));
     return algorithms::nearestIntersectionDistance<float, types::Point2d>(ray, cell, max_range);
@@ -999,7 +999,7 @@ void OrientedVisibilityGridVectorMap::doLoad(const YAML::Node &node)
     theta_bins_inv_     = node["theta_bins_inv"].as<double>();
 }
 
-void OrientedVisibilityGridVectorMap::doSave(YAML::Node &node)
+void OrientedVisibilityGridVectorMap::doSave(YAML::Node &node) const
 {
     GridVectorMap::doSave(node);
     node["map_type"]           = "oriented_grid";

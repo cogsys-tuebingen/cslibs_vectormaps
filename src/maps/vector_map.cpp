@@ -73,7 +73,7 @@ bool VectorMap::load(const std::string &path,
 }
 
 bool VectorMap::save(const std::string &path,
-                     const bool compress)
+                     const bool compress) const
 {
     std::ofstream out(path.c_str(), std::ios_base::out | std::ios_base::binary);
     if(!out.is_open()) {
@@ -101,7 +101,7 @@ void VectorMap::load(const YAML::Node &node)
     doLoad(node);
 }
 
-void VectorMap::save(YAML::Node &node)
+void VectorMap::save(YAML::Node &node) const
 {
     doSave(node);
 }
@@ -163,7 +163,7 @@ void VectorMap::doLoad(const YAML::Node &node)
     deserialize(binary, data_);
 }
 
-void VectorMap::doSave(YAML::Node &node)
+void VectorMap::doSave(YAML::Node &node) const
 {
     assert(node.IsMap());
     YAML::Binary binary;

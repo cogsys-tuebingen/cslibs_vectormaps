@@ -80,7 +80,7 @@ public:
                             const unsigned int row,
                             const unsigned int col,
                             const double angle,
-                            const double max_range = 0.0);
+                            const double max_range = 0.0) const;
 
     double minDistanceNearbyStructure(const Point &pos,
                                       const unsigned int row,
@@ -125,14 +125,14 @@ public:
 
 protected:
     virtual void doLoad(const YAML::Node &node);
-    virtual void doSave(YAML::Node &node);
+    virtual void doSave(YAML::Node &node) const;
 
 private:
     double      angular_resolution_;
     std::size_t theta_bins_;
     double      theta_bins_inv_;
 
-    virtual unsigned int handleInsertion ();
+    virtual unsigned int handleInsertion();
 
 
     constexpr static double _2M_PI =  2.0 * M_PI;

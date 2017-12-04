@@ -49,7 +49,7 @@ protected:
     grid_;
 
     virtual void doLoad(const YAML::Node &node);
-    virtual void doSave(YAML::Node &node);
+    virtual void doSave(YAML::Node &node) const;
 
     inline unsigned int row(const double y) const
     {

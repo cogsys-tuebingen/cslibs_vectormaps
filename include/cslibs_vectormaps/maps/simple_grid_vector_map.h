@@ -42,7 +42,7 @@ public:
 protected:
     virtual unsigned int handleInsertion();
     virtual void doLoad(const YAML::Node &node);
-    virtual void doSave(YAML::Node &node);
+    virtual void doSave(YAML::Node &node) const;
 
 };
 }

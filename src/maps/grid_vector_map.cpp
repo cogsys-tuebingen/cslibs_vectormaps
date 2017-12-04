@@ -175,7 +175,7 @@ void GridVectorMap::doLoad(const YAML::Node &node)
     }
 }
 
-void GridVectorMap::doSave(YAML::Node &node)
+void GridVectorMap::doSave(YAML::Node &node) const
 {
     VectorMap::doSave(node);
     assert(node.IsMap());
@@ -189,13 +189,13 @@ void GridVectorMap::doSave(YAML::Node &node)
     std::vector<unsigned int> cells_sizes;
     std::vector<unsigned int> cell_indeces;
 
-    for(std::vector<VectorPtrs>::iterator
+    for(std::vector<VectorPtrs>::const_iterator
         it  = grid_.data_.begin() ;
         it != grid_.data_.end() ;
         ++it) {
-        VectorPtrs &cell = *it;
+        const VectorPtrs &cell = *it;
         cells_sizes.push_back(cell.size());
-        for(VectorPtrs::iterator
+        for(VectorPtrs::const_iterator
             cell_it  = cell.begin() ;
             cell_it != cell.end() ;
             ++cell_it) {

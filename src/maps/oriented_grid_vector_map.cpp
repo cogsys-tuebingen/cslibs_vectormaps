@@ -249,7 +249,7 @@ void OrientedGridVectorMap::findPossibleLines(const Point &center, const Boundin
 
 int OrientedGridVectorMap::removeHiddenLines(const Point& center,
                                              const BoundingBox& cell_bounding,
-                                             VectorPtrs& possible_lines)
+                                             VectorPtrs& possible_lines) const
 {
     // need to check the four corners too garantuee seeing every vector
     double o = resolution_ * 0.5;
@@ -339,7 +339,7 @@ int OrientedGridVectorMap::removeHiddenLines(const Point& center,
 void OrientedGridVectorMap::findVisibleLinesByRaycasting(const Point& center,
                                                          const BoundingBox& cell_bounding,
                                                          const VectorPtrs& possible_lines,
-                                                         std::set<cslibs_boost_geometry::types::Line2d*> &visible)
+                                                         std::set<cslibs_boost_geometry::types::Line2d*> &visible) const
 {
     double max_range = 1e10;
     double angular_res = algorithms::rad(2.0);
@@ -902,7 +902,7 @@ void OrientedGridVectorMap::doLoad(const YAML::Node &node)
     theta_bins_inv_     = node["theta_bins_inv"].as<double>();
 }
 
-void OrientedGridVectorMap::doSave(YAML::Node &node)
+void OrientedGridVectorMap::doSave(YAML::Node &node) const
 {
     GridVectorMap::doSave(node);
     node["map_type"]           = "oriented_grid";

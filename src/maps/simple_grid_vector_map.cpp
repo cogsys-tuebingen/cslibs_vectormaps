@@ -281,7 +281,7 @@ void SimpleGridVectorMap::doLoad(const YAML::Node &node)
     GridVectorMap::doLoad(node);
 }
 
-void SimpleGridVectorMap::doSave(YAML::Node &node)
+void SimpleGridVectorMap::doSave(YAML::Node &node) const
 {
     GridVectorMap::doSave(node);
     node["map_type"]        = "simple_grid";
