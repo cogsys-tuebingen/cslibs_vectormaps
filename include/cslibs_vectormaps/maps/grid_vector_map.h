@@ -24,11 +24,6 @@ public:
     unsigned int cols()       const;
     unsigned int elements()   const;
 
-    unsigned int cellEntries(const unsigned int row,
-                             const unsigned int col) const;
-
-    unsigned int cellEntries(const Point &pos) const;
-
     bool cellIndeces(const Point &pos,
                      unsigned int &row,
                      unsigned int &col) const;

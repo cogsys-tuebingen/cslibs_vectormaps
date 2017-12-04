@@ -82,18 +82,6 @@ unsigned int GridVectorMap::elements() const
     return data_.size();
 }
 
-unsigned int GridVectorMap::cellEntries(const Point &pos) const
-{
-    unsigned int row = GridVectorMap::row(pos);
-    unsigned int col = GridVectorMap::col(pos);
-
-    if(row < rows_ && col < cols_ )
-        return cellEntries(row, col);
-    else
-        return 0;
-}
-
-
 bool GridVectorMap::cellIndeces(const Point& pos,
                                 unsigned int &row,
                                 unsigned int &col) const
@@ -131,17 +119,6 @@ bool GridVectorMap::cellIndeces(const double x,
     col = GridVectorMap::col(x);
 
     return true;
-}
-
-
-unsigned int GridVectorMap::cellEntries(const unsigned int row,
-                                        const unsigned int col) const
-{
-    assert(row < rows_);
-    assert(row >= 0);
-    assert(col < cols_);
-    assert(col >= 0);
-    return grid_.at(grid_.dimensions.index(row,col)).size();
 }
 
 void GridVectorMap::doLoad(const YAML::Node &node)
