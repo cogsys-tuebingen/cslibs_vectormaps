@@ -5,7 +5,6 @@
 #include <cslibs_boost_geometry/types.hpp>
 
 #include <yaml-cpp/yaml.h>
-#include <map>
 
 namespace cslibs_vectormaps {
 

@@ -113,7 +113,6 @@ unsigned int OrientedGridVectorMap::handleInsertion()
 
                 std::cout << "\t" << possible_lines.size() << " visible lines (" << dropped << " dropped)";
                 std::cout << '\n';
-                //            std::cout << std::flush;
 
                 for(unsigned int t = 0 ; t < theta_bins_ ; ++t) {
                     VectorPtrs cell;
@@ -131,7 +130,7 @@ unsigned int OrientedGridVectorMap::handleInsertion()
                         }
                     }
 
-                    grid_.at(grid_dimensions_.index(i,j,t)) = cell;
+                    grid_[grid_dimensions_.index(i,j,t)] = cell;
 
                     ++assigned;
                 }
@@ -139,8 +138,6 @@ unsigned int OrientedGridVectorMap::handleInsertion()
                 min.x(min.x() + resolution_);
                 max.x(max.x() + resolution_);
             }
-            std::cout << std::flush;
-
         }
     } else {
 #pragma omp parallel for reduction(+:assigned)
@@ -169,7 +166,7 @@ unsigned int OrientedGridVectorMap::handleInsertion()
 
                     dropped += removeHiddenLines(center, cell_bounding, possible_lines);
 
-                    // need to check the four corners too garantuee seeing every vector
+                    // need to check the four corners too guarantee seeing every vector
                     std::set<cslibs_boost_geometry::types::Line2d*> visible_lines;
                     double sample_resolution = 1.0;
                     unsigned int sampling_steps = std::ceil(resolution_ / sample_resolution);
@@ -190,7 +187,6 @@ unsigned int OrientedGridVectorMap::handleInsertion()
 
                     std::cout << "\t" << possible_lines.size() << " visible lines (" << dropped << " dropped)";
                     std::cout << '\n';
-                    //            std::cout << std::flush;
 
                     for(unsigned int t = 0 ; t < theta_bins_ ; ++t) {
                         VectorPtrs cell;
@@ -208,7 +204,7 @@ unsigned int OrientedGridVectorMap::handleInsertion()
                             }
                         }
 
-                        grid_.at(grid_dimensions_.index(i,j,t)) = cell;
+                        grid_[grid_dimensions_.index(i,j,t)] = cell;
 
                         ++assigned;
                     }
@@ -223,7 +219,6 @@ unsigned int OrientedGridVectorMap::handleInsertion()
                 pmin.x(pmin.x() + resolution_);
                 pmax.x(pmax.x() + resolution_);
             }
-            std::cout << std::flush;
         }
     }
 
@@ -247,7 +242,7 @@ int OrientedGridVectorMap::removeHiddenLines(const Point& center,
                                              const BoundingBox& cell_bounding,
                                              VectorPtrs& possible_lines) const
 {
-    // need to check the four corners too garantuee seeing every vector
+    // need to check the four corners too guarantee seeing every vector
     double o = resolution_ * 0.5;
     Point corner[4];
     corner[0] = Point(center.x() - o, center.y() - o);
@@ -882,7 +877,7 @@ unsigned int OrientedGridVectorMap::sizeAccessStructures() const
     for(unsigned int y = 0 ; y < rows_ ; ++y) {
         for(unsigned int x = 0 ; x < cols_ ; ++x) {
             for(unsigned int z = 0 ; z < theta_bins_ ; ++z) {
-                const VectorPtrs &cell = grid_.at(grid_dimensions_.index(y, x, z));
+                const VectorPtrs &cell = grid_[grid_dimensions_.index(y, x, z)];
                 size += cell.size() * sizeof(Vector*);
             }
         }
@@ -894,7 +889,7 @@ void OrientedGridVectorMap::doLoad(const YAML::Node &node)
 {
     GridVectorMap::doLoad(node);
     angular_resolution_ = node["angular_resolution"].as<double>();
-    theta_bins_         = node["theta_bins"].as<double>();
+    theta_bins_         = node["theta_bins"].as<std::size_t>();
     theta_bins_inv_     = node["theta_bins_inv"].as<double>();
 
     grid_dimensions_ = {rows_, cols_, theta_bins_};

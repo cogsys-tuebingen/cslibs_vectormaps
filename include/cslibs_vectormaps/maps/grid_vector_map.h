@@ -3,6 +3,8 @@
 
 #include "vector_map.h"
 
+#include <cmath>
+
 namespace cslibs_vectormaps {
 class GridVectorMap : public VectorMap
 {
@@ -23,11 +25,11 @@ public:
     unsigned int cols()       const;
     unsigned int elements()   const;
 
-    bool cellIndeces(const Point &pos,
+    bool cellIndices(const Point &pos,
                      unsigned int &row,
                      unsigned int &col) const;
 
-    bool cellIndeces(const double x,
+    bool cellIndices(const double x,
                      const double y,
                      unsigned int &row,
                      unsigned int &col) const;
@@ -46,12 +48,12 @@ protected:
 
     inline unsigned int row(const double y) const
     {
-        return floor((y - min_corner_.y()) * resolution_inv_);
+        return std::floor((y - min_corner_.y()) * resolution_inv_);
     }
 
     inline unsigned int col(const double x) const
     {
-        return floor((x - min_corner_.x()) * resolution_inv_);
+        return std::floor((x - min_corner_.x()) * resolution_inv_);
     }
 
     inline unsigned int row(const Point &pos) const

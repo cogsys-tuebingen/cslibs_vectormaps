@@ -49,7 +49,7 @@ unsigned int GridVectorMap::elements() const
     return data_.size();
 }
 
-bool GridVectorMap::cellIndeces(const Point& pos,
+bool GridVectorMap::cellIndices(const Point& pos,
                                 unsigned int &row,
                                 unsigned int &col) const
 {
@@ -68,7 +68,7 @@ bool GridVectorMap::cellIndeces(const Point& pos,
     return true;
 }
 
-bool GridVectorMap::cellIndeces(const double x,
+bool GridVectorMap::cellIndices(const double x,
                                 const double y,
                                 unsigned int &row,
                                 unsigned int &col) const
@@ -99,16 +99,16 @@ void GridVectorMap::doLoad(const YAML::Node &node)
     cols_            = node["cols"].as<unsigned int>();
 
     YAML::Binary size_binary  =  node["grid_cell_sizes"].as<YAML::Binary>();
-    YAML::Binary index_binary =  node["grid_cell_indeces"].as<YAML::Binary>();
+    YAML::Binary index_binary =  node["grid_cell_indices"].as<YAML::Binary>();
     std::vector<unsigned int> cell_sizes;
-    std::vector<unsigned int> cell_indeces;
+    std::vector<unsigned int> cell_indices;
 
     deserialize(size_binary, cell_sizes);
-    deserialize(index_binary, cell_indeces);
+    deserialize(index_binary, cell_indices);
 
     grid_.resize(cell_sizes.size());
 
-    std::vector<unsigned int>::iterator it = cell_indeces.begin();
+    std::vector<unsigned int>::iterator it = cell_indices.begin();
     for(unsigned int i = 0 ; i < cell_sizes.size() ; ++i) {
         unsigned int size = cell_sizes[i];
         VectorPtrs &grid_cell = grid_[i];
@@ -129,7 +129,7 @@ void GridVectorMap::doSave(YAML::Node &node) const
     node["cols"]            = cols_;
 
     std::vector<unsigned int> cells_sizes;
-    std::vector<unsigned int> cell_indeces;
+    std::vector<unsigned int> cell_indices;
 
     for(std::vector<VectorPtrs>::const_iterator
         it  = grid_.begin() ;
@@ -141,7 +141,7 @@ void GridVectorMap::doSave(YAML::Node &node) const
             cell_it  = cell.begin() ;
             cell_it != cell.end() ;
             ++cell_it) {
-            cell_indeces.push_back(static_cast<unsigned>(*cell_it - data_.data()));
+            cell_indices.push_back(static_cast<unsigned>(*cell_it - data_.data()));
         }
     }
 
@@ -149,6 +149,6 @@ void GridVectorMap::doSave(YAML::Node &node) const
     serialize(cells_sizes, size_binary);
     node["grid_cell_sizes"] = size_binary;
     YAML::Binary index_binary;
-    serialize(cell_indeces,index_binary);
-    node["grid_cell_indeces"] = index_binary;
+    serialize(cell_indices, index_binary);
+    node["grid_cell_indices"] = index_binary;
 }

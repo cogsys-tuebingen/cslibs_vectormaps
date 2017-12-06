@@ -430,7 +430,7 @@ unsigned int OrientedVisibilityGridVectorMap::handleInsertion()
             for(std::size_t j = col_start; j < col_to; ++j) {
                 for(unsigned int t = 0 ; t < theta_bins_ ; ++t) {
                     // TODO: check in view
-                    VectorPtrs& entry = grid_.at(grid_dimensions_.index(i,j,t));
+                    VectorPtrs& entry = grid_[grid_dimensions_.index(i,j,t)];
                     entry.push_back(&line);
                 }
             }
@@ -512,7 +512,7 @@ unsigned int OrientedVisibilityGridVectorMap::handleInsertion()
                             boost::geometry::within(br, shadow.polygon)) {
 
                         for(unsigned int t = 0 ; t < theta_bins_ ; ++t) {
-                            VectorPtrs& entry = grid_.at(grid_dimensions_.index(i,j,t));
+                            VectorPtrs& entry = grid_[grid_dimensions_.index(i,j,t)];
                             VectorPtrs::iterator pos = std::find(entry.begin(), entry.end(), &line);
                             if(pos != entry.end()) {
                                 entry.erase(pos);
@@ -977,14 +977,14 @@ void OrientedVisibilityGridVectorMap::intersectScanPattern(const Point   &pos,
 
     ranges.resize(pattern.size());
     for(unsigned int i = 0 ; i < pattern.size() ; ++i) {
-        const Vector& line = pattern.at(i);
+        const Vector& line = pattern[i];
         double dx = line.second.x() - line.first.x();
         double dy = line.second.y() - line.first.y();
         double angle = atan2(dy, dx);
         unsigned int theta = angle2index(angle);
         const VectorPtrs &cell = grid_.at(grid_dimensions_.index(row, col, theta));
 
-        ranges.at(i) = algorithms::nearestIntersectionDistance<float, types::Point2d>(line, cell, default_measurement);
+        ranges[i] = algorithms::nearestIntersectionDistance<float, types::Point2d>(line, cell, default_measurement);
     }
 }
 
@@ -992,7 +992,7 @@ void OrientedVisibilityGridVectorMap::doLoad(const YAML::Node &node)
 {
     GridVectorMap::doLoad(node);
     angular_resolution_ = node["angular_resolution"].as<double>();
-    theta_bins_         = node["theta_bins"].as<double>();
+    theta_bins_         = node["theta_bins"].as<std::size_t>();
     theta_bins_inv_     = node["theta_bins_inv"].as<double>();
 
     grid_dimensions_ = {rows_, cols_, theta_bins_};
