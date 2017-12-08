@@ -50,8 +50,8 @@ inline void serialize(const std::vector<T> &data,
     for(unsigned int i = 0 ; i < id.size ; ++i, ++bytes_ptr)
         *bytes_ptr = id.bytes[i];
 
-    for(unsigned int i = 0 ; i < data.size() ; ++i) {
-        td.value = data.at(i);
+    for(const T& element : data) {
+        td.value = element;
         for(unsigned int i = 0 ; i < td.size ; ++i, ++bytes_ptr)
             *bytes_ptr = td.bytes[i];
     }
@@ -72,8 +72,7 @@ inline void serialize(const Vectors &data,
     for(unsigned int i = 0 ; i < id.size ; ++i, ++bytes_ptr)
         *bytes_ptr = id.bytes[i];
 
-    for(unsigned int i = 0 ; i < data.size() ; ++i) {
-        const Vector &vector = data.at(i);
+    for(const Vector& vector : data) {
         sd.value = vector.first.x();
         for(unsigned int i = 0 ; i < sd.size ; ++i, ++bytes_ptr)
             *bytes_ptr = sd.bytes[i];
@@ -113,14 +112,12 @@ inline bool deserialize(const YAML::Binary &binary,
         return false;
 
     data.resize(size);
-    for(unsigned int i = 0 ; i < size ; ++i) {
-        T &entry = data.at(i);
+    for(T& entry : data) {
         for(unsigned int i = 0 ; i < td.size ; ++i, ++binary_ptr)
             td.bytes[i] = *binary_ptr;
         entry = td.value;
     }
     return true;
-
 }
 
 inline bool deserialize(const YAML::Binary &binary,
@@ -141,8 +138,7 @@ inline bool deserialize(const YAML::Binary &binary,
         return false;
 
     data.resize(size);
-    for(unsigned int i = 0 ; i < size ; ++i) {
-        Vector &vector = data.at(i);
+    for(Vector& vector : data) {
         for(unsigned int i = 0 ; i < sd.size ; ++i, ++binary_ptr)
             sd.bytes[i] = *binary_ptr;
         vector.first.x(sd.value);
@@ -163,6 +159,7 @@ inline bool deserialize(const YAML::Binary &binary,
 
     return true;
 }
+
 }
 }
 

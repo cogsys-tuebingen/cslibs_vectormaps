@@ -45,11 +45,8 @@ template<>
 struct convert<Polygon::ring_type> {
     static Node encode(const Polygon::ring_type& rhs) {
         Node node(YAML::NodeType::Sequence);
-        for(Polygon::ring_type::const_iterator
-            it  = rhs.begin();
-            it != rhs.end();
-            ++it) {
-            node.push_back(*it);
+        for(const auto& element : rhs) {
+            node.push_back(element);
         }
         return node;
     }
@@ -60,11 +57,8 @@ struct convert<Polygon::ring_type> {
         }
 
         rhs = Polygon::ring_type();
-        for(YAML::Node::const_iterator
-            it = node.begin() ;
-            it != node.end() ;
-            ++it) {
-            Point p = it->as<Point>();
+        for(const auto& element : node) {
+            Point p = element.as<Point>();
             rhs.push_back(p);
         }
         return true;
@@ -81,11 +75,8 @@ struct convert<Polygon> {
             node["outer"] = rhs.outer();
 
         const Polygon::inner_container_type &inners = rhs.inners();
-        for(Polygon::inner_container_type::const_iterator
-            it  = inners.begin() ;
-            it != inners.end() ;
-            ++it) {
-            node["inners"].push_back(*it);
+        for(const auto& element : inners) {
+            node["inners"].push_back(element);
         }
 
         return node;
@@ -104,10 +95,8 @@ struct convert<Polygon> {
 
         if(node["inners"]) {
             Polygon::inner_container_type &inners = rhs.inners();
-            for(YAML::Node::const_iterator it = node["inners"].begin() ;
-                it != node["inners"].end() ;
-                ++it) {
-                Polygon::ring_type r = it->as<Polygon::ring_type>();
+            for(const auto& element : node["inners"]) {
+                Polygon::ring_type r = element.as<Polygon::ring_type>();
                 inners.push_back(r);
             }
         }

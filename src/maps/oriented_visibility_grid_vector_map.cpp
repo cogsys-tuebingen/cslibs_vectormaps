@@ -56,8 +56,7 @@ inline bool operator != (const VectorMap::Vector& lhs, const VectorMap::Vector& 
 
 bool isShadowedByOneOf(const VectorMap::Point& point, std::vector<OrientedVisibilityGridVectorMap::ShadowBorder>& areas)
 {
-    for(std::size_t i = 0, total_i = areas.size(); i < total_i; ++i) {
-        const OrientedVisibilityGridVectorMap::ShadowBorder& shadow = areas[i];
+    for(const OrientedVisibilityGridVectorMap::ShadowBorder& shadow : areas) {
         if(boost::geometry::within(point, shadow.area)) {
             return true;
         }
@@ -67,8 +66,7 @@ bool isShadowedByOneOf(const VectorMap::Point& point, std::vector<OrientedVisibi
 
 bool isShadowedByOneOf(const VectorMap::Vector& line, std::vector<OrientedVisibilityGridVectorMap::ShadowBorder>& areas)
 {
-    for(std::size_t i = 0, total_i = areas.size(); i < total_i; ++i) {
-        const OrientedVisibilityGridVectorMap::ShadowBorder& shadow = areas[i];
+    for(const OrientedVisibilityGridVectorMap::ShadowBorder& shadow : areas) {
         if(boost::geometry::within(line.first, shadow.area) && boost::geometry::within(line.second, shadow.area)) {
             return true;
         }
@@ -198,8 +196,7 @@ OrientedVisibilityGridVectorMap::Shadow OrientedVisibilityGridVectorMap::castSha
 
     // generate raw shadows
     std::vector<ShadowBorder> shadows_init;
-    for(std::size_t i = 0, total_i = cs.size(); i < total_i; ++i) {
-        const Vector& s = cs[i];
+    for(const Vector& s : cs) {
         if(!boost::geometry::intersects(s, l)) {
             VectorMap::Vector line_s_first;
             VectorMap::Vector line_s_second;
@@ -226,13 +223,10 @@ OrientedVisibilityGridVectorMap::Shadow OrientedVisibilityGridVectorMap::castSha
         // filter contained shadows
         std::vector<ShadowBorder> shadows_raw = shadows;
         shadows.clear();
-        for(std::vector<ShadowBorder>::iterator it = shadows_raw.begin(); it != shadows_raw.end(); ++it) {
-            const ShadowBorder& border_to_test = *it;
+        for(const ShadowBorder& border_to_test : shadows_raw) {
             bool contained = false;
 
-            for(std::vector<ShadowBorder>::iterator inner_it = shadows_raw.begin(); inner_it != shadows_raw.end(); ++inner_it) {
-                ShadowBorder& border = *inner_it;
-
+            for(const ShadowBorder& border : shadows_raw) {
                 if(boost::geometry::within(border_to_test.outline.baseline.first, border.area) &&
                         boost::geometry::within(border_to_test.outline.baseline.second, border.area)) {
                     contained = true;
@@ -266,15 +260,13 @@ OrientedVisibilityGridVectorMap::Shadow OrientedVisibilityGridVectorMap::castSha
     }
 
     Shadow shadow;
-    for(std::size_t j = 0, total_j = shadows.size(); j < total_j; ++j) {
-        ShadowBorder& s = shadows[j];
+    for(const ShadowBorder& s : shadows) {
         if(s.outline.valid) {
             shadow.lines.push_back(s.outline.baseline);
         }
     }
 
-    for(std::size_t j = 0, total_j = shadows.size(); j < total_j; ++j) {
-        ShadowBorder& s = shadows[j];
+    for(const ShadowBorder& s : shadows) {
         if(!s.outline.valid) {
             continue;
         }
@@ -343,11 +335,10 @@ void OrientedVisibilityGridVectorMap::findBorderLines(const VectorMap::Vector &c
     VectorMap::Vector first;
     VectorMap::Vector second;
 
-    const typename VectorMap::Polygon::ring_type &ring = hull.outer();
-    typename VectorMap::Polygon::ring_type::const_iterator it = ring.begin();
-    for(; it != ring.end(); ++it) {
+    const VectorMap::Polygon::ring_type &ring = hull.outer();
+    for(VectorMap::Polygon::ring_type::const_iterator begin = ring.begin(), end = ring.end(), it = begin; it != end; ++it) {
         const VectorMap::Point& pt = *it;
-        const VectorMap::Point& next = (it + 1 == ring.end()) ? *ring.begin() : *(it+1);
+        const VectorMap::Point& next = (it + 1 == end) ? *begin : *(it+1);
 
         bool pt_is_line = pt == l.first || pt == l.second;
         bool next_is_line = next == l.first || next == l.second;
@@ -400,14 +391,8 @@ unsigned int OrientedVisibilityGridVectorMap::handleInsertion()
     std::size_t cols = grid_dimensions_.size<1>();
 
     std::cerr << "generate ground state" << "\n";
-    for(Vectors::iterator
-        line_it = data_.begin() ;
-        line_it != data_.end() ;
-        ++line_it) {
 
-        // TODO: make const!
-        Vector& line = *line_it;
-
+    for(Vector& line : data_) { // TODO: make const!
         Point la = line.first;
         Point lb = line.second;
         boost::geometry::divide_value(la, resolution_);
@@ -439,25 +424,11 @@ unsigned int OrientedVisibilityGridVectorMap::handleInsertion()
 
     int line_count = 0;
     std::cerr << "optimize using visibility" << "\n";
-    for(Vectors::iterator
-        line_it = data_.begin() ;
-        line_it != data_.end() ;
-        ++line_it) {
-
-        // TODO: make const!
-        Vector& caster = *line_it;
-
+    for(Vector& caster : data_) { // TODO: make const!
         std::cerr << "analyzing line " << line_count << " / " << data_.size()<< "\n";
         ++line_count;
 
-        for(Vectors::iterator
-            line_it = data_.begin() ;
-            line_it != data_.end() ;
-            ++line_it) {
-
-            // TODO: make const!
-            Vector& line = *line_it;
-
+        for(Vector& line : data_) { // TODO: make const!
             if(&line == &caster) {
                 // no self checking
                 continue;
@@ -490,9 +461,9 @@ unsigned int OrientedVisibilityGridVectorMap::handleInsertion()
             max.y(std::max(la.y(), lb.y()) + padding_);
 
             std::size_t col_start = std::max(0, static_cast<int>(std::floor(min.x())));
-            std::size_t col_to = std::min(cols-1, static_cast<std::size_t>(std::ceil(max.x())));
+            std::size_t col_to = std::min(cols-1, static_cast<std::size_t>(std::ceil(max.x()))); // TODO: should this be cols and not cols-1?
             std::size_t row_start = std::max(0, static_cast<int>(std::floor(min.y())));
-            std::size_t row_to = std::min(rows-1, static_cast<std::size_t>(std::ceil(max.y())));
+            std::size_t row_to = std::min(rows-1, static_cast<std::size_t>(std::ceil(max.y()))); // TODO: should this be rows and not rows-1?
 
             for(std::size_t i = row_start; i < row_to; ++i) {
                 for(std::size_t j = col_start; j < col_to; ++j) {
@@ -541,12 +512,8 @@ double OrientedVisibilityGridVectorMap::minDistanceNearbyStructure(const Point &
     double min_dist = std::numeric_limits<double>::max();
     double dist(0.0);
     const VectorPtrs &cell = grid_.at(grid_dimensions_.index(row, col, theta));
-    for(VectorPtrs::const_iterator it =
-        cell.begin() ;
-        it != cell.end() ;
-        ++it) {
-
-        dist = algorithms::distance<double,Point>(pos, **it);
+    for(const Vector* line : cell) {
+        dist = algorithms::distance<double,Point>(pos, *line);
         if(dist < min_dist)
             min_dist = dist;
     }
@@ -563,7 +530,7 @@ double OrientedVisibilityGridVectorMap::minSquaredDistanceNearbyStructure(const 
     double min_squared_dist = std::numeric_limits<double>::max();
     const VectorPtrs &cell = grid_.at(grid_dimensions_.index(row, col, theta));
 
-    for(auto line : cell) {
+    for(const Vector* line : cell) {
         double squared_dist = boost::geometry::comparable_distance(pos, *line);
         if(squared_dist < min_squared_dist)
             min_squared_dist = squared_dist;
@@ -594,12 +561,8 @@ double OrientedVisibilityGridVectorMap::minDistanceNearbyStructure(const Point &
     double dist(0.0);
     for(unsigned int theta = 0 ; theta < grid_dimensions_.size<2>() ; ++theta) {
         const VectorPtrs &cell = grid_.at(grid_dimensions_.index(row, col, theta));
-        for(VectorPtrs::const_iterator it =
-            cell.begin() ;
-            it != cell.end() ;
-            ++it) {
-
-            dist = algorithms::distance<double,Point>(pos, **it);
+        for(const Vector* line : cell) {
+            dist = algorithms::distance<double,Point>(pos, *line);
             if(dist < min_dist)
                 min_dist = dist;
         }
@@ -627,7 +590,7 @@ double OrientedVisibilityGridVectorMap::minSquaredDistanceNearbyStructure(const 
 
     for(unsigned int theta = 0 ; theta < grid_dimensions_.size<2>() ; ++theta) {
         const VectorPtrs &cell = grid_.at(grid_dimensions_.index(row, col, theta));
-        for(auto line : cell) {
+        for(const Vector* line : cell) {
             double squared_dist = boost::geometry::comparable_distance(pos, *line);
             if(squared_dist < min_squared_dist)
                 min_squared_dist = squared_dist;
@@ -657,12 +620,8 @@ bool OrientedVisibilityGridVectorMap::structureNearby(const Point &pos,
     double dist(0.0);
     for(unsigned int theta = 0 ; theta < grid_dimensions_.size<2>() ; ++theta) {
         const VectorPtrs &cell = grid_.at(grid_dimensions_.index(row, col, theta));
-        for(VectorPtrs::const_iterator it =
-            cell.begin() ;
-            it != cell.end() ;
-            ++it) {
-
-            dist = algorithms::distance<double,Point>(pos, **it);
+        for(const Vector* line : cell) {
+            dist = algorithms::distance<double,Point>(pos, *line);
             if(dist > 0.0 && dist < thresh)
                 return true;
         }
@@ -697,15 +656,10 @@ bool OrientedVisibilityGridVectorMap::retrieveFiltered(const Point &pos,
     Point max(pos.x() + range_, pos.y() + range_);
     BoundingBox bound(min, max);
 
-    for(VectorPtrs::const_iterator it =
-        cell.begin();
-        it != cell.end() ;
-        ++it) {
-
-        const Vector& line = **it;
+    for(const Vector* line : cell) {
         // filter out unnecessary lines
-        if(algorithms::touches<Point>(line, bound)) {
-            lines.push_back(line);
+        if(algorithms::touches<Point>(*line, bound)) {
+            lines.push_back(*line);
         }
     }
 
@@ -732,13 +686,8 @@ bool OrientedVisibilityGridVectorMap::retrieve(const Point &pos,
 
     const VectorPtrs &cell = grid_.at(grid_dimensions_.index(row, col, theta));
 
-    for(VectorPtrs::const_iterator it =
-        cell.begin() ;
-        it != cell.end() ;
-        ++it) {
-
-        const Vector& line = **it;
-        lines.push_back(line);
+    for(const Vector* line : cell) {
+        lines.push_back(*line);
     }
 
     return lines.size() > 0;
@@ -764,12 +713,8 @@ bool OrientedVisibilityGridVectorMap::retrieve(const double x,
 
     const VectorPtrs &cell = grid_.at(grid_dimensions_.index(row, col, theta));
 
-    for(VectorPtrs::const_iterator it =
-        cell.begin() ;
-        it != cell.end() ;
-        ++it) {
-        const Vector& line = **it;
-        lines.push_back(line);
+    for(const Vector* line : cell) {
+        lines.push_back(*line);
     }
 
     return lines.size() > 0;
@@ -782,12 +727,8 @@ bool OrientedVisibilityGridVectorMap::retrieve(const unsigned int row,
 {
     const VectorPtrs &cell = grid_.at(grid_dimensions_.index(row, col,  angle2index(angle)));
 
-    for(VectorPtrs::const_iterator it =
-        cell.begin() ;
-        it != cell.end() ;
-        ++it) {
-        const Vector& line = **it;
-        lines.push_back(line);
+    for(const Vector* line : cell) {
+        lines.push_back(*line);
     }
 
     return lines.size() > 0;
@@ -832,15 +773,10 @@ bool OrientedVisibilityGridVectorMap::retrieveFiltered(const Point &pos,
         bound.min_corner() = min;
         bound.max_corner() = max;
 
-        for(VectorPtrs::const_iterator it =
-            cell.begin();
-            it != cell.end() ;
-            ++it) {
-
-            const Vector& line = **it;
+        for(const Vector* line : cell) {
             // filter out unnecessary lines
-            if(algorithms::touches<Point>(line, bound)) {
-                lines.push_back(line);
+            if(algorithms::touches<Point>(*line, bound)) {
+                lines.push_back(*line);
             }
         }
     }
@@ -866,13 +802,8 @@ bool OrientedVisibilityGridVectorMap::retrieve(const Point &pos,
     for(unsigned int theta = 0 ; theta < grid_dimensions_.size<2>() ; ++theta) {
         const VectorPtrs &cell = grid_.at(grid_dimensions_.index(row, col, theta));
 
-        for(VectorPtrs::const_iterator it =
-            cell.begin() ;
-            it != cell.end() ;
-            ++it) {
-
-            const Vector& line = **it;
-            lines.push_back(line);
+        for(const Vector* line : cell) {
+            lines.push_back(*line);
         }
     }
 
@@ -900,8 +831,7 @@ int OrientedVisibilityGridVectorMap::intersectScanPattern (
     int intersection_count = 0;
     ValidPoints result;
 
-    for(Vectors::const_iterator it = pattern.begin(); it != pattern.end(); ++it) {
-        const Vector& line = *it;
+    for(const Vector& line : pattern) {
         double dx = line.second.x() - line.first.x();
         double dy = line.second.y() - line.first.y();
         double angle = atan2(dy, dx);

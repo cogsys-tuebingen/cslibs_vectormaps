@@ -109,11 +109,11 @@ void GridVectorMap::doLoad(const YAML::Node &node)
     grid_.resize(cell_sizes.size());
 
     std::vector<unsigned int>::iterator it = cell_indices.begin();
-    for(unsigned int i = 0 ; i < cell_sizes.size() ; ++i) {
+    for(std::size_t i = 0; i < cell_sizes.size(); ++i) {
         unsigned int size = cell_sizes[i];
         VectorPtrs &grid_cell = grid_[i];
         grid_cell.resize(size);
-        for(unsigned int j = 0 ; j < size ; ++j, ++it)
+        for(unsigned int j = 0; j < size; ++j, ++it)
             grid_cell[j] = &data_[*it];
     }
 }
@@ -130,18 +130,13 @@ void GridVectorMap::doSave(YAML::Node &node) const
 
     std::vector<unsigned int> cells_sizes;
     std::vector<unsigned int> cell_indices;
+    cells_sizes.reserve(grid_.size());
+    cell_indices.reserve(data_.size());
 
-    for(std::vector<VectorPtrs>::const_iterator
-        it  = grid_.begin() ;
-        it != grid_.end() ;
-        ++it) {
-        const VectorPtrs &cell = *it;
+    for(const VectorPtrs& cell : grid_) {
         cells_sizes.push_back(cell.size());
-        for(VectorPtrs::const_iterator
-            cell_it  = cell.begin() ;
-            cell_it != cell.end() ;
-            ++cell_it) {
-            cell_indices.push_back(static_cast<unsigned>(*cell_it - data_.data()));
+        for(const Vector* segment : cell) {
+            cell_indices.push_back(static_cast<unsigned>(segment - data_.data()));
         }
     }
 

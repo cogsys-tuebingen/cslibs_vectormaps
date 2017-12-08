@@ -1,9 +1,9 @@
 #ifndef GENERIC_GRID_HPP
 #define GENERIC_GRID_HPP
 
+#include <cstddef>
 #include <vector>
-#include <assert.h>
-#include <boost/static_assert.hpp>
+#include <cassert>
 #include <stdexcept>
 
 namespace cslibs_vectormaps {
@@ -14,7 +14,7 @@ struct Dimension;
 struct IndexExpression
 {
     IndexExpression(std::size_t i)
-        : accumulator_(i), dimension_(NULL)
+        : accumulator_(i), dimension_(nullptr)
     {}
     IndexExpression(std::size_t coordinate, const Dimension* dimension)
         : accumulator_(coordinate), dimension_(dimension)
@@ -32,7 +32,7 @@ struct IndexExpression
 };
 
 struct Dimension {
-    Dimension(std::size_t size, Dimension* next = NULL)
+    Dimension(std::size_t size, Dimension* next = nullptr)
         : size_(size), next_(next)
     {
 
@@ -86,19 +86,15 @@ struct Dimensions
     }
     Dimensions(const Dimensions& copy)
     {
-        for(std::vector<Dimension>::const_iterator it = copy.dimensions.begin();
-            it != copy.dimensions.end();
-            ++it) {
-            add(*it);
+        for(const Dimension& dimension : copy.dimensions) {
+            add(dimension);
         }
     }
     Dimensions& operator =(const Dimensions& assign)
     {
         dimensions.clear();
-        for(std::vector<Dimension>::const_iterator it = assign.dimensions.begin();
-            it != assign.dimensions.end();
-            ++it) {
-            add(*it);
+        for(const Dimension& dimension : assign.dimensions) {
+            add(dimension);
         }
         return *this;
     }
