@@ -14,7 +14,7 @@ catkin_package(
   INCLUDE_DIRS     include
   LIBRARIES        ${PROJECT_NAME}_dxf ${PROJECT_NAME}_maps
   CATKIN_DEPENDS   cslibs_boost_geometry
-  DEPENDS          Boost GDAL yaml-cpp
+  DEPENDS          Boost GDAL
 )
 
 # C++ 11
