@@ -15,6 +15,7 @@ SimpleGridVectorMap::SimpleGridVectorMap(const BoundingBox &bounding,
     GridVectorMap(bounding, range, resolution, debug)
 {
     grid_dimensions_ = {rows_, cols_};
+    grid_.resize(grid_dimensions_.globalSize());
 }
 
 SimpleGridVectorMap::SimpleGridVectorMap() :

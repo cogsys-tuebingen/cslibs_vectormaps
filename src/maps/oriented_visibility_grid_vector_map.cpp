@@ -27,6 +27,7 @@ OrientedVisibilityGridVectorMap::OrientedVisibilityGridVectorMap(const BoundingB
     theta_bins_      = std::ceil(2 * M_PI / angular_resolution);
     theta_bins_inv_  = 1.0 / theta_bins_;
     grid_dimensions_ = {rows_, cols_, theta_bins_};
+    grid_.resize(grid_dimensions_.globalSize());
 }
 
 OrientedVisibilityGridVectorMap::OrientedVisibilityGridVectorMap() :
