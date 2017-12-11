@@ -4,6 +4,7 @@
 #include <QStringList>
 #include <thread>
 #include <functional>
+#include <set>
 
 #include "models/vector_layer_model.h"
 #include "models/point_layer_model.h"
