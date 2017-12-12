@@ -3,6 +3,7 @@
 
 #include <cslibs_vectormaps/dxf/dxf_map.h>
 #include <functional>
+#include <set>
 
 namespace cslibs_vectormaps {
 struct CornerDetectionParameter {
