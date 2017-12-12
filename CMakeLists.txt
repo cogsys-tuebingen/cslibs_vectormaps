@@ -127,7 +127,9 @@ if(${Qt5_FOUND})
     )
 
 endif()
-if(${gazebo_FOUND} AND ${xacro_FOUND})
+
+find_package(protobuf)
+if(${gazebo_FOUND} AND ${xacro_FOUND} AND ${protobuf_VERSION} VERSION_EQUAL 2.6.1)
     find_package(Eigen3 REQUIRED)
     find_package(Boost  REQUIRED system filesystem)
 
