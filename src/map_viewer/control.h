@@ -5,9 +5,8 @@
 
 #include <thread>
 #include <mutex>
-#include <atomic>
-
-
+#include <condition_variable>
+#include <functional>
 
 namespace cslibs_vectormaps {
 class Map;
@@ -22,6 +21,7 @@ class Control : public QObject
 
 public:
     Control();
+    ~Control();
 
     void setup(Map *map,
                View *view);
@@ -46,9 +46,13 @@ public slots:
 private:
     Map             *map_;
 
-    std::atomic_bool  running_;
-    std::thread worker_thread_; /// used to applied algorithms
+    std::function<void()> work_;
+    bool stop_;
+    mutable std::mutex work_mutex_;
+    std::condition_variable work_condition_;
+    std::thread worker_thread_; /// used to apply algorithms
 
+    void doWork(const std::function<void()>& work);
     void executeCornerDetection(const CornerDetectionParameter &params);
     void executeGridmapExport(const RasterizationParameter &params);
     void executeVectormapExport(const VectormapConversionParameter &params);
