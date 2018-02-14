@@ -67,7 +67,7 @@ public:
      * @param vectors   the set of lines retrieved
      */
     void getVectors(Vectors &vectors,
-                    const std::string &attrib_filter = "");
+                    const std::string &attrib_filter = "") const;
 
     /**
      * @brief Get vectors of the map.
@@ -144,7 +144,7 @@ public:
      * @brief Get the names of existing layers.
      * @param names     the names to be returned
      */
-    void getLayerNames(std::vector<std::string> &names);
+    void getLayerNames(std::vector<std::string> &names) const;
 
     /**
      * @brief Attribute filter string for layer names.
@@ -167,7 +167,7 @@ private:
 
     bool retrieveBounding();
     void retrieveVectors(Vectors &vectors,
-                         const std::string &attrib_filter = "");
+                         const std::string &attrib_filter = "") const;
 
     void retrievePolygons(Polygons &polygons,
                           const std::string &attrib_filter = "");

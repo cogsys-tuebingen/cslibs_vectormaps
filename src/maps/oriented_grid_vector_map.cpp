@@ -330,18 +330,14 @@ void OrientedGridVectorMap::findVisibleLinesByRaycasting(const Point& center,
     }
 }
 
-bool OrientedGridVectorMap::isInView(Vector& line, Point center, std::size_t t)
+bool OrientedGridVectorMap::isInView(const Vector& line, Point center, std::size_t t) const
 {
     // take the general fov and shift it to center
-    Polygon fov = fovs_[t];
+    Vector linecopy = line;
+    boost::geometry::subtract_point(linecopy.first, center);
+    boost::geometry::subtract_point(linecopy.second, center);
 
-    VectorMap::Polygon::ring_type &ring = fov.outer();
-    for(VectorMap::Point& pt : ring) {
-        pt.x(pt.x() + center.x());
-        pt.y(pt.y() + center.y());
-    }
-
-    return algorithms::touches<Point>(line, fov);
+    return algorithms::touches<Point>(linecopy, fovs_[t]);
 }
 
 double OrientedGridVectorMap::angularResolution() const

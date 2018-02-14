@@ -109,7 +109,7 @@ void DXFMap::getPolygons(Polygons &polygons,
 }
 
 void DXFMap::getVectors(Vectors &vectors,
-                        const std::string &attrib_filter)
+                        const std::string &attrib_filter) const
 {
     retrieveVectors(vectors, attrib_filter);
 }
@@ -189,7 +189,7 @@ void DXFMap::printInfo()
 
 }
 
-void DXFMap::getLayerNames(std::vector<std::string> &names)
+void DXFMap::getLayerNames(std::vector<std::string> &names) const
 {
     OGRLayer *layers = dxf_source_->ExecuteSQL("SELECT DISTINCT Layer FROM entities", NULL, NULL);
     for(int i = 0 ; i < layers->GetFeatureCount() ; ++i) {
@@ -376,7 +376,7 @@ bool DXFMap::retrieveBounding()
 }
 
 void DXFMap::retrieveVectors(Vectors &vectors,
-                             const std::string &attrib_filter)
+                             const std::string &attrib_filter) const
 {
     if(dxf_layer_ == nullptr)
         return;
