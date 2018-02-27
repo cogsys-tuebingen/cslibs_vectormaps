@@ -14,7 +14,7 @@ catkin_package(
   INCLUDE_DIRS     include
   LIBRARIES        ${PROJECT_NAME}_dxf ${PROJECT_NAME}_maps
   CATKIN_DEPENDS   cslibs_boost_geometry
-  DEPENDS          Boost GDAL yaml-cpp
+  DEPENDS          Boost GDAL
 )
 
 # C++ 11
@@ -127,40 +127,44 @@ if(${Qt5_FOUND})
     )
 
 endif()
-if(${gazebo_FOUND} AND ${xacro_FOUND})
-    find_package(Eigen3 REQUIRED)
-    find_package(Boost  REQUIRED system filesystem)
 
-    include_directories(
-        ${Eigen3_INCLUDE_DIRS}
-        ${Boost_INCLUDE_DIRS}
-    )
+find_package(protobuf QUIET)
+if(${protobuf_FOUND} AND ${gazebo_FOUND} AND ${xacro_FOUND})
+    if(${protobuf_VERSION} VERSION_EQUAL 2.6.1)
+        find_package(Eigen3 REQUIRED)
+        find_package(Boost  REQUIRED system filesystem)
 
-    add_library(${PROJECT_NAME}_gazebo_dxf_map_plugin
-        src/gazebo/dxf_map_gazebo.cpp
-        src/gazebo/mesh.cpp
-    )
-    target_link_libraries(${PROJECT_NAME}_gazebo_dxf_map_plugin
-        ${GAZEBO_LIBRARIES}
-        ${PROJECT_NAME}_dxf
-    )
+        include_directories(
+            ${Eigen3_INCLUDE_DIR}
+            ${Boost_INCLUDE_DIRS}
+        )
 
-    xacro_add_xacro_file("${CMAKE_CURRENT_LIST_DIR}/gazebo/launch/empty.xacro"
-                         "${CMAKE_CURRENT_LIST_DIR}/gazebo/launch/empty.world"
-                         INORDER)
+        add_library(${PROJECT_NAME}_gazebo_dxf_map_plugin
+            src/gazebo/dxf_map_gazebo.cpp
+            src/gazebo/mesh.cpp
+        )
+        target_link_libraries(${PROJECT_NAME}_gazebo_dxf_map_plugin
+            ${GAZEBO_LIBRARIES}
+            ${PROJECT_NAME}_dxf
+        )
 
-    add_custom_target(${PROJECT_NAME}_world ALL DEPENDS "gazebo/launch/empty.world")
+        xacro_add_xacro_file("${CMAKE_CURRENT_LIST_DIR}/gazebo/launch/empty.xacro"
+                             "${CMAKE_CURRENT_LIST_DIR}/gazebo/launch/empty.world"
+                             INORDER)
 
-    add_executable(${PROJECT_NAME}_dxf_to_gazebo_world
-        src/gazebo/dxf_to_world.cpp
-        src/gazebo/mesh.cpp
-    )
-    target_link_libraries(${PROJECT_NAME}_dxf_to_gazebo_world
-        ${GAZEBO_LIBRARIES}
-        ${Boost_LIBRARIES}
-        ${PROJECT_NAME}_dxf
-        yaml-cpp
-    )
+        add_custom_target(${PROJECT_NAME}_world ALL DEPENDS "gazebo/launch/empty.world")
+
+        add_executable(${PROJECT_NAME}_dxf_to_gazebo_world
+            src/gazebo/dxf_to_world.cpp
+            src/gazebo/mesh.cpp
+        )
+        target_link_libraries(${PROJECT_NAME}_dxf_to_gazebo_world
+            ${GAZEBO_LIBRARIES}
+            ${Boost_LIBRARIES}
+            ${PROJECT_NAME}_dxf
+            yaml-cpp
+        )
+    endif()
 endif()
 
 install(DIRECTORY include/${PROJECT_NAME}/

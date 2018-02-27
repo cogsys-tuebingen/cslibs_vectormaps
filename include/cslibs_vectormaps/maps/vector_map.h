@@ -5,7 +5,6 @@
 #include <cslibs_boost_geometry/types.hpp>
 
 #include <yaml-cpp/yaml.h>
-#include <map>
 
 namespace cslibs_vectormaps {
 
@@ -60,10 +59,10 @@ public:
                                         const float default_measurement = 0.f) const = 0;
 
     bool load(const std::string &path, const bool compressed = true);
-    bool save(const std::string &path, const bool compress   = true);
+    bool save(const std::string &path, const bool compress   = true) const;
 
     void load(const YAML::Node &node);
-    void save(YAML::Node &node);
+    void save(YAML::Node &node) const;
 
     unsigned int size() const;
     bool         withinValidArea(const Point &p) const;
@@ -85,9 +84,9 @@ protected:
 
     Vectors         data_;
 
-    virtual unsigned int handleInsertion () = 0;
+    virtual unsigned int handleInsertion() = 0;
     virtual void doLoad(const YAML::Node &node);
-    virtual void doSave(YAML::Node &node);
+    virtual void doSave(YAML::Node &node) const;
 
 };
 }

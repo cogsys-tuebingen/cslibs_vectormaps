@@ -17,13 +17,10 @@ OrientedGridVectorMap::OrientedGridVectorMap(const BoundingBox &bounding,
     : GridVectorMap(bounding, range, resolution, debug),
       angular_resolution_(angular_resolution)
 {
-    data_structures::Dimensions dimensions;
-    dimensions.add(data_structures::Dimension(rows_));
-    dimensions.add(data_structures::Dimension(cols_));
-    dimensions.add(data_structures::Dimension(std::ceil(2 * M_PI / angular_resolution)));
-    grid_.setDimensions(dimensions);
-    theta_bins_     =  grid_.dimensions.size(2);
-    theta_bins_inv_ = 1.0 / theta_bins_;
+    theta_bins_      = std::ceil(2 * M_PI / angular_resolution);
+    theta_bins_inv_  = 1.0 / theta_bins_;
+    grid_dimensions_ = {rows_, cols_, theta_bins_};
+    grid_.resize(grid_dimensions_.globalSize());
 
     fovs_.resize(theta_bins_);
 
@@ -46,7 +43,7 @@ OrientedGridVectorMap::OrientedGridVectorMap(const BoundingBox &bounding,
         Point ray_low(r * std::cos(low), r * std::sin(low));
 
         Polygon polygon;
-        for(unsigned int c = 0 ; c < 4; ++c) {
+        for(unsigned int c = 0; c < 4; ++c) {
             boost::geometry::append(polygon.outer(),
                                     corner[c]);
             boost::geometry::append(polygon.outer(),
@@ -70,8 +67,8 @@ unsigned int OrientedGridVectorMap::handleInsertion()
 {
     unsigned int assigned = 0;
 
-    const std::size_t rows = grid_.dimensions.size(0);
-    const std::size_t cols = grid_.dimensions.size(1);
+    const std::size_t rows = grid_dimensions_.size<0>();
+    const std::size_t cols = grid_dimensions_.size<1>();
 
     std::cout << "generating index" << "\n";
 
@@ -96,7 +93,7 @@ unsigned int OrientedGridVectorMap::handleInsertion()
 
                 dropped += removeHiddenLines(center, cell_bounding, possible_lines);
 
-                // need to check the four corners too garantuee seeing every vector
+                // need to check the four corners to guarantee seeing every vector
                 std::set<cslibs_boost_geometry::types::Line2d*> visible_lines;
                 double sample_resolution = 1.0;
                 unsigned int sampling_steps = std::ceil(resolution_ / sample_resolution);
@@ -117,25 +114,19 @@ unsigned int OrientedGridVectorMap::handleInsertion()
 
                 std::cout << "\t" << possible_lines.size() << " visible lines (" << dropped << " dropped)";
                 std::cout << '\n';
-                //            std::cout << std::flush;
 
                 for(unsigned int t = 0 ; t < theta_bins_ ; ++t) {
                     VectorPtrs cell;
 
-                    for(VectorPtrs::iterator
-                        it = possible_lines.begin() ;
-                        it != possible_lines.end() ;
-                        ++it) {
-                        Vector& line = **it;
-                        
+                    for(Vector* line : possible_lines) {
                         /*Point current_center((min.x() + max.x()) * 0.5,
                                              (min.y() + max.y()) * 0.5);*/
-                        if(isInView(line, center, t)) {
-                            cell.push_back(&line);
+                        if(isInView(*line, center, t)) {
+                            cell.push_back(line);
                         }
                     }
 
-                    grid_.at(grid_.dimensions.index(i,j,t)) = cell;
+                    grid_[grid_dimensions_.index(i,j,t)] = cell;
 
                     ++assigned;
                 }
@@ -143,8 +134,6 @@ unsigned int OrientedGridVectorMap::handleInsertion()
                 min.x(min.x() + resolution_);
                 max.x(max.x() + resolution_);
             }
-            std::cout << std::flush;
-
         }
     } else {
 #pragma omp parallel for reduction(+:assigned)
@@ -173,7 +162,7 @@ unsigned int OrientedGridVectorMap::handleInsertion()
 
                     dropped += removeHiddenLines(center, cell_bounding, possible_lines);
 
-                    // need to check the four corners too garantuee seeing every vector
+                    // need to check the four corners too guarantee seeing every vector
                     std::set<cslibs_boost_geometry::types::Line2d*> visible_lines;
                     double sample_resolution = 1.0;
                     unsigned int sampling_steps = std::ceil(resolution_ / sample_resolution);
@@ -194,25 +183,19 @@ unsigned int OrientedGridVectorMap::handleInsertion()
 
                     std::cout << "\t" << possible_lines.size() << " visible lines (" << dropped << " dropped)";
                     std::cout << '\n';
-                    //            std::cout << std::flush;
 
                     for(unsigned int t = 0 ; t < theta_bins_ ; ++t) {
                         VectorPtrs cell;
 
-                        for(VectorPtrs::iterator
-                            it = possible_lines.begin() ;
-                            it != possible_lines.end() ;
-                            ++it) {
-                            Vector& line = **it;
-
+                        for(Vector* line : possible_lines) {
                             /*Point current_center((min.x() + max.x()) * 0.5,
                                                  (min.y() + max.y()) * 0.5);*/
-                            if(isInView(line, center, t)) {
-                                cell.push_back(&line);
+                            if(isInView(*line, center, t)) {
+                                cell.push_back(line);
                             }
                         }
 
-                        grid_.at(grid_.dimensions.index(i,j,t)) = cell;
+                        grid_[grid_dimensions_.index(i,j,t)] = cell;
 
                         ++assigned;
                     }
@@ -227,7 +210,6 @@ unsigned int OrientedGridVectorMap::handleInsertion()
                 pmin.x(pmin.x() + resolution_);
                 pmax.x(pmax.x() + resolution_);
             }
-            std::cout << std::flush;
         }
     }
 
@@ -236,11 +218,7 @@ unsigned int OrientedGridVectorMap::handleInsertion()
 
 void OrientedGridVectorMap::findPossibleLines(const Point &center, const BoundingBox &cell_bounding, VectorPtrs &necessary_lines)
 {
-    for(Vectors::iterator
-        line_it = data_.begin() ;
-        line_it != data_.end() ;
-        ++line_it) {
-        Vector& line = *line_it;
+    for(Vector& line : data_) {
         if(algorithms::touches<Point>(line, cell_bounding)) {
             necessary_lines.push_back(&line);
         }
@@ -249,9 +227,9 @@ void OrientedGridVectorMap::findPossibleLines(const Point &center, const Boundin
 
 int OrientedGridVectorMap::removeHiddenLines(const Point& center,
                                              const BoundingBox& cell_bounding,
-                                             VectorPtrs& possible_lines)
+                                             VectorPtrs& possible_lines) const
 {
-    // need to check the four corners too garantuee seeing every vector
+    // need to check the four corners to guarantee seeing every vector
     double o = resolution_ * 0.5;
     Point corner[4];
     corner[0] = Point(center.x() - o, center.y() - o);
@@ -268,36 +246,22 @@ int OrientedGridVectorMap::removeHiddenLines(const Point& center,
     std::list<cslibs_boost_geometry::types::Line2d*> visible_lines;//(necessary_lines.begin(), necessary_lines.end());
     std::list<cslibs_boost_geometry::types::Line2d*> necessary_lines;
 
-    for(std::vector<cslibs_boost_geometry::types::Line2d*>::iterator
-        line_it = possible_lines.begin() ;
-        line_it != possible_lines.end() ;
-        ++line_it) {
-        Vector& line = **line_it;
-
-        if(algorithms::touches<Point>(line, bb)) {
-            necessary_lines.push_back(&line);
+    for(Vector* line : possible_lines) {
+        if(algorithms::touches<Point>(*line, bb)) {
+            necessary_lines.push_back(line);
         } else {
-            visible_lines.push_back(&line);
+            visible_lines.push_back(line);
         }
     }
 
     //    std::cerr << "necessary: " << necessary_lines.size() << "\tvisible: " << visible_lines.size() << "\n";
 
     int dropped = 0;
-    for(std::list<cslibs_boost_geometry::types::Line2d*>::iterator
-        line_it = visible_lines.begin() ;
-        line_it != visible_lines.end() ;
-        ++line_it) {
+    for(auto line_it = visible_lines.begin(); line_it != visible_lines.end(); ++line_it) {
         Vector& line = **line_it;
 
-
-
-        // now check if *line* completely coveres other lines
-        for(std::list<cslibs_boost_geometry::types::Line2d*>::iterator
-            other_it = visible_lines.begin() ;
-            other_it != visible_lines.end();
-            ) {
-
+        // now check if *line* completely covers other lines
+        for(auto other_it = visible_lines.begin(); other_it != visible_lines.end();) {
             if(other_it == line_it) {
                 ++other_it;
                 continue;
@@ -305,8 +269,8 @@ int OrientedGridVectorMap::removeHiddenLines(const Point& center,
             Vector& other = **other_it;
 
             bool covered = true; // iff every line between corners and *other* crosses *line*
-            for(unsigned int c = 0 ; c <= 3; ++c) {
-                std::vector<VectorMap::Point> inter;
+            for(unsigned int c = 0; c < 4; ++c) {
+                //std::vector<VectorMap::Point> inter;
 
                 Vector c1(corner[c], other.first);
                 if(!boost::geometry::intersects(c1, line)) {
@@ -339,17 +303,16 @@ int OrientedGridVectorMap::removeHiddenLines(const Point& center,
 void OrientedGridVectorMap::findVisibleLinesByRaycasting(const Point& center,
                                                          const BoundingBox& cell_bounding,
                                                          const VectorPtrs& possible_lines,
-                                                         std::set<cslibs_boost_geometry::types::Line2d*> &visible)
+                                                         std::set<cslibs_boost_geometry::types::Line2d*> &visible) const
 {
     double max_range = 1e10;
     double angular_res = algorithms::rad(2.0);
     for(double theta = -M_PI; theta < M_PI; theta += angular_res) {
         Vector ray(center, Point(max_range * std::cos(theta), max_range * std::sin(theta)));
         double min_dist = std::numeric_limits<double>::max();
-        Vector* min_line = NULL;
+        Vector* min_line = nullptr;
 
-        for(VectorPtrs::const_iterator it = possible_lines.begin(); it != possible_lines.end(); ++it) {
-            Vector* other = *it;
+        for(Vector* other : possible_lines) {
             std::vector<Point> intersections;
             boost::geometry::intersection(ray, *other, intersections);
             if(!intersections.empty()) {
@@ -361,24 +324,20 @@ void OrientedGridVectorMap::findVisibleLinesByRaycasting(const Point& center,
                 }
             }
         }
-        if(min_line != NULL) {
+        if(min_line != nullptr) {
             visible.insert(min_line);
         }
     }
 }
 
-bool OrientedGridVectorMap::isInView(Vector& line, Point center, std::size_t t)
+bool OrientedGridVectorMap::isInView(const Vector& line, Point center, std::size_t t) const
 {
     // take the general fov and shift it to center
-    Polygon fov = fovs_[t];
+    Vector linecopy = line;
+    boost::geometry::subtract_point(linecopy.first, center);
+    boost::geometry::subtract_point(linecopy.second, center);
 
-    VectorMap::Polygon::ring_type &ring = fov.outer();
-    for(VectorMap::Point& pt : ring) {
-        pt.x(pt.x() + center.x());
-        pt.y(pt.y() + center.y());
-    }
-
-    return algorithms::touches<Point>(line, fov);
+    return algorithms::touches<Point>(linecopy, fovs_[t]);
 }
 
 double OrientedGridVectorMap::angularResolution() const
@@ -393,12 +352,10 @@ double OrientedGridVectorMap::minDistanceNearbyStructure(const Point &pos,
 {
     unsigned int theta = angle2index(angle);
     double min_dist = std::numeric_limits<double>::max();
-    auto cell = grid_.at(grid_.dimensions.index(row, col, theta));
-    auto cell_ptr = cell.data();
+    auto cell = grid_.at(grid_dimensions_.index(row, col, theta));
 
-    for(unsigned int i = 0 ; i < cell.size() ; ++i) {
-        auto &line = **(cell_ptr + i);
-        double dist = algorithms::distance<double,Point>(pos, line);
+    for(const Vector* line : cell) {
+        double dist = algorithms::distance<double,Point>(pos, *line);
         if(dist < min_dist)
             min_dist = dist;
     }
@@ -413,9 +370,9 @@ double OrientedGridVectorMap::minSquaredDistanceNearbyStructure(const Point &pos
 {
     unsigned int theta = angle2index(angle);
     double min_squared_dist = std::numeric_limits<double>::max();
-    auto cell = grid_.at(grid_.dimensions.index(row, col, theta));
+    auto cell = grid_.at(grid_dimensions_.index(row, col, theta));
 
-    for(auto line : cell) {
+    for(const Vector* line : cell) {
         double squared_dist = boost::geometry::comparable_distance(pos, *line);
         if(squared_dist < min_squared_dist)
             min_squared_dist = squared_dist;
@@ -444,14 +401,10 @@ double OrientedGridVectorMap::minDistanceNearbyStructure(const Point &pos) const
 
     double min_dist = std::numeric_limits<double>::max();
 
-    for(unsigned int theta = 0 ; theta < grid_.dimensions.size(2) ; ++theta) {
-        const VectorPtrs &cell = grid_.at(grid_.dimensions.index(row, col, theta));
-        for(VectorPtrs::const_iterator it =
-            cell.begin() ;
-            it != cell.end() ;
-            ++it) {
-
-            double dist = algorithms::distance<double,Point>(pos, **it);
+    for(unsigned int theta = 0 ; theta < grid_dimensions_.size<2>() ; ++theta) {
+        const VectorPtrs &cell = grid_.at(grid_dimensions_.index(row, col, theta));
+        for(const Vector* line : cell) {
+            double dist = algorithms::distance<double,Point>(pos, *line);
             if(dist < min_dist)
                 min_dist = dist;
         }
@@ -478,9 +431,9 @@ double OrientedGridVectorMap::minSquaredDistanceNearbyStructure(const Point &pos
 
     double min_squared_dist = std::numeric_limits<double>::max();
 
-    for(unsigned int theta = 0 ; theta < grid_.dimensions.size(2) ; ++theta) {
-        const VectorPtrs &cell = grid_.at(grid_.dimensions.index(row, col, theta));
-        for(auto line : cell) {
+    for(unsigned int theta = 0 ; theta < grid_dimensions_.size<2>() ; ++theta) {
+        const VectorPtrs &cell = grid_.at(grid_dimensions_.index(row, col, theta));
+        for(const Vector* line : cell) {
             double squared_dist = boost::geometry::comparable_distance(pos, *line);
             if(squared_dist < min_squared_dist)
                 min_squared_dist = squared_dist;
@@ -507,14 +460,10 @@ bool OrientedGridVectorMap::structureNearby(const Point &pos,
     unsigned int row = GridVectorMap::row(pos);
     unsigned int col = GridVectorMap::col(pos);
 
-    for(unsigned int theta = 0 ; theta < grid_.dimensions.size(2) ; ++theta) {
-        const VectorPtrs &cell = grid_.at(grid_.dimensions.index(row, col, theta));
-        for(VectorPtrs::const_iterator it =
-            cell.begin() ;
-            it != cell.end() ;
-            ++it) {
-
-            double dist = algorithms::distance<double,Point>(pos, **it);
+    for(unsigned int theta = 0 ; theta < grid_dimensions_.size<2>() ; ++theta) {
+        const VectorPtrs &cell = grid_.at(grid_dimensions_.index(row, col, theta));
+        for(const Vector* line : cell) {
+            double dist = algorithms::distance<double,Point>(pos, *line);
             if(dist > 0.0 && dist < thresh)
                 return true;
         }
@@ -540,7 +489,7 @@ bool OrientedGridVectorMap::retrieveFiltered(const Point &pos,
     unsigned int col = GridVectorMap::col(pos);
     unsigned int theta = angle2index(orientation);
 
-    const VectorPtrs &cell = grid_.at(grid_.dimensions.index(row, col, theta));
+    const VectorPtrs &cell = grid_.at(grid_dimensions_.index(row, col, theta));
 
 
     // compute the exact bound box for pos
@@ -549,15 +498,10 @@ bool OrientedGridVectorMap::retrieveFiltered(const Point &pos,
     Point max(pos.x() + range_, pos.y() + range_);
     BoundingBox bound(min, max);
 
-    for(VectorPtrs::const_iterator it =
-        cell.begin();
-        it != cell.end() ;
-        ++it) {
-
-        const Vector& line = **it;
+    for(const Vector* line : cell) {
         // filter out unnecessary lines
-        if(algorithms::touches<Point>(line, bound)) {
-            lines.push_back(line);
+        if(algorithms::touches<Point>(*line, bound)) {
+            lines.push_back(*line);
         }
     }
 
@@ -582,15 +526,10 @@ bool OrientedGridVectorMap::retrieve(const Point &pos,
     unsigned int col = GridVectorMap::col(pos);
     unsigned int theta = angle2index(orientation);
 
-    const VectorPtrs &cell = grid_.at(grid_.dimensions.index(row, col, theta));
+    const VectorPtrs &cell = grid_.at(grid_dimensions_.index(row, col, theta));
 
-    for(VectorPtrs::const_iterator it =
-        cell.begin() ;
-        it != cell.end() ;
-        ++it) {
-
-        const Vector& line = **it;
-        lines.push_back(line);
+    for(const Vector* line : cell) {
+        lines.push_back(*line);
     }
 
     return lines.size() > 0;
@@ -614,14 +553,10 @@ bool OrientedGridVectorMap::retrieve(const double x,
     unsigned int col = GridVectorMap::col(x);
     unsigned int theta = angle2index(orientation);
 
-    const VectorPtrs &cell = grid_.at(grid_.dimensions.index(row, col, theta));
+    const VectorPtrs &cell = grid_.at(grid_dimensions_.index(row, col, theta));
 
-    for(VectorPtrs::const_iterator it =
-        cell.begin() ;
-        it != cell.end() ;
-        ++it) {
-        const Vector& line = **it;
-        lines.push_back(line);
+    for(const Vector* line : cell) {
+        lines.push_back(*line);
     }
 
     return lines.size() > 0;
@@ -632,9 +567,9 @@ bool OrientedGridVectorMap::retrieve(const unsigned int row,
                                      const double angle,
                                      Vectors &lines) const
 {
-    const VectorPtrs &cell = grid_.at(grid_.dimensions.index(row, col,  angle2index(angle)));
+    const VectorPtrs &cell = grid_.at(grid_dimensions_.index(row, col,  angle2index(angle)));
 
-    for(auto line : cell) {
+    for(const Vector* line : cell) {
         lines.push_back(*line);
     }
 
@@ -653,11 +588,11 @@ bool OrientedGridVectorMap::retrieve(const unsigned int row,
     for(unsigned int i = index_min ; i < index_max ; ++i) {
         if(i == theta_bins_)
             i = 0;
-        const VectorPtrs &cell = grid_.at(grid_.dimensions.index(row, col, i));
+        const VectorPtrs &cell = grid_.at(grid_dimensions_.index(row, col, i));
         bucket.insert(cell.begin(), cell.end());
     }
 
-    for(auto line : bucket) {
+    for(const Vector* line : bucket) {
         lines.push_back(*line);
     }
 
@@ -670,7 +605,7 @@ double OrientedGridVectorMap::intersectScanRay(const Vector &ray,
                                                const double angle,
                                                const double max_range) const
 {
-    const VectorPtrs &cell = grid_.at(grid_.dimensions.index(row, col, angle2index(angle)));
+    const VectorPtrs &cell = grid_.at(grid_dimensions_.index(row, col, angle2index(angle)));
     return algorithms::nearestIntersectionDistance<double, types::Point2d>(ray, cell, max_range);
 }
 
@@ -683,7 +618,7 @@ void OrientedGridVectorMap::intersectScanRay(const Vector &ray,
                                              const double max_range,
                                              const double default_angle) const
 {
-    const VectorPtrs &cell = grid_.at(grid_.dimensions.index(row, col, angle2index(ray_angle)));
+    const VectorPtrs &cell = grid_.at(grid_dimensions_.index(row, col, angle2index(ray_angle)));
     algorithms::nearestIntersectionDistance<double, types::Point2d>(ray, cell,
                                                                 distance,
                                                                 angle,
@@ -707,8 +642,8 @@ bool OrientedGridVectorMap::retrieveFiltered(const Point &pos,
     unsigned int row = GridVectorMap::row(pos);
     unsigned int col = GridVectorMap::col(pos);
 
-    for(unsigned int theta = 0 ; theta < grid_.dimensions.size(2) ; ++theta) {
-        const VectorPtrs &cell = grid_.at(grid_.dimensions.index(row, col, theta));
+    for(unsigned int theta = 0 ; theta < grid_dimensions_.size<2>() ; ++theta) {
+        const VectorPtrs &cell = grid_.at(grid_dimensions_.index(row, col, theta));
 
         // compute the exact bound box for pos
         //  (if the resolution is large, there might be many unnecessary lines)
@@ -718,15 +653,10 @@ bool OrientedGridVectorMap::retrieveFiltered(const Point &pos,
                   pos.y() + range_);
         BoundingBox bound(min, max);
 
-        for(VectorPtrs::const_iterator it =
-            cell.begin();
-            it != cell.end() ;
-            ++it) {
-
-            const Vector& line = **it;
+        for(const Vector* line : cell) {
             // filter out unnecessary lines
-            if(algorithms::touches<Point>(line, bound)) {
-                lines.push_back(line);
+            if(algorithms::touches<Point>(*line, bound)) {
+                lines.push_back(*line);
             }
         }
     }
@@ -749,16 +679,11 @@ bool OrientedGridVectorMap::retrieve(const Point &pos,
     unsigned int row = GridVectorMap::row(pos);
     unsigned int col = GridVectorMap::col(pos);
 
-    for(unsigned int theta = 0 ; theta < grid_.dimensions.size(2) ; ++theta) {
-        const VectorPtrs &cell = grid_.at(grid_.dimensions.index(row, col, theta));
+    for(unsigned int theta = 0 ; theta < grid_dimensions_.size<2>() ; ++theta) {
+        const VectorPtrs &cell = grid_.at(grid_dimensions_.index(row, col, theta));
 
-        for(VectorPtrs::const_iterator it =
-            cell.begin() ;
-            it != cell.end() ;
-            ++it) {
-
-            const Vector& line = **it;
-            lines.push_back(line);
+        for(const Vector* line : cell) {
+            lines.push_back(*line);
         }
     }
 
@@ -786,15 +711,12 @@ int OrientedGridVectorMap::intersectScanPattern (
     int intersection_count = 0;
     ValidPoints result;
 
-    auto lines_ptr = pattern.data();
-
-    for(unsigned int i = 0 ; i < pattern.size() ; ++i) {
-        auto &line = *(lines_ptr + i);
+    for(const Vector& line : pattern) {
         double dx = line.second.x() - line.first.x();
         double dy = line.second.y() - line.first.y();
         double angle = atan2(dy, dx);
         unsigned int theta = angle2index(angle);
-        auto &cell = grid_.at(grid_.dimensions.index(row, col, theta));
+        auto &cell = grid_.at(grid_dimensions_.index(row, col, theta));
 
         result.result.clear();
         result.valid = algorithms::nearestIntersection<Point>(line,
@@ -836,7 +758,7 @@ int OrientedGridVectorMap::intersectScanPattern (
         auto &line = *(lines_ptr + i);
         auto angle = *(angles_ptr + i);
         unsigned int theta = angle2index(angle);
-        auto &cell = grid_.at(grid_.dimensions.index(row, col, theta));
+        auto &cell = grid_.at(grid_dimensions_.index(row, col, theta));
 
         result.result.clear();
         result.valid = algorithms::nearestIntersection<Point>(line,
@@ -869,12 +791,12 @@ void OrientedGridVectorMap::intersectScanPattern(const Point   &pos,
     ranges.resize(pattern.size());
 
     for(unsigned int i = 0 ; i < pattern.size() ; ++i) {
-        const Vector& line = pattern.at(i);
+        const Vector& line = pattern[i];
         double dx = line.second.x() - line.first.x();
         double dy = line.second.y() - line.first.y();
         double angle = atan2(dy, dx);
         unsigned int theta = angle2index(angle);
-        const VectorPtrs &cell = grid_.at(grid_.dimensions.index(row, col, theta));
+        const VectorPtrs &cell = grid_.at(grid_dimensions_.index(row, col, theta));
 
         ranges[i] = algorithms::nearestIntersectionDistance<float, types::Point2d>(line, cell, default_measurement);
     }
@@ -883,13 +805,8 @@ void OrientedGridVectorMap::intersectScanPattern(const Point   &pos,
 unsigned int OrientedGridVectorMap::sizeAccessStructures() const
 {
     unsigned int size = 0;
-    for(unsigned int y = 0 ; y < rows_ ; ++y) {
-        for(unsigned int x = 0 ; x < cols_ ; ++x) {
-            for(unsigned int z = 0 ; z < theta_bins_ ; ++z) {
-                const VectorPtrs &cell = grid_.at(grid_.dimensions.index(y, x, z));
-                size += cell.size() * sizeof(Vector*);
-            }
-        }
+    for(const VectorPtrs &cell : grid_) {
+        size += cell.size() * sizeof(Vector*);
     }
     return size;
 }
@@ -898,11 +815,13 @@ void OrientedGridVectorMap::doLoad(const YAML::Node &node)
 {
     GridVectorMap::doLoad(node);
     angular_resolution_ = node["angular_resolution"].as<double>();
-    theta_bins_         = node["theta_bins"].as<double>();
+    theta_bins_         = node["theta_bins"].as<std::size_t>();
     theta_bins_inv_     = node["theta_bins_inv"].as<double>();
+
+    grid_dimensions_ = {rows_, cols_, theta_bins_};
 }
 
-void OrientedGridVectorMap::doSave(YAML::Node &node)
+void OrientedGridVectorMap::doSave(YAML::Node &node) const
 {
     GridVectorMap::doSave(node);
     node["map_type"]           = "oriented_grid";

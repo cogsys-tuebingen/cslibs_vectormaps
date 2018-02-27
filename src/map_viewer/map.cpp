@@ -4,6 +4,7 @@
 #include <QStringList>
 #include <thread>
 #include <functional>
+#include <set>
 
 #include "models/vector_layer_model.h"
 #include "models/point_layer_model.h"
@@ -30,7 +31,7 @@ LayerModel::Ptr Map::getLayer(const std::string &name)
     return layers_[name];
 }
 
-void Map::getLayers(std::vector<LayerModel::Ptr> &layers)
+void Map::getLayers(std::vector<LayerModel::Ptr> &layers) const
 {
     std::unique_lock<std::mutex> l(layers_mutex_);
     for(auto &l : layers_) {
@@ -60,14 +61,6 @@ QPointF Map::getMax() const
 void Map::load(const dxf::DXFMap::Ptr &map)
 {
     std::unique_lock<std::mutex> l(layers_mutex_);
-    auto execution = [this,&l,map](){doLoad(map);};
-    worker_thread_ = std::thread(execution);
-    worker_thread_.detach();
-
-}
-
-void Map::doLoad(const dxf::DXFMap::Ptr &map)
-{
     layers_.clear();
 
     dxf::DXFMap::Point min, max;

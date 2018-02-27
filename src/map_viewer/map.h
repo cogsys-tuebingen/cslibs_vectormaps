@@ -29,7 +29,7 @@ public:
 
     LayerModel::Ptr getLayer(const std::string &name);
 
-    void getLayers(std::vector<LayerModel::Ptr> &layers);
+    void getLayers(std::vector<LayerModel::Ptr> &layers) const;
 
     void setLayer(const LayerModel::Ptr &layer);
 
@@ -47,12 +47,8 @@ private:
     mutable std::mutex                     layers_mutex_;
     std::map<std::string, LayerModel::Ptr> layers_;
 
-    void doLoad(const dxf::DXFMap::Ptr &map);
-
     QPointF min_;
     QPointF max_;
-
-    std::thread worker_thread_;
 };
 }
 

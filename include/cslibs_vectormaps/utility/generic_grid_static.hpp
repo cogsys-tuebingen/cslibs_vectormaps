@@ -1,9 +1,8 @@
 #ifndef GENERIC_GRID_STATIC_HPP
 #define GENERIC_GRID_STATIC_HPP
 
+#include <cstddef>
 #include <vector>
-#include <assert.h>
-#include <boost/static_assert.hpp>
 
 namespace cslibs_vectormaps {
 namespace data_structures {
@@ -54,7 +53,7 @@ struct StaticDimension<S, void>
 
     template <int dim>
     static std::size_t index(int coordinate, std::size_t rest_coordinate) {
-        BOOST_STATIC_ASSERT(dim <= 0);
+        static_assert(dim <= 0, "invalid dimension");
         return coordinate;
     }
 
@@ -66,7 +65,7 @@ struct StaticDimension<S, void>
     template <int dim>
     static std::size_t size()
     {
-        BOOST_STATIC_ASSERT(dim <= 0);
+        static_assert(dim <= 0, "invalid dimension");
         return S;
     }
 };

@@ -14,10 +14,8 @@ SimpleGridVectorMap::SimpleGridVectorMap(const BoundingBox &bounding,
                                          const double resolution, const bool debug) :
     GridVectorMap(bounding, range, resolution, debug)
 {
-    data_structures::Dimensions dimensions;
-    dimensions.add(data_structures::Dimension(rows_));
-    dimensions.add(data_structures::Dimension(cols_));
-    grid_.setDimensions(dimensions);
+    grid_dimensions_ = {rows_, cols_};
+    grid_.resize(grid_dimensions_.globalSize());
 }
 
 SimpleGridVectorMap::SimpleGridVectorMap() :
@@ -43,16 +41,13 @@ double SimpleGridVectorMap::minDistanceNearbyStructure(const Point &pos) const
     unsigned int col = GridVectorMap::col(pos);
 
     double min_dist = std::numeric_limits<double>::max();
-    const VectorPtrs &cell = grid_.at(grid_.dimensions.index(row, col));
+    const VectorPtrs &cell = grid_.at(grid_dimensions_.index(row, col));
 
     if(cell.size() == 0)
         return -1.0;
 
-    for(VectorPtrs::const_iterator it =
-        cell.begin() ;
-        it != cell.end() ;
-        ++it) {
-        double dist = algorithms::distance<double,Point>(pos, **it);
+    for(const Vector* line : cell) {
+        double dist = algorithms::distance<double,Point>(pos, *line);
         if(min_dist > dist)
             min_dist = dist;
     }
@@ -74,12 +69,12 @@ double SimpleGridVectorMap::minSquaredDistanceNearbyStructure(const Point &pos) 
     unsigned int col = GridVectorMap::col(pos);
 
     double min_squared_dist = std::numeric_limits<double>::max();
-    const VectorPtrs &cell = grid_.at(grid_.dimensions.index(row, col));
+    const VectorPtrs &cell = grid_.at(grid_dimensions_.index(row, col));
 
     if(cell.size() == 0)
         return -1.0;
 
-    for(auto line : cell) {
+    for(const Vector* line : cell) {
         double squared_dist = boost::geometry::comparable_distance(pos, *line);
         if(min_squared_dist > squared_dist)
             min_squared_dist = squared_dist;
@@ -101,12 +96,9 @@ bool SimpleGridVectorMap::structureNearby(const Point &pos,
 
     unsigned int row = GridVectorMap::row(pos);
     unsigned int col = GridVectorMap::col(pos);
-    const VectorPtrs &cell = grid_.at(grid_.dimensions.index(row, col));
-    for(VectorPtrs::const_iterator it =
-        cell.begin() ;
-        it != cell.end() ;
-        ++it) {
-        double dist = algorithms::distance<double,Point>(pos, **it);
+    const VectorPtrs &cell = grid_.at(grid_dimensions_.index(row, col));
+    for(const Vector* line : cell) {
+        double dist = algorithms::distance<double,Point>(pos, *line);
         if(dist > 0.0 && dist < thresh)
             return true;
     }
@@ -129,7 +121,7 @@ bool SimpleGridVectorMap::retrieveFiltered(const Point &pos,
     unsigned int row = GridVectorMap::row(pos);
     unsigned int col = GridVectorMap::col(pos);
 
-    const VectorPtrs &cell = grid_.at(grid_.dimensions.index(row, col));
+    const VectorPtrs &cell = grid_.at(grid_dimensions_.index(row, col));
 
 
     // compute the exact bound box for pos
@@ -138,15 +130,10 @@ bool SimpleGridVectorMap::retrieveFiltered(const Point &pos,
     Point max(pos.x() + range_, pos.y() + range_);
     BoundingBox bound(min, max);
 
-    for(VectorPtrs::const_iterator it =
-        cell.begin();
-        it != cell.end() ;
-        ++it) {
-
-        const Vector& line = **it;
+    for(const Vector* line : cell) {
         // filter out unnecessary lines
-        if(algorithms::touches<Point>(line, bound)) {
-            lines.push_back(line);
+        if(algorithms::touches<Point>(*line, bound)) {
+            lines.push_back(*line);
         }
     }
 
@@ -168,15 +155,10 @@ bool SimpleGridVectorMap::retrieve(const Point &pos,
     unsigned int row = GridVectorMap::row(pos);
     unsigned int col = GridVectorMap::col(pos);
 
-    const VectorPtrs &cell = grid_.at(grid_.dimensions.index(row, col));
+    const VectorPtrs &cell = grid_.at(grid_dimensions_.index(row, col));
 
-    for(VectorPtrs::const_iterator it =
-        cell.begin() ;
-        it != cell.end() ;
-        ++it) {
-
-        const Vector& line = **it;
-        lines.push_back(line);
+    for(const Vector* line : cell) {
+        lines.push_back(*line);
     }
 
 
@@ -228,12 +210,9 @@ unsigned int SimpleGridVectorMap::handleInsertion()
                           min_corner_.y() + padding_ + (i+1) * resolution_);
                 BoundingBox cell_bounding(min, max);
 
-                for(Vectors::iterator
-                    it = data_.begin() ;
-                    it != data_.end() ;
-                    ++it) {
-                    if(algorithms::touches<Point>(*it, cell_bounding)) {
-                        grid_.at(grid_.dimensions.index(i,j)).push_back(&(*it));
+                for(Vector& line : data_) {
+                    if(algorithms::touches<Point>(line, cell_bounding)) {
+                        grid_[grid_dimensions_.index(i,j)].push_back(&line);
                         ++assigned;
                     }
                 }
@@ -252,13 +231,10 @@ unsigned int SimpleGridVectorMap::handleInsertion()
                 Polygon     cell_bounding_poly =
                         algorithms::toPolygon<Point>(min, max);
 
-                for(Vectors::iterator
-                    it = data_.begin() ;
-                    it != data_.end() ;
-                    ++it) {
+                for(Vector& line : data_) {
                     if(algorithms::covered_by<Point>(cell_bounding_poly, valid_area_)) {
-                        if(algorithms::touches<Point>(*it, cell_bounding)) {
-                            grid_.at(grid_.dimensions.index(i,j)).push_back(&(*it));
+                        if(algorithms::touches<Point>(line, cell_bounding)) {
+                            grid_[grid_dimensions_.index(i,j)].push_back(&line);
                             ++assigned;
                         }
                     } else {
@@ -279,9 +255,11 @@ unsigned int SimpleGridVectorMap::handleInsertion()
 void SimpleGridVectorMap::doLoad(const YAML::Node &node)
 {
     GridVectorMap::doLoad(node);
+
+    grid_dimensions_ = {rows_, cols_};
 }
 
-void SimpleGridVectorMap::doSave(YAML::Node &node)
+void SimpleGridVectorMap::doSave(YAML::Node &node) const
 {
     GridVectorMap::doSave(node);
     node["map_type"]        = "simple_grid";

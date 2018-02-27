@@ -18,10 +18,30 @@
 
 using namespace cslibs_vectormaps;
 
-Control::Control() :
-    running_(false)
+Control::Control() : stop_(false)
 {
+    worker_thread_ = std::thread([this]() {
+        std::unique_lock<std::mutex> l(work_mutex_);
+        for (;;) {
+            while (!work_ && !stop_)
+                work_condition_.wait(l);
+            if (stop_)
+                return;
+            l.unlock();
+            work_();
+            l.lock();
+            work_ = nullptr;
+        }
+    });
+}
 
+Control::~Control()
+{
+    std::unique_lock<std::mutex> l(work_mutex_);
+    stop_ = true;
+    l.unlock();
+    work_condition_.notify_one();
+    worker_thread_.join();
 }
 
 void Control::setup(Map *map,
@@ -38,49 +58,37 @@ void Control::setup(Map *map,
             this, SLOT(runVectormapExport(const VectormapConversionParameter&)));
 }
 
-void Control::runCornerDetection(const CornerDetectionParameter &params)
+void Control::doWork(const std::function<void()>& work)
 {
-    if(running_) {
+    std::unique_lock<std::mutex> l(work_mutex_);
+    if(work_) {
         notification("Already running a process!");
         return;
     }
+    work_ = work;
+    l.unlock();
+    work_condition_.notify_one();
+}
 
-    running_.store(true);
-    auto execution = [params, this] () {
+void Control::runCornerDetection(const CornerDetectionParameter &params)
+{
+    doWork([params, this] () {
         executeCornerDetection(params);
-    };
-    worker_thread_ = std::thread(execution);
-    worker_thread_.detach();
+    });
 }
 
 void Control::runGridmapExport(const RasterizationParameter &params)
 {
-    if(running_) {
-        notification("Already running a process!");
-        return;
-    }
-
-    running_.store(true);
-    auto execution = [params, this] () {
+    doWork([params, this] () {
         executeGridmapExport(params);
-    };
-    worker_thread_ = std::thread(execution);
-    worker_thread_.detach();
+    });
 }
 
 void Control::runVectormapExport(const VectormapConversionParameter &params)
 {
-    if(running_) {
-        notification("Already running a process!");
-        return;
-    }
-
-    running_.store(true);
-    auto execution = [params, this] () {
+    doWork([params, this] () {
         executeVectormapExport(params);
-    };
-    worker_thread_ = std::thread(execution);
-    worker_thread_.detach();
+    });
 }
 
 void Control::openDXF(const QString &path)
@@ -145,7 +153,6 @@ void Control::executeCornerDetection(const CornerDetectionParameter &params)
     map_->setLayer(layer_end_points);
 
     /// and there goes the progress
-    running_.store(false);
     closeProgressDialog();
 }
 
@@ -174,7 +181,6 @@ void Control::executeGridmapExport(const RasterizationParameter &params)
     if(!raster(vectors, map_->getMin(), map_->getMax(), [this](const int p){progress(p);}))
         notification("Rasterization Failed!");
 
-    running_.store(false);
     closeProgressDialog();
 }
 
@@ -203,6 +209,5 @@ void Control::executeVectormapExport(const VectormapConversionParameter &params)
     if(!vector_conversion(vectors, map_->getMin(), map_->getMax(), [this](const int p){progress(p);}))
         notification("Conversion Failed!");
 
-    running_.store(false);
     closeProgressDialog();
 }

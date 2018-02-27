@@ -3,6 +3,8 @@
 
 #include "grid_vector_map.h"
 
+#include <cslibs_vectormaps/utility/grid_dimensions.hpp>
+
 namespace cslibs_vectormaps {
 class OrientedGridVectorMap : public GridVectorMap
 {
@@ -103,20 +105,21 @@ public:
 
 protected:
     virtual void doLoad(const YAML::Node &node);
-    virtual void doSave(YAML::Node &node);
+    virtual void doSave(YAML::Node &node) const;
 
     double      angular_resolution_;
     std::size_t theta_bins_;
     double      theta_bins_inv_;
+    data_structures::GridDimensions<3> grid_dimensions_;
     std::vector<Polygon> fovs_;
 
     virtual unsigned int handleInsertion();
 
-    bool        isInView(Vector& line, Point center, std::size_t t);
+    bool        isInView(const Vector& line, Point center, std::size_t t) const;
     void        findPossibleLines(const Point &center, const BoundingBox &cell_bounding, VectorPtrs &necessary_lines);
-    int         removeHiddenLines(const Point &center, const BoundingBox &cell_bounding, VectorPtrs &visible_lines);
+    int         removeHiddenLines(const Point &center, const BoundingBox &cell_bounding, VectorPtrs &visible_lines) const;
     void        findVisibleLinesByRaycasting(const Point &center, const BoundingBox &cell_bounding, const VectorPtrs &visible_lines,
-                                             std::set<cslibs_boost_geometry::types::Line2d*> &visible);
+                                             std::set<cslibs_boost_geometry::types::Line2d*> &visible) const;
     constexpr static double _2M_PI =  2.0 * M_PI;
     constexpr static double _1_2MPI = 1.0 / (2.0*M_PI);
 
