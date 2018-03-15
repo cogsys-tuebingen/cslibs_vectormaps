@@ -56,8 +56,8 @@ bool GridVectorMap::cellIndices(const Point& pos,
     if(tools::pointOutsideMap(pos, min_corner_, max_corner_)) {
         if(debug_) {
             std::cerr << "[GridVectorMap] : Position "
-                      << "(" << pos.x() << "|" << pos.y() << ")"
-                      << " to test not within grid structured area!" << "\n";
+                         "(" << pos.x() << "|" << pos.y() << ")"
+                         " to test not within grid structured area!\n";
         }
         return false;
     }
@@ -76,8 +76,8 @@ bool GridVectorMap::cellIndices(const double x,
     if(tools::coordinatesOutsideMap(x, y, min_corner_, max_corner_)) {
         if(debug_) {
             std::cerr << "[GridVectorMap] : Position "
-                      << "(" << x << "|" << y << ")"
-                      << " to test not within grid structured area!" << "\n";
+                         "(" << x << "|" << y << ")"
+                         " to test not within grid structured area!\n";
         }
         return false;
     }

@@ -27,8 +27,6 @@ public:
 
         std::ofstream out(path);
         out << emitter.c_str();
-        out.close();
-
     }
 
 };

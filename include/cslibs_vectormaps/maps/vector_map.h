@@ -1,7 +1,7 @@
 #ifndef VECTOR_MAP_H
 #define VECTOR_MAP_H
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <cslibs_boost_geometry/types.hpp>
 
 #include <yaml-cpp/yaml.h>
@@ -12,7 +12,7 @@ class VectorMap
 {
 public:
     /// SOME TYPE DEFINITIONS FOR EASIER USAGE
-    using Ptr = boost::shared_ptr<VectorMap>;
+    using Ptr = std::shared_ptr<VectorMap>;
 
     using Dimension         = cslibs_boost_geometry::types::Dim2d;
     using Point             = cslibs_boost_geometry::types::Point2d;

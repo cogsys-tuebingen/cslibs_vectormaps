@@ -9,7 +9,7 @@ namespace cslibs_vectormaps {
 class OrientedGridVectorMap : public GridVectorMap
 {
 public:
-    typedef boost::shared_ptr<OrientedGridVectorMap> Ptr;
+    typedef std::shared_ptr<OrientedGridVectorMap> Ptr;
 
     OrientedGridVectorMap(const BoundingBox &bounding,
                           const double       range,

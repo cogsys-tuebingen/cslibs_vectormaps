@@ -2,7 +2,6 @@
 #define MAP_LOADER_HPP
 
 /// COMPONENT
-#include <cslibs_vectormaps/maps/grid_vector_map.h>
 #include <cslibs_vectormaps/maps/simple_grid_vector_map.h>
 #include <cslibs_vectormaps/maps/oriented_grid_vector_map.h>
 
@@ -13,8 +12,7 @@
 #include <boost/iostreams/filtering_stream.hpp>
 #include <boost/regex.hpp>
 
-#include <ostream>
-#include <istream>
+#include <iostream>
 #include <fstream>
 
 
@@ -31,9 +29,9 @@ struct MapLoader {
     {
         const bool compressed = isCompressed(path);
 
-        std::ifstream in(path.c_str(), std::ios_base::in | std::ios_base::binary);
+        std::ifstream in(path.c_str(), std::ios_base::binary);
         if(!in.is_open()) {
-            std::cerr << "[MapLoader] : Can't load '" << path << "'!" << "\n";
+            std::cerr << "[MapLoader] : Can't load '" << path << "'!\n";
             return false;
         }
 

@@ -53,7 +53,7 @@ bool VectorMap::load(const std::string &path,
 {
     std::ifstream in(path.c_str(), std::ios_base::in | std::ios_base::binary);
     if(!in.is_open()) {
-        std::cerr << "[VectorMap] : Can't load '" << path << "'!" << "\n";
+        std::cerr << "[VectorMap] : Can't load '" << path << "'!\n";
         return false;
     }
 
@@ -78,7 +78,7 @@ bool VectorMap::save(const std::string &path,
 {
     std::ofstream out(path.c_str(), std::ios_base::out | std::ios_base::binary);
     if(!out.is_open()) {
-        std::cerr << "[VectorMap] : Can't save to '" << path << "'!" << "\n";
+        std::cerr << "[VectorMap] : Can't save to '" << path << "'!\n";
         return false;
     }
 

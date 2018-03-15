@@ -39,7 +39,7 @@ void LayerModel::setName(const QString &name)
 
 void LayerModel::getName(QString &name) const
 {
-    name = QString(name_.c_str());
+    name = QString::fromStdString(name_);
 }
 
 void LayerModel::setColor(const QColor &color)

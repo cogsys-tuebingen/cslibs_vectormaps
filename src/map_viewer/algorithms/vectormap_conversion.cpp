@@ -32,15 +32,15 @@ bool VectormapConversion::operator () (const QLineFList &vectors,
                                             parameters_.angular_resolution,
                                             true  /* Debug */));
     } else {
-        std::cerr << "[VectorMapConversion]: Unknown map type '" << parameters_.type.toStdString() << "'!" << "\n";
+        std::cerr << "[VectorMapConversion]: Unknown map type '" << parameters_.type.toStdString() << "'!\n";
         return false;
     }
 
     VectorMap::Vectors converted_vectors;
-    for(std::size_t i = 0 ; i < vectors.size() ; ++i) {
-        const QLineF &v = vectors.at(i);
-        converted_vectors.emplace_back(VectorMap::Vector(convertPoint(v.p1()),convertPoint(v.p2())));
-        progress(static_cast<int>(std::floor((i + 1ul) / static_cast<double>(vectors.size()))));
+    for(std::size_t i = 0, s = vectors.size(); i < s; ++i) {
+        progress(static_cast<int>(i / s));
+        const QLineF &v = vectors[i];
+        converted_vectors.emplace_back(convertPoint(v.p1()), convertPoint(v.p2()));
     }
     progress(-1);
     map->insert(converted_vectors); /// todo : valid area

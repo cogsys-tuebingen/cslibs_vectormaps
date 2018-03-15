@@ -9,7 +9,7 @@ namespace cslibs_vectormaps {
 class OrientedVisibilityGridVectorMap : public GridVectorMap
 {
 public:
-    typedef boost::shared_ptr<OrientedVisibilityGridVectorMap> Ptr;
+    typedef std::shared_ptr<OrientedVisibilityGridVectorMap> Ptr;
 
     OrientedVisibilityGridVectorMap(const BoundingBox &bounding,
                           const double       range,
