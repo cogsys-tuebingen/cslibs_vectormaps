@@ -14,6 +14,7 @@ class View;
 struct CornerDetectionParameter;
 struct RasterizationParameter;
 struct VectormapConversionParameter;
+struct RtreeVectormapConversionParameter;
 
 class Control : public QObject
 {
@@ -42,6 +43,7 @@ public slots:
     void runCornerDetection(const CornerDetectionParameter &params);
     void runGridmapExport(const RasterizationParameter &params);
     void runVectormapExport(const VectormapConversionParameter &params);
+    void runRtreeVectormapExport(const RtreeVectormapConversionParameter &params);
 
 private:
     Map             *map_;
@@ -56,6 +58,7 @@ private:
     void executeCornerDetection(const CornerDetectionParameter &params);
     void executeGridmapExport(const RasterizationParameter &params);
     void executeVectormapExport(const VectormapConversionParameter &params);
+    void executeRtreeVectormapExport(const RtreeVectormapConversionParameter &params);
 
 };
 }

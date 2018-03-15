@@ -21,17 +21,27 @@ VectormapConversionParameter& Parameters::getVectormapConversionParameters()
     return vectormap_conversion_parameter_;
 }
 
-void Parameters::setCornerDetectionParameters(CornerDetectionParameter &params)
+RtreeVectormapConversionParameter& Parameters::getRtreeVectormapConversionParameters()
+{
+    return rtree_vectormap_conversion_parameter_;
+}
+
+void Parameters::setCornerDetectionParameters(CornerDetectionParameter& params)
 {
     corner_detection_parameters_ = params;
 }
 
-void Parameters::setRasterizationParamters(RasterizationParameter &params)
+void Parameters::setRasterizationParameters(RasterizationParameter& params)
 {
     rasterization_parameters_ = params;
 }
 
-void Parameters::setVectormapConversionParamters(VectormapConversionParameter &params)
+void Parameters::setVectormapConversionParameters(VectormapConversionParameter& params)
 {
     vectormap_conversion_parameter_ = params;
+}
+
+void Parameters::setRtreeVectormapConversionParameters(RtreeVectormapConversionParameter& params)
+{
+    rtree_vectormap_conversion_parameter_ = params;
 }

@@ -25,6 +25,7 @@ class  Parameters;
 struct CornerDetectionParameter;
 struct RasterizationParameter;
 struct VectormapConversionParameter;
+struct RtreeVectormapConversionParameter;
 
 class View : public QMainWindow
 {
@@ -43,6 +44,7 @@ signals:
     void runCornerDetection(const CornerDetectionParameter &params);
     void runGridmapExport(const RasterizationParameter &params);
     void runVectormapExport(const VectormapConversionParameter &params);
+    void runRtreeVectormapExport(const RtreeVectormapConversionParameter &params);
 
 public slots:
     void update();
@@ -56,6 +58,7 @@ private slots:
     void actionOpen();
     void actionExport_gridmap();
     void actionExport_vectormap();
+    void actionExport_rtree_vectormap();
     void actionRun_corner_detection();
     void actionBuild_topology();
     void actionFind_doors();

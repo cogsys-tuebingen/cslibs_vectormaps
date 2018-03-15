@@ -44,11 +44,12 @@ target_link_libraries(${PROJECT_NAME}_dxf
 )
 
 add_library(${PROJECT_NAME}_maps
+    src/maps/vector_map.cpp
     src/maps/grid_vector_map.cpp
+    src/maps/simple_grid_vector_map.cpp
     src/maps/oriented_grid_vector_map.cpp
     src/maps/oriented_visibility_grid_vector_map.cpp
-    src/maps/simple_grid_vector_map.cpp
-    src/maps/vector_map.cpp
+    src/maps/rtree_vector_map.cpp
 )
 
 target_link_libraries(${PROJECT_NAME}_maps
@@ -82,11 +83,13 @@ if(${Qt5_FOUND})
     )
 
     qt5_wrap_ui(QT_UI
-                src/map_viewer/ui/map_viewer.ui
-                src/map_viewer/ui/map_viewer_list_item.ui
-                src/map_viewer/ui/map_viewer_corner_param_dialog.ui
-                src/map_viewer/ui/map_viewer_gridmap_param_dialog.ui
-                src/map_viewer/ui/map_viewer_vectormap_param_dialog.ui)
+        src/map_viewer/ui/map_viewer.ui
+        src/map_viewer/ui/map_viewer_list_item.ui
+        src/map_viewer/ui/map_viewer_corner_param_dialog.ui
+        src/map_viewer/ui/map_viewer_gridmap_param_dialog.ui
+        src/map_viewer/ui/map_viewer_vectormap_param_dialog.ui
+        src/map_viewer/ui/map_viewer_rtree_vectormap_param_dialog.ui
+    )
 
     add_executable(${PROJECT_NAME}_map_viewer
         src/map_viewer/map_viewer.cpp
@@ -108,12 +111,14 @@ if(${Qt5_FOUND})
         src/map_viewer/qt/QCornerParamDialog.hpp
         src/map_viewer/qt/QGridmapParamDialog.hpp
         src/map_viewer/qt/QVectormapParamDialog.hpp
+        src/map_viewer/qt/QRtreeVectormapParamDialog.hpp
 
         src/map_viewer/util/rng_color.hpp
 
         src/map_viewer/algorithms/corner_detection.cpp
         src/map_viewer/algorithms/rasterization.cpp
         src/map_viewer/algorithms/vectormap_conversion.cpp
+        src/map_viewer/algorithms/rtree_vectormap_conversion.cpp
 
         ${QT_UI}
 

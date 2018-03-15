@@ -10,6 +10,7 @@
 #include "algorithms/corner_detection.h"
 #include "algorithms/rasterization.h"
 #include "algorithms/vectormap_conversion.h"
+#include "algorithms/rtree_vectormap_conversion.h"
 #include "util/map_meta_exporter.hpp"
 
 #include <cslibs_vectormaps/dxf/dxf_map.h>
@@ -56,6 +57,8 @@ void Control::setup(Map *map,
             this, SLOT(runGridmapExport(const RasterizationParameter&)));
     connect(view, SIGNAL(runVectormapExport(const VectormapConversionParameter&)),
             this, SLOT(runVectormapExport(const VectormapConversionParameter&)));
+    connect(view, SIGNAL(runRtreeVectormapExport(const RtreeVectormapConversionParameter&)),
+            this, SLOT(runRtreeVectormapExport(const RtreeVectormapConversionParameter&)));
 }
 
 void Control::doWork(const std::function<void()>& work)
@@ -72,22 +75,29 @@ void Control::doWork(const std::function<void()>& work)
 
 void Control::runCornerDetection(const CornerDetectionParameter &params)
 {
-    doWork([params, this] () {
+    doWork([params, this]() {
         executeCornerDetection(params);
     });
 }
 
 void Control::runGridmapExport(const RasterizationParameter &params)
 {
-    doWork([params, this] () {
+    doWork([params, this]() {
         executeGridmapExport(params);
     });
 }
 
 void Control::runVectormapExport(const VectormapConversionParameter &params)
 {
-    doWork([params, this] () {
+    doWork([params, this]() {
         executeVectormapExport(params);
+    });
+}
+
+void Control::runRtreeVectormapExport(const RtreeVectormapConversionParameter &params)
+{
+    doWork([params, this]() {
+        executeRtreeVectormapExport(params);
     });
 }
 
@@ -104,9 +114,8 @@ void Control::openDXF(const QString &path)
 
 void Control::executeCornerDetection(const CornerDetectionParameter &params)
 {
-
-    /// get all layers that are visible
-    /// create a new layer model with points of corners
+    // get all layers that are visible
+    // create a new layer model with points of corners
 
     openProgressDialog("Corner Detection");
     progress(-1);
@@ -114,7 +123,7 @@ void Control::executeCornerDetection(const CornerDetectionParameter &params)
     std::vector<LayerModel::Ptr> layers;
     map_->getLayers(layers);
 
-    /// get all line segments from visible layers
+    // get all line segments from visible layers
     dxf::DXFMap::Vectors vectors;
     for(LayerModel::Ptr &l : layers) {
         if(l->getVisibility()) {
@@ -152,7 +161,7 @@ void Control::executeCornerDetection(const CornerDetectionParameter &params)
     map_->setLayer(layer_corners);
     map_->setLayer(layer_end_points);
 
-    /// and there goes the progress
+    // and there goes the progress
     closeProgressDialog();
 }
 
@@ -161,7 +170,7 @@ void Control::executeGridmapExport(const RasterizationParameter &params)
     std::vector<LayerModel::Ptr> layers;
     map_->getLayers(layers);
 
-    /// get all line segments from visible layers
+    // get all line segments from visible layers
     VectorLayerModel::QLineFList vectors;
     for(LayerModel::Ptr &l : layers) {
         if(l->getVisibility()) {
@@ -189,7 +198,7 @@ void Control::executeVectormapExport(const VectormapConversionParameter &params)
     std::vector<LayerModel::Ptr> layers;
     map_->getLayers(layers);
 
-    /// get all line segments from visible layers
+    // get all line segments from visible layers
     VectorLayerModel::QLineFList vectors;
     for(LayerModel::Ptr &l : layers) {
         if(l->getVisibility()) {
@@ -207,7 +216,35 @@ void Control::executeVectormapExport(const VectormapConversionParameter &params)
 
     VectormapConversion vector_conversion(params);
     if(!vector_conversion(vectors, map_->getMin(), map_->getMax(), [this](const int p){progress(p);}))
-        notification("Conversion Failed!");
+        notification("Conversion failed!");
+
+    closeProgressDialog();
+}
+
+void Control::executeRtreeVectormapExport(const RtreeVectormapConversionParameter &params)
+{
+    std::vector<LayerModel::Ptr> layers;
+    map_->getLayers(layers);
+
+    // get all line segments from visible layers
+    VectorLayerModel::QLineFList vectors;
+    for(LayerModel::Ptr &l : layers) {
+        if(l->getVisibility()) {
+            VectorLayerModel::Ptr lv = LayerModel::as<VectorLayerModel>(l);
+            if(lv) {
+                VectorLayerModel::QLineFList v;
+                lv->getVectors(v);
+                vectors.insert(vectors.end(), v.begin(), v.end());
+            }
+        }
+    }
+
+    openProgressDialog("R-tree vectormap export");
+    progress(-1);
+
+    RtreeVectormapConversion rtree_vector_conversion(params);
+    if(!rtree_vector_conversion(vectors, map_->getMin(), map_->getMax(), [this](const int p){progress(p);}))
+        notification("Conversion failed!");
 
     closeProgressDialog();
 }

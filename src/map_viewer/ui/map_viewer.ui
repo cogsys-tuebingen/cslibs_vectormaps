@@ -166,6 +166,7 @@
     <addaction name="actionOpen"/>
     <addaction name="actionExport_gridmap"/>
     <addaction name="actionExport_vectormap"/>
+    <addaction name="actionExport_rtree_vectormap"/>
    </widget>
    <widget class="QMenu" name="menuTools">
     <property name="title">
@@ -227,6 +228,14 @@
    </property>
    <property name="text">
     <string>Export vectormap ...</string>
+   </property>
+  </action>
+  <action name="actionExport_rtree_vectormap">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Export rtree vectormap ...</string>
    </property>
   </action>
  </widget>

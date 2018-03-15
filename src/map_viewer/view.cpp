@@ -19,6 +19,7 @@
 #include "qt/QCornerParamDialog.hpp"
 #include "qt/QGridmapParamDialog.hpp"
 #include "qt/QVectormapParamDialog.hpp"
+#include "qt/QRtreeVectormapParamDialog.hpp"
 
 #include <ui_map_viewer.h>
 #include <ui_map_viewer_list_item.h>
@@ -31,7 +32,6 @@
 
 #include <QAction>
 #include <QProgressDialog>
-
 
 using namespace cslibs_vectormaps;
 
@@ -58,6 +58,7 @@ View::View() :
     connect(ui_->actionOpen, SIGNAL(triggered()), this, SLOT(actionOpen()));
     connect(ui_->actionExport_gridmap, SIGNAL(triggered()), this, SLOT(actionExport_gridmap()));
     connect(ui_->actionExport_vectormap, SIGNAL(triggered()), this, SLOT(actionExport_vectormap()));
+    connect(ui_->actionExport_rtree_vectormap, SIGNAL(triggered()), this, SLOT(actionExport_rtree_vectormap()));
     connect(ui_->buttonHideLayerList, SIGNAL(clicked(bool)), this, SLOT(hideLayerList()));
     connect(ui_->actionRun_corner_detection, SIGNAL(triggered()), this, SLOT(actionRun_corner_detection()));
 }
@@ -111,6 +112,7 @@ void View::update()
     ui_->actionRun_corner_detection->setEnabled(true);
     ui_->actionExport_gridmap->setEnabled(true);
     ui_->actionExport_vectormap->setEnabled(true);
+    ui_->actionExport_rtree_vectormap->setEnabled(true);
 
     view_->show();
 }
@@ -197,8 +199,20 @@ void View::actionExport_vectormap()
                          params.range,
                          params.type,
                          params.path);
-        parameters_->setVectormapConversionParamters(params);
+        parameters_->setVectormapConversionParameters(params);
         runVectormapExport(params);
+    }
+}
+
+void View::actionExport_rtree_vectormap()
+{
+    QRtreeVectormapParamDialog param_dialog;
+    RtreeVectormapConversionParameter& params = parameters_->getRtreeVectormapConversionParameters();
+    param_dialog.setup(params);
+    if(param_dialog.exec() == QDialog::Accepted) {
+        param_dialog.get(params);
+        parameters_->setRtreeVectormapConversionParameters(params);
+        runRtreeVectormapExport(params);
     }
 }
 

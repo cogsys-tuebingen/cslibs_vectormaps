@@ -42,7 +42,7 @@ VectorMap::~VectorMap()
 
 unsigned int VectorMap::insert(const Vectors &set, const Polygon &valid)
 {
-    data_.assign(set.begin(), set.end());
+    data_ = set;
     valid_area_ = valid;
 
     return handleInsertion();
@@ -64,8 +64,8 @@ bool VectorMap::load(const std::string &path,
     in_decompressing.push(in);
 
     try {
-    YAML::Node node = YAML::Load(in_decompressing);
-    doLoad(node);
+        YAML::Node node = YAML::Load(in_decompressing);
+        doLoad(node);
     } catch (const YAML::Exception &e) {
         std::cerr << "[VectorMap] : " << e.what() << "\n";
         return false;
