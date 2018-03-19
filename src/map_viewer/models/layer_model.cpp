@@ -12,9 +12,9 @@ LayerModel::~LayerModel()
 {
 }
 
-void LayerModel::setVisible(const bool visbile)
+void LayerModel::setVisible(bool visible)
 {
-    visible_ = visbile;
+    visible_ = visible;
 }
 
 bool LayerModel::getVisibility() const

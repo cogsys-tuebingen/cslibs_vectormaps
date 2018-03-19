@@ -243,7 +243,7 @@ void Control::executeRtreeVectormapExport(const RtreeVectormapConversionParamete
     progress(-1);
 
     RtreeVectormapConversion rtree_vector_conversion(params);
-    if(!rtree_vector_conversion(vectors, map_->getMin(), map_->getMax(), [this](const int p){progress(p);}), *map_)
+    if(!rtree_vector_conversion(vectors, map_->getMin(), map_->getMax(), [this](const int p){progress(p);}, *map_))
         notification("Conversion failed!");
 
     closeProgressDialog();

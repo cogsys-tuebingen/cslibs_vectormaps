@@ -45,3 +45,27 @@ void VectorLayerModel::getVectors(QLineFList &vectors) const
         vectors.emplace_back(QLineF(p1.x(), p1.y(), p2.x(), p2.y()));
     }
 }
+
+void VectorLayerModel::render(QGraphicsItemGroup &group, const QPen& pen, double point_alpha) const
+{
+    QPen p(pen);
+    p.setColor(getColor());
+    std::vector<QLineF> lines;
+    getVectors(lines);
+    for(auto l : lines) {
+        QGraphicsLineItem *i = new QGraphicsLineItem(QLineF(l.p1(), l.p2()));
+        i->setPen(p);
+        group.addToGroup(i);
+    }
+}
+
+void VectorLayerModel::update(QGraphicsItemGroup &group, const QPen& pen, double point_alpha) const
+{
+    QColor c(getColor());
+    QPen p(pen);
+    p.setColor(c);
+    QList<QGraphicsItem*> children = group.childItems();
+    for(auto *child : children) {
+        static_cast<QGraphicsLineItem*>(child)->setPen(p);
+    }
+}

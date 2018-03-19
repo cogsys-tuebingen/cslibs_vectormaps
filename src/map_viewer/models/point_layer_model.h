@@ -15,6 +15,9 @@ public:
 
     virtual ~PointLayerModel();
 
+    void render(QGraphicsItemGroup &group, const QPen& pen, double point_alpha) const;
+    void update(QGraphicsItemGroup &group, const QPen& pen, double point_alpha) const;
+
     virtual void setPoints(const dxf::DXFMap::Points &points);
 
     void getPoints(dxf::DXFMap::Points &p) const;

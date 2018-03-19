@@ -13,6 +13,9 @@ public:
     CornerLayerModel();
     virtual ~CornerLayerModel();
 
+    void render(QGraphicsItemGroup &group, const QPen& pen, double point_alpha) const override;
+    void update(QGraphicsItemGroup &group, const QPen& pen, double point_alpha) const override;
+
     void setPoints(const dxf::DXFMap::Points &points) override;
     void setPoints(const QPointFList &points) override;
 

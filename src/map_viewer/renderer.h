@@ -76,23 +76,6 @@ private:
     void doRepaint();
     void doRepaint(const QString &name);
     void doUpdate(const QString &name);
-
-    void render(const CornerLayerModel &model,
-                QGraphicsItemGroup &group);
-    void render(const PointLayerModel  &model,
-                QGraphicsItemGroup &group);
-    void render(const VectorLayerModel &model,
-                QGraphicsItemGroup &group);
-
-    void update(const VectorLayerModel &model,
-                QGraphicsItemGroup *group);
-    void update(const CornerLayerModel &model,
-                QGraphicsItemGroup *group);
-    void update(const PointLayerModel  &model,
-                QGraphicsItemGroup *group);
-
-
-
 };
 }
 #endif // RENDERER_H

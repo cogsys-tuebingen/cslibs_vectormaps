@@ -128,37 +128,13 @@ void Renderer::doRepaint()
 void Renderer::doRepaint(const QString &layer_name)
 {
     LayerModel::ConstPtr l = map_->getLayer(layer_name);
-    QGraphicsItemGroup *g = nullptr;
 
-    /// TODO : REFACTORING TO DOUBLE CALL PATTERN
+    QGraphicsItemGroup *g = new QGraphicsItemGroup;
+    l->render(*g, default_pen_, default_point_alpha_);
+    groups_[layer_name] = g;
+    g->setVisible(l->getVisibility());
 
-    VectorLayerModel::ConstPtr lv = LayerModel::as<VectorLayerModel const>(l);
-    if(lv) {
-        QGraphicsItemGroup *g = new QGraphicsItemGroup;
-        render(*lv, *g);
-        groups_[layer_name] = g;
-        g->setVisible(l->getVisibility());
-
-        add(g);
-    }
-    CornerLayerModel::ConstPtr cl = LayerModel::as<CornerLayerModel const>(l);
-    if(cl) {
-        QGraphicsItemGroup *g = new QGraphicsItemGroup;
-        render(*cl, *g);
-        groups_[layer_name] = g;
-        g->setVisible(l->getVisibility());
-
-        add(g);
-   }
-    PointLayerModel::ConstPtr lp = LayerModel::as<PointLayerModel const>(l);
-    if(lp && !cl) {
-        QGraphicsItemGroup *g = new QGraphicsItemGroup;
-        render(*lp, *g);
-        groups_[layer_name] = g;
-        g->setVisible(l->getVisibility());
-
-        add(g);
-    }
+    add(g);
 }
 
 void Renderer::doUpdate(const QString &layer_name)
@@ -166,124 +142,8 @@ void Renderer::doUpdate(const QString &layer_name)
     LayerModel::ConstPtr l = map_->getLayer(layer_name);
     QGraphicsItemGroup *g = groups_[layer_name];
 
-    VectorLayerModel::ConstPtr lv = LayerModel::as<VectorLayerModel const>(l);
-    if(lv) {
-        update(*lv, g);
-    }
-    CornerLayerModel::ConstPtr cl = LayerModel::as<CornerLayerModel const>(l);
-    if(cl) {
-        update(*cl, g);
-    }
-    PointLayerModel::ConstPtr  lp = LayerModel::as<PointLayerModel const>(l);
-    if(lp && !cl) {
-        update(*lp, g);
-    }
+    l->update(*g, default_pen_, default_point_alpha_);
     g->setVisible(l->getVisibility());
-}
-
-void Renderer::render(const CornerLayerModel &model,
-                      QGraphicsItemGroup &group)
-{
-    QColor color = model.getColor();
-    QPen    p(default_pen_);
-    p.setColor(Qt::black);
-
-    std::vector<QPointF> points;
-    std::vector<double>  cornerness;
-    model.getPoints(points);
-    model.getCornerness(cornerness);
-
-    for(std::size_t i = 0 ; i < points.size(); ++i) {
-        const QPointF &point = points[i];
-        const double  &corner = cornerness[i];
-        color.setAlphaF(corner * default_point_alpha_);
-        QBrush  b(color);
-        QGraphicsEllipseItem *item = new QGraphicsEllipseItem(point.x() - 0.1, point.y() - 0.1, 0.2, 0.2);
-        item->setBrush(b);
-        item->setPen(p);
-        group.addToGroup(item);
-    }
-
-}
-
-void Renderer::render(const PointLayerModel &model,
-                      QGraphicsItemGroup &group)
-{
-    QPen    p(default_pen_);
-    p.setColor(Qt::black);
-    QColor  c(model.getColor());
-    c.setAlphaF(default_point_alpha_);
-    QBrush  b(c);
-
-    QGraphicsItemGroup *g = new QGraphicsItemGroup;
-    std::vector<QPointF> points;
-    model.getPoints(points);
-    for(const QPointF &point : points) {
-        QGraphicsEllipseItem *i = new QGraphicsEllipseItem(point.x() - 0.1, point.y() - 0.1, 0.2, 0.2);
-        i->setPen(p);
-        i->setBrush(b);
-        group.addToGroup(i);
-    }
-}
-
-void Renderer::render(const VectorLayerModel &model,
-                      QGraphicsItemGroup &group)
-{
-    QPen    p(default_pen_);
-    p.setColor(model.getColor());
-    std::vector<QLineF> lines;
-    model.getVectors(lines);
-    for(auto l : lines) {
-        QGraphicsLineItem *i = new QGraphicsLineItem(QLineF(l.p1(), l.p2()));
-        i->setPen(p);
-        group.addToGroup(i);
-    }
-}
-
-void Renderer::update(const CornerLayerModel &model,
-                      QGraphicsItemGroup *group)
-{
-    QColor color = model.getColor();
-    QPen    p(default_pen_);
-    p.setColor(Qt::black);
-
-    std::vector<double>  cornerness;
-    model.getCornerness(cornerness);
-
-    QList<QGraphicsItem*> children = group->childItems();
-    assert(cornerness.size() == children.size());
-    for(std::size_t i = 0 ; i < children.size(); ++i) {
-        QGraphicsEllipseItem *item = static_cast<QGraphicsEllipseItem*>(children[i]);
-        const double  &corner = cornerness[i];
-        color.setAlphaF(corner * default_point_alpha_);
-        QBrush  b(color);
-        item->setBrush(b);
-        item->setPen(p);
-    }
-}
-
-void Renderer::update(const PointLayerModel &model,
-                      QGraphicsItemGroup *group)
-{
-    QColor c(model.getColor());
-    c.setAlphaF(default_point_alpha_);
-    QBrush b(c);
-    QList<QGraphicsItem*> children = group->childItems();
-    for(auto *child : children) {
-        static_cast<QGraphicsEllipseItem*>(child)->setBrush(b);
-    }
-}
-
-void Renderer::update(const VectorLayerModel &model,
-                      QGraphicsItemGroup *group)
-{
-    QColor c(model.getColor());
-    QPen    p(default_pen_);
-    p.setColor(c);
-    QList<QGraphicsItem*> children = group->childItems();
-    for(auto *child : children) {
-        static_cast<QGraphicsLineItem*>(child)->setPen(p);
-    }
 }
 
 

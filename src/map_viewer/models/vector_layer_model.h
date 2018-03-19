@@ -14,6 +14,9 @@ public:
     VectorLayerModel();
     virtual ~VectorLayerModel();
 
+    void render(QGraphicsItemGroup &group, const QPen& pen, double point_alpha) const;
+    void update(QGraphicsItemGroup &group, const QPen& pen, double point_alpha) const;
+
     void setVectors(const dxf::DXFMap::Vectors &v);
 
     void getVectors(dxf::DXFMap::Vectors &v) const;

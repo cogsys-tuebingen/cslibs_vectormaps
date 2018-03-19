@@ -36,3 +36,32 @@ void PointLayerModel::getPoints(QPointFList &points) const
     for(const auto &p : points_)
         points.emplace_back(QPointF(p.x(), p.y()));
 }
+
+void PointLayerModel::render(QGraphicsItemGroup &group, const QPen& pen, double point_alpha) const
+{
+    QPen p(pen);
+    p.setColor(Qt::black);
+    QColor c(getColor());
+    c.setAlphaF(point_alpha);
+    QBrush b(c);
+
+    std::vector<QPointF> points;
+    getPoints(points);
+    for(const QPointF &point : points) {
+        QGraphicsEllipseItem *i = new QGraphicsEllipseItem(point.x() - 0.1, point.y() - 0.1, 0.2, 0.2);
+        i->setPen(p);
+        i->setBrush(b);
+        group.addToGroup(i);
+    }
+}
+
+void PointLayerModel::update(QGraphicsItemGroup &group, const QPen& pen, double point_alpha) const
+{
+    QColor c(getColor());
+    c.setAlphaF(point_alpha);
+    QBrush b(c);
+    QList<QGraphicsItem*> children = group.childItems();
+    for(auto *child : children) {
+        static_cast<QGraphicsEllipseItem*>(child)->setBrush(b);
+    }
+}

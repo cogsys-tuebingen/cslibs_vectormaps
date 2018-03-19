@@ -2,13 +2,16 @@
 #define LAYERMODEL_H
 
 #include <cslibs_vectormaps/dxf/dxf_map.h>
-#include <array>
-#include <memory>
 
 #include <QLine>
 #include <QString>
 #include <QColor>
 #include <QObject>
+#include <QGraphicsItemGroup>
+#include <QPen>
+
+#include <array>
+#include <memory>
 
 namespace cslibs_vectormaps {
 class LayerModel
@@ -22,18 +25,18 @@ public:
     LayerModel();
     virtual ~LayerModel();
 
-    void setVisible(const bool visbile);
+    virtual void render(QGraphicsItemGroup &group, const QPen& pen, double point_alpha) const = 0;
+    virtual void update(QGraphicsItemGroup &group, const QPen& pen, double point_alpha) const = 0;
 
+    void setVisible(const bool visible);
     bool getVisibility() const;
 
     //// std types
     void setName(const std::string &setName);
-
     void getName(std::string &name) const;
 
     //// qt types
     void setName(const QString &name);
-
     void getName(QString &name) const;
 
     template<typename StringT>
@@ -56,7 +59,6 @@ public:
 
     /// visualization specific
     void setColor(const QColor &color);
-
     QColor getColor() const;
 
 private:

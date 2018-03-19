@@ -1,7 +1,6 @@
 #include "map.h"
 #include "view.h"
 
-#include <QStringList>
 #include <thread>
 #include <functional>
 #include <set>
