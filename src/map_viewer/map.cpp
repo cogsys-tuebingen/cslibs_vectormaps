@@ -19,16 +19,16 @@ Map::~Map()
 {
 }
 
-LayerModel::Ptr Map::getLayer(const QString &name)
+LayerModel::Ptr Map::getLayer(const QString &name) const
 {
-    std::unique_lock<std::mutex> l(layers_mutex_);
-    return layers_[name.toStdString()];
+    return getLayer(name.toStdString());
 }
 
-LayerModel::Ptr Map::getLayer(const std::string &name)
+LayerModel::Ptr Map::getLayer(const std::string &name) const
 {
     std::unique_lock<std::mutex> l(layers_mutex_);
-    return layers_[name];
+    auto result = layers_.find(name);
+    return result != layers_.end() ? result->second : LayerModel::Ptr();
 }
 
 void Map::getLayers(std::vector<LayerModel::Ptr> &layers) const
@@ -44,6 +44,12 @@ void Map::setLayer(const LayerModel::Ptr &layer)
     std::unique_lock<std::mutex> l(layers_mutex_);
     layers_[layer->getName<std::string>()] = layer;
     updated();
+}
+
+void Map::setLayers(const std::vector<LayerModel::Ptr> &layers)
+{
+    for (const LayerModel::Ptr& layer : layers)
+        setLayer(layer);
 }
 
 QPointF Map::getMin() const

@@ -1,6 +1,8 @@
 #ifndef RTREE_VECTORMAP_CONVERSION_H
 #define RTREE_VECTORMAP_CONVERSION_H
 
+#include "../map.h"
+
 #include <QLineF>
 
 #include <boost/geometry/geometries/point_xy.hpp>
@@ -32,14 +34,18 @@ public:
     bool operator()(const std::vector<QLineF>& vectors,
                     const QPointF& min,
                     const QPointF& max,
-                    progress_t progress);
+                    progress_t progress,
+                    Map& mapviewer_map);
 private:
     RtreeVectormapConversionParameter parameters_;
 
     using point_t = boost::geometry::model::d2::point_xy<double>;
     using segment_t = boost::geometry::model::segment<point_t>;
 
-    std::vector<std::vector<point_t>> find_rooms(const std::vector<segment_t>& segments, const RtreeVectormapConversionParameter& params);
+    // expresses segments in exact multiples of the map precision (e.g. converts
+    // decimal meters to integer millimeters: 2.030001 -> 2030.0)
+    std::vector<segment_t> round_segments(const std::vector<segment_t>& segments, const RtreeVectormapConversionParameter& params) const;
+    std::vector<std::vector<point_t>> find_rooms(const std::vector<segment_t>& rounded_segments, const RtreeVectormapConversionParameter& params) const;
 };
 
 }

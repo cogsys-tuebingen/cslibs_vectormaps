@@ -25,13 +25,15 @@ public:
     Map();
     virtual ~Map();
 
-    LayerModel::Ptr getLayer(const QString &name);
+    LayerModel::Ptr getLayer(const QString &name) const;
 
-    LayerModel::Ptr getLayer(const std::string &name);
+    LayerModel::Ptr getLayer(const std::string &name) const;
 
     void getLayers(std::vector<LayerModel::Ptr> &layers) const;
 
     void setLayer(const LayerModel::Ptr &layer);
+
+    void setLayers(const std::vector<LayerModel::Ptr> &layers);
 
     QPointF getMin() const;
 

@@ -38,7 +38,8 @@ RtreeVectormapConversion::RtreeVectormapConversion(const RtreeVectormapConversio
 bool RtreeVectormapConversion::operator()(const std::vector<QLineF>& vectors,
                                           const QPointF& min,
                                           const QPointF& max,
-                                          progress_t progress)
+                                          progress_t progress,
+                                          Map& mapviewer_map)
 {
     auto convertPoint = [](const QPointF &p) {
         return VectorMap::Point(p.x(), p.y());
@@ -51,14 +52,21 @@ bool RtreeVectormapConversion::operator()(const std::vector<QLineF>& vectors,
     VectorMap::BoundingBox bounding(convertPoint(min), convertPoint(max));
     VectorMap::Ptr map(new RtreeVectorMap(bounding, true));
 
-    VectorMap::Vectors converted_vectors;
+    VectorMap::Vectors converted_segments;
     for(std::size_t i = 0, s = vectors.size(); i < s; ++i) {
         progress(static_cast<int>(i / s));
         const QLineF& v = vectors[i];
-        converted_vectors.emplace_back(convertPoint(v.p1()), convertPoint(v.p2()));
+        converted_segments.emplace_back(convertPoint(v.p1()), convertPoint(v.p2()));
     }
+
     progress(-1);
-    std::vector<std::vector<point_t>> rooms = find_rooms(converted_vectors, parameters_);
+    std::vector<segment_t> rounded_segments = round_segments(converted_segments, parameters_);
+    std::vector<std::vector<point_t>> rooms = find_rooms(rounded_segments, parameters_);
+
+    std::vector<LayerModel::Ptr> oldlayers;
+    mapviewer_map.getLayers(oldlayers);
+
+
     //dynamic_cast<RtreeVectorMap&>(*map).create(converted_vectors, parameters_);
     const bool compress = ends_with(parameters_.path, std::string(".gzip"));
     return map->save(parameters_.path, compress);
@@ -225,7 +233,7 @@ static std::size_t sort_edges_delete_duplicates(std::vector<node_t>& nodes)
     return erased;
 }
 
-std::vector<std::vector<point_t>> RtreeVectormapConversion::find_rooms(const std::vector<segment_t>& segments, const RtreeVectormapConversionParameter& params)
+std::vector<segment_t> RtreeVectormapConversion::round_segments(const std::vector<segment_t>& segments, const RtreeVectormapConversionParameter& params) const
 {
     std::vector<segment_t> roundedsegments;
     for (const segment_t& segment : segments) {
@@ -239,7 +247,11 @@ std::vector<std::vector<point_t>> RtreeVectormapConversion::find_rooms(const std
         }
         roundedsegments.push_back(roundedsegment);
     }
+    return roundedsegments;
+}
 
+std::vector<std::vector<point_t>> RtreeVectormapConversion::find_rooms(const std::vector<segment_t>& rounded_segments, const RtreeVectormapConversionParameter& params) const
+{
     // first of all, make a new vector that only contains successive
     // segments, no overlapping segments. we can only replace exact vertical
     // or exact horizontal overlappings at the moment.
@@ -247,7 +259,7 @@ std::vector<std::vector<point_t>> RtreeVectormapConversion::find_rooms(const std
     {
         // sort original segments into std::vectors (vertical, horizontal, other)
         std::vector<segment_t> vertical, horizontal;
-        for (const segment_t& segment : roundedsegments) {
+        for (const segment_t& segment : rounded_segments) {
             if (segment.first.x() == segment.second.x()) {
                 segment_t s = {
                     {segment.first.x(), std::min(segment.first.y(), segment.second.y())},
