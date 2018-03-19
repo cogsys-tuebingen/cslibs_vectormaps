@@ -1,8 +1,6 @@
 #ifndef RTREE_VECTORMAP_CONVERSION_H
 #define RTREE_VECTORMAP_CONVERSION_H
 
-#include <cslibs_vectormaps/maps/rtree_vector_map.h>
-
 #include <QLineF>
 
 #include <boost/geometry/geometries/point_xy.hpp>
@@ -13,10 +11,21 @@
 
 namespace cslibs_vectormaps {
 
+struct RtreeVectormapConversionParameter {
+    std::string path;
+    double map_precision = 1000.; // 1 mm
+    double merge_max_proximity = .005;
+    enum {ROWS, COLUMNS} find_door_mode = ROWS;
+    double door_depth_min = .05;
+    double door_depth_max = .5;
+    double door_width_min = .5;
+    double door_width_max = 2.5;
+    double door_angle_diff_max = .08726646259971647884618453842443; // 5 deg
+};
+
 class RtreeVectormapConversion {
 public:
     using progress_t = std::function<void(int)>;
-    //using segment_t = boost::geometry::
 
     RtreeVectormapConversion(const RtreeVectormapConversionParameter& parameters);
 

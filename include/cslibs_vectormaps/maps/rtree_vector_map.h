@@ -7,18 +7,6 @@
 
 namespace cslibs_vectormaps {
 
-struct RtreeVectormapConversionParameter {
-    std::string path;
-    double map_precision = .001;
-    double merge_max_proximity = .005;
-    enum {ROWS, COLUMNS} find_door_mode = ROWS;
-    double door_depth_min = .05;
-    double door_depth_max = .5;
-    double door_width_min = .5;
-    double door_width_max = 2.5;
-    double door_angle_diff_max = .08726646259971647884618453842443; // 5 deg
-};
-
 class RtreeVectorMap : public VectorMap {
 public:
     RtreeVectorMap(const BoundingBox& bounding, bool debug);
@@ -48,7 +36,6 @@ public:
                                         const float default_mesaurement = 0.f) const final;
 
     virtual unsigned int handleInsertion();
-    void create(const Vectors& segments, const RtreeVectormapConversionParameter& params);
     virtual void doLoad(const YAML::Node& node);
     virtual void doSave(YAML::Node& node) const;
 };

@@ -60,12 +60,6 @@ void RtreeVectorMap::intersectScanPattern(const Point& pos,
 
 unsigned int RtreeVectorMap::handleInsertion()
 {
-
-}
-
-void RtreeVectorMap::create(const Vectors& segments, const RtreeVectormapConversionParameter& params)
-{
-
 }
 
 void RtreeVectorMap::doLoad(const YAML::Node& node)

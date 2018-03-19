@@ -32,7 +32,7 @@ public:
         ui_.doubleSpinBox_door_depth_max->setValue(params.door_depth_max);
         ui_.doubleSpinBox_door_width_min->setValue(params.door_width_min);
         ui_.doubleSpinBox_door_width_max->setValue(params.door_width_max);
-        ui_.doubleSpinBox_door_angle_diff_max->setValue(params.door_angle_diff_max);
+        ui_.doubleSpinBox_door_angle_diff_max->setValue(toDeg(params.door_angle_diff_max));
     }
 
     void get(cslibs_vectormaps::RtreeVectormapConversionParameter& params)

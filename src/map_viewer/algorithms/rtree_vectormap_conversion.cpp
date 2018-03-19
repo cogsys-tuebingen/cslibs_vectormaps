@@ -1,5 +1,7 @@
 #include "rtree_vectormap_conversion.h"
 
+#include <cslibs_vectormaps/maps/rtree_vector_map.h>
+
 #include <boost/geometry/geometries/point_xy.hpp>
 #include <boost/geometry/arithmetic/arithmetic.hpp>
 #include <boost/geometry/algorithms/distance.hpp>
@@ -56,7 +58,8 @@ bool RtreeVectormapConversion::operator()(const std::vector<QLineF>& vectors,
         converted_vectors.emplace_back(convertPoint(v.p1()), convertPoint(v.p2()));
     }
     progress(-1);
-    dynamic_cast<RtreeVectorMap&>(*map).create(converted_vectors, parameters_);
+    std::vector<std::vector<point_t>> rooms = find_rooms(converted_vectors, parameters_);
+    //dynamic_cast<RtreeVectorMap&>(*map).create(converted_vectors, parameters_);
     const bool compress = ends_with(parameters_.path, std::string(".gzip"));
     return map->save(parameters_.path, compress);
 }
@@ -147,7 +150,7 @@ static void get_corners(const std::vector<segment_t>& segments, const RtreeVecto
 
 static std::size_t merge_nodes(const RtreeVectormapConversionParameter& params, const std::vector<double>& cpositions, const std::vector<std::vector<double>>& clines, std::map<point_t, corner_t*, point_compare>& corner_lookup)
 {
-    double maxdist = params.merge_max_proximity;
+    double maxdist = params.merge_max_proximity * params.map_precision;
     std::size_t merged = 0;
     auto mergenode = [&corner_lookup](point_t p1, point_t p2) {
         corner_t* c1 = corner_lookup[p1];
@@ -242,9 +245,9 @@ std::vector<std::vector<point_t>> RtreeVectormapConversion::find_rooms(const std
     // or exact horizontal overlappings at the moment.
     std::vector<segment_t> clean_segments;
     {
-        // sort original segments into vectors (vertical, horizontal, other)
+        // sort original segments into std::vectors (vertical, horizontal, other)
         std::vector<segment_t> vertical, horizontal;
-        for (const segment_t& segment : segments) {
+        for (const segment_t& segment : roundedsegments) {
             if (segment.first.x() == segment.second.x()) {
                 segment_t s = {
                     {segment.first.x(), std::min(segment.first.y(), segment.second.y())},
@@ -261,7 +264,7 @@ std::vector<std::vector<point_t>> RtreeVectormapConversion::find_rooms(const std
                 clean_segments.push_back(segment);
             }
         }
-        // sort the vectors
+        // sort the std::vectors
         std::sort(vertical.begin(), vertical.end(), [](const segment_t& s1, const segment_t& s2) {
             return s1.first.x() < s2.first.x() || s1.first.x() == s2.first.x() && (s1.first.y() < s2.first.y()/* || s1.first.y() == s2.first.y() && s1.second.y() < s2.second.y()*/);
         });
@@ -337,7 +340,7 @@ std::vector<std::vector<point_t>> RtreeVectormapConversion::find_rooms(const std
     // make vector of all corners and vector of all nodes
     std::vector<node_t> nodes;
     std::vector<corner_t> corners;
-    for (std::size_t i = 0, j = 0, n = cpositions.size(); i < n; i++) {
+    for (std::size_t i = 0, n = cpositions.size(); i < n; i++) {
         for (double p2 : clines[i]) {
             nodes.push_back({});
             corner_t corner = {
@@ -362,8 +365,8 @@ std::vector<std::vector<point_t>> RtreeVectormapConversion::find_rooms(const std
     for (const segment_t& segment : clean_segments) {
         corner_t* c1 = corner_lookup[segment.first];
         corner_t* c2 = corner_lookup[segment.second];
-        edge_t e1 = {c1, c2, false, false};
-        edge_t e2 = {c2, c1, false, false};
+        edge_t e1 = {c2, c1, false, false};
+        edge_t e2 = {c1, c2, false, false};
         c1->node->edges.push_back(e2);
         c2->node->edges.push_back(e1);
     }
@@ -379,6 +382,18 @@ std::vector<std::vector<point_t>> RtreeVectormapConversion::find_rooms(const std
     // find doors
     std::vector<std::array<const edge_t, 2>> doors;
     {
+        double door_depth_min = params.door_depth_min;
+        double door_depth_max = params.door_depth_max;
+        double door_width_min = params.door_width_min;
+        double door_width_max = params.door_width_max;
+        if (params.map_precision) {
+            double p = params.map_precision;
+            door_depth_min = std::round(door_depth_min * p);
+            door_depth_max = std::round(door_depth_max * p);
+            door_width_min = std::round(door_width_min * p);
+            door_width_max = std::round(door_width_max * p);
+        }
+
         auto check_length = [](const point_t& v, double min, double max) {
             // checks the length of a vector
             double d = v.x() * v.x() + v.y() * v.y();
@@ -391,7 +406,7 @@ std::vector<std::vector<point_t>> RtreeVectormapConversion::find_rooms(const std
             return angle >= boost::math::double_constants::half_pi - params.door_angle_diff_max
                 && angle <= boost::math::double_constants::half_pi + params.door_angle_diff_max;
         };
-        auto check_door_side = [&params, &check_length, &check_angle](const point_t& v1, const point_t& v2, const point_t& v3) {
+        auto check_door_side = [&door_depth_min, &door_depth_max, &check_length, &check_angle](const point_t& v1, const point_t& v2, const point_t& v3) {
             // Checks if v1, v2, v3 could form the side of a door like this:
             //     v1
             //  +<----+
@@ -404,7 +419,7 @@ std::vector<std::vector<point_t>> RtreeVectormapConversion::find_rooms(const std
             // approximately 90 deg. 270 deg does not count! This is so that
             // v2's direction is consistent and so that no duplicates occur
             // when considering edges in both directions.
-            return check_length(v2, params.door_depth_min, params.door_depth_max)
+            return check_length(v2, door_depth_min, door_depth_max)
                 && check_angle(v1, v2) && check_angle(v3, v2);
         };
         auto check_node = [&check_door_side](const node_t& firstnode, const edge_t& e1, const edge_t& e2) {
@@ -440,19 +455,20 @@ std::vector<std::vector<point_t>> RtreeVectormapConversion::find_rooms(const std
 
         for (auto it1 = door_side_candidates.begin(), end = door_side_candidates.end(); it1 != door_side_candidates.end();) {
             // we search for the other side of the door frame by drawing
-            // a line g from the middle of the edge like this:
+            // a ray r from the middle of the edge like this:
             //     v1
             //  +<----+          +---->+
             //        |  v       ^
-            //      v2|----->----|--- g
+            //      v2|----->----|--- r
             //        v          |w2
-            //  +<----+          +<----+
+            //  +<----+          +---->+
             //     v3
-            // If g cuts another possible door frame side nearly
+            // If r cuts another possible door frame side nearly
             // perpendicularly and that intersection point is not too far
             // and not too close from v2, we found a door.
             const point_t& v21 = (*it1)->start->point;
             const point_t& v22 = (*it1)->target->point;
+            // r = middle + t * v
             point_t middle = (v21 + v22) * .5;
             point_t v2 = v22 - v21;
             point_t v = {-v2.y(), v2.x()}; // 90 deg turn
@@ -479,7 +495,7 @@ std::vector<std::vector<point_t>> RtreeVectormapConversion::find_rooms(const std
                     continue;
                 // check distance to second side
                 double d = cross(w21 - middle, w2) * v_length / det;
-                if (d < params.door_width_min || d > params.door_width_max)
+                if (d < door_width_min || d > door_width_max)
                     continue;
                 // check that sides are approximately parallel
                 if (!check_angle(v, w2))
@@ -502,8 +518,8 @@ next_door_side_candidate:
         for (std::size_t side = 0; side < 2; side++)  {
             corner_t* c1 = door[side].start;
             corner_t* c2 = door[(side + 1) % 2].target;
-            edge_t e1 = {c1, c2, true, false};
-            edge_t e2 = {c2, c1, true, false};
+            edge_t e1 = {c2, c1, true, false};
+            edge_t e2 = {c1, c2, true, false};
             c1->node->edges.push_back(e2);
             c2->node->edges.push_back(e1);
         }
