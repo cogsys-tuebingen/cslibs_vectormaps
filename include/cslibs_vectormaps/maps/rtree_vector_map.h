@@ -4,7 +4,6 @@
 #include "vector_map.h"
 
 #include <string>
-struct asdffsdafsdafsfsddfsadfdsdfs{int x;};
 
 namespace cslibs_vectormaps {
 
@@ -12,6 +11,7 @@ struct RtreeVectormapConversionParameter {
     std::string path;
     double map_precision = .001;
     double merge_max_proximity = .005;
+    enum {ROWS, COLUMNS} find_door_mode = ROWS;
     double door_depth_min = .05;
     double door_depth_max = .5;
     double door_width_min = .5;
