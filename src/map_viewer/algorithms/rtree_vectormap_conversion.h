@@ -3,8 +3,6 @@
 
 #include "../map.h"
 
-#include <QLineF>
-
 #include <boost/geometry/geometries/point_xy.hpp>
 #include <boost/geometry/geometries/segment.hpp>
 
@@ -26,21 +24,20 @@ struct RtreeVectormapConversionParameter {
 };
 
 class RtreeVectormapConversion {
+    using point_t = boost::geometry::model::d2::point_xy<double>;
+    using segment_t = boost::geometry::model::segment<point_t>;
 public:
     using progress_t = std::function<void(int)>;
 
     RtreeVectormapConversion(const RtreeVectormapConversionParameter& parameters);
 
-    bool operator()(const std::vector<QLineF>& vectors,
-                    const QPointF& min,
-                    const QPointF& max,
+    bool operator()(const std::vector<segment_t>& vectors,
+                    const point_t& min,
+                    const point_t& max,
                     progress_t progress,
                     Map& mapviewer_map);
 private:
     RtreeVectormapConversionParameter parameters_;
-
-    using point_t = boost::geometry::model::d2::point_xy<double>;
-    using segment_t = boost::geometry::model::segment<point_t>;
 
     // expresses segments in exact multiples of the map precision (e.g. converts
     // decimal meters to integer millimeters: 2.030001 -> 2030.0)

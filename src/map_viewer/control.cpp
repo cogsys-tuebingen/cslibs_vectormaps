@@ -187,7 +187,8 @@ void Control::executeGridmapExport(const RasterizationParameter &params)
     progress(-1);
 
     Rasterization raster(params);
-    if(!raster(vectors, map_->getMin(), map_->getMax(), [this](const int p){progress(p);}))
+    dxf::DXFMap::Point min = map_->getMin(), max = map_->getMax();
+    if(!raster(vectors, QPointF(min.x(), min.y()), QPointF(max.x(), max.y()), [this](const int p){progress(p);}))
         notification("Rasterization Failed!");
 
     closeProgressDialog();
@@ -199,12 +200,12 @@ void Control::executeVectormapExport(const VectormapConversionParameter &params)
     map_->getLayers(layers);
 
     // get all line segments from visible layers
-    VectorLayerModel::QLineFList vectors;
+    dxf::DXFMap::Vectors vectors;
     for(LayerModel::Ptr &l : layers) {
         if(l->getVisibility()) {
             VectorLayerModel::Ptr lv = LayerModel::as<VectorLayerModel>(l);
             if(lv) {
-                VectorLayerModel::QLineFList v;
+                dxf::DXFMap::Vectors v;
                 lv->getVectors(v);
                 vectors.insert(vectors.end(), v.begin(), v.end());
             }
@@ -227,12 +228,12 @@ void Control::executeRtreeVectormapExport(const RtreeVectormapConversionParamete
     map_->getLayers(layers);
 
     // get all line segments from visible layers
-    VectorLayerModel::QLineFList vectors;
+    dxf::DXFMap::Vectors vectors;
     for(LayerModel::Ptr &l : layers) {
         if(l->getVisibility()) {
             VectorLayerModel::Ptr lv = LayerModel::as<VectorLayerModel>(l);
             if(lv) {
-                VectorLayerModel::QLineFList v;
+                dxf::DXFMap::Vectors v;
                 lv->getVectors(v);
                 vectors.insert(vectors.end(), v.begin(), v.end());
             }

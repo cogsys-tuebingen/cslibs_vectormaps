@@ -1,24 +1,20 @@
 #ifndef MODEL_H
 #define MODEL_H
 
-#include <cslibs_vectormaps/dxf/dxf_map.h>
-
 #include "models/layer_model.h"
 
-#include <QPoint>
-#include <QLine>
+#include <cslibs_vectormaps/dxf/dxf_map.h>
+
 #include <QString>
 #include <QObject>
 
-#include <thread>
+#include <string>
 #include <mutex>
 
 namespace cslibs_vectormaps {
-class View;
 
 class Map : public QObject
 {
-
     Q_OBJECT
 
 public:
@@ -35,9 +31,9 @@ public:
 
     void setLayers(const std::vector<LayerModel::Ptr> &layers);
 
-    QPointF getMin() const;
+    dxf::DXFMap::Point getMin() const;
 
-    QPointF getMax() const;
+    dxf::DXFMap::Point getMax() const;
 
     void load(const dxf::DXFMap::Ptr &map);
 
@@ -49,8 +45,8 @@ private:
     mutable std::mutex                     layers_mutex_;
     std::map<std::string, LayerModel::Ptr> layers_;
 
-    QPointF min_;
-    QPointF max_;
+    dxf::DXFMap::Point min_;
+    dxf::DXFMap::Point max_;
 };
 }
 

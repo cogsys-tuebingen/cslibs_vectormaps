@@ -10,15 +10,13 @@ VectormapConversion::VectormapConversion(const VectormapConversionParameter &par
 {
 }
 
-bool VectormapConversion::operator () (const QLineFList &vectors,
-                                       const QPointF    &min,
-                                       const QPointF    &max,
-                                       progress_t progress)
+bool VectormapConversion::operator()(const dxf::DXFMap::Vectors &vectors,
+                                     const dxf::DXFMap::Point &min,
+                                     const dxf::DXFMap::Point &max,
+                                     progress_t progress)
 {
-    auto convertPoint = [](const QPointF &p) {return VectorMap::Point(p.x(), p.y());};
-
     VectorMap::Ptr map;
-    VectorMap::BoundingBox bounding(convertPoint(min), convertPoint(max));
+    VectorMap::BoundingBox bounding(min, max);
 
     if(parameters_.type == "Grid") {
         map.reset(new SimpleGridVectorMap(bounding,
@@ -36,14 +34,8 @@ bool VectormapConversion::operator () (const QLineFList &vectors,
         return false;
     }
 
-    VectorMap::Vectors converted_vectors;
-    for(std::size_t i = 0, s = vectors.size(); i < s; ++i) {
-        progress(static_cast<int>(i / s));
-        const QLineF &v = vectors[i];
-        converted_vectors.emplace_back(convertPoint(v.p1()), convertPoint(v.p2()));
-    }
     progress(-1);
-    map->insert(converted_vectors); /// todo : valid area
+    map->insert(vectors); /// todo : valid area
     const bool compress = parameters_.path.endsWith(QString(".gzip"));
     return map->save(parameters_.path.toStdString(), compress);
 }

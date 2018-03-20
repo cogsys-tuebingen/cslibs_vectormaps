@@ -35,32 +35,22 @@ RtreeVectormapConversion::RtreeVectormapConversion(const RtreeVectormapConversio
 {
 }
 
-bool RtreeVectormapConversion::operator()(const std::vector<QLineF>& vectors,
-                                          const QPointF& min,
-                                          const QPointF& max,
+bool RtreeVectormapConversion::operator()(const std::vector<segment_t>& segments,
+                                          const point_t& min,
+                                          const point_t& max,
                                           progress_t progress,
                                           Map& mapviewer_map)
 {
-    auto convertPoint = [](const QPointF &p) {
-        return VectorMap::Point(p.x(), p.y());
-    };
     auto ends_with = [](const std::string& value, const std::string& ending) {
         return ending.size() <= value.size()
             && std::equal(ending.rbegin(), ending.rend(), value.rbegin());
     };
 
-    VectorMap::BoundingBox bounding(convertPoint(min), convertPoint(max));
+    VectorMap::BoundingBox bounding(min, max);
     VectorMap::Ptr map(new RtreeVectorMap(bounding, true));
 
-    VectorMap::Vectors converted_segments;
-    for(std::size_t i = 0, s = vectors.size(); i < s; ++i) {
-        progress(static_cast<int>(i / s));
-        const QLineF& v = vectors[i];
-        converted_segments.emplace_back(convertPoint(v.p1()), convertPoint(v.p2()));
-    }
-
     progress(-1);
-    std::vector<segment_t> rounded_segments = round_segments(converted_segments, parameters_);
+    std::vector<segment_t> rounded_segments = round_segments(segments, parameters_);
     std::vector<std::vector<point_t>> rooms = find_rooms(rounded_segments, parameters_);
 
     std::vector<LayerModel::Ptr> oldlayers;

@@ -1,8 +1,12 @@
 #include "rasterization.h"
 
-#include <QPainter>
-
 #include "../util/map_meta_exporter.hpp"
+
+#include <QPainter>
+#include <QImage>
+#include <QPixmap>
+#include <QPen>
+#include <QLine>
 
 using namespace cslibs_vectormaps;
 
@@ -11,10 +15,10 @@ Rasterization::Rasterization(const RasterizationParameter &parameters) :
 {
 }
 
-bool Rasterization::operator ()(const QLineFList &vectors,
-                                const QPointF &min,
-                                const QPointF &max,
-                                progress_t progress)
+bool Rasterization::operator()(const QLineFList &vectors,
+                               const QPointF &min,
+                               const QPointF &max,
+                               progress_t progress)
 {
     QPointF span = max - min;
     QPixmap canvas = QPixmap(span.x() / parameters_.resolution, span.y() / parameters_.resolution);
@@ -28,11 +32,11 @@ bool Rasterization::operator ()(const QLineFList &vectors,
     vangogh.setRenderHint(QPainter::SmoothPixmapTransform, false);
     vangogh.setPen(pen);
 
-    for(std::size_t i = 0 ; i < vectors.size() ; ++i) {
-        const QLineF &v = vectors.at(i);
+    for(std::size_t i = 0, s = vectors.size(); i < s; ++i) {
+        progress(static_cast<int>(i / s));
+        const QLineF &v = vectors[i];
         QLine line(((v.p1() - min) / parameters_.resolution).toPoint(), ((v.p2() - min) / parameters_.resolution).toPoint());
         vangogh.drawLine(line);
-        progress(static_cast<int>(std::floor((i + 1ul) / static_cast<double>(vectors.size()))));
     }
 
     progress(-1);

@@ -1,12 +1,10 @@
 #include "map.h"
-#include "view.h"
-
-#include <thread>
-#include <functional>
-#include <set>
 
 #include "models/vector_layer_model.h"
 #include "models/point_layer_model.h"
+
+#include <set>
+#include <vector>
 
 using namespace cslibs_vectormaps;
 
@@ -51,13 +49,13 @@ void Map::setLayers(const std::vector<LayerModel::Ptr> &layers)
         setLayer(layer);
 }
 
-QPointF Map::getMin() const
+dxf::DXFMap::Point Map::getMin() const
 {
     std::unique_lock<std::mutex> l(layers_mutex_);
     return min_;
 }
 
-QPointF Map::getMax() const
+dxf::DXFMap::Point Map::getMax() const
 {
     std::unique_lock<std::mutex> l(layers_mutex_);
     return max_;
@@ -68,17 +66,14 @@ void Map::load(const dxf::DXFMap::Ptr &map)
     std::unique_lock<std::mutex> l(layers_mutex_);
     layers_.clear();
 
-    dxf::DXFMap::Point min, max;
-    map->getBounding(min, max);
-    min_ = QPointF(min.x(), min.y());
-    max_ = QPointF(max.x(), max.y());
+    map->getBounding(min_, max_);
 
     std::vector<std::string> names;
     map->getLayerNames(names);
 
-    auto less = [] (const dxf::DXFMap::Point &p1,
-                    const dxf::DXFMap::Point &p2) {
-        return p1.x() < p2.x() || p1.y() < p2.y();
+    auto less = [](const dxf::DXFMap::Point &p1,
+                   const dxf::DXFMap::Point &p2) {
+        return p1.x() < p2.x() && p1.y() < p2.y();
     };
 
     std::set<dxf::DXFMap::Point, decltype(less)> corner_set(less);
