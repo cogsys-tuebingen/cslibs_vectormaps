@@ -1,17 +1,11 @@
 #include "renderer.h"
 
+#include "map.h"
+#include "models/layer_model.h"
+
 #include <QGraphicsView>
 #include <QGraphicsScene>
-#include <QPainterPath>
-#include <QGraphicsPathItem>
-
-#include "view.h"
-#include "map.h"
-#include "models/vector_layer_model.h"
-#include "models/point_layer_model.h"
-#include "models/corner_layer_model.h"
-#include "util/bezier_color.hpp"
-#include "util/hsv.hpp"
+#include <QGraphicsItemGroup>
 
 using namespace cslibs_vectormaps;
 
@@ -23,21 +17,20 @@ Renderer::Renderer() :
 
 Renderer::~Renderer()
 {
-    stop_ = true;
-    render_condition_.notify_one();
-    try{
-        worker_thread_.join();
-    } catch(const std::exception &e) {
-        std::cerr << e.what() << "\n";
+    {
+        std::lock_guard<std::mutex> l(render_queue_mutex_);
+        stop_ = true;
     }
+    render_condition_.notify_one();
+    worker_thread_.join();
 
     delete scene_;
 }
 
-void Renderer::setup(Map *map, QGraphicsView *grahpics_view)
+void Renderer::setup(Map *map, QGraphicsView *graphics_view)
 {
     map_ = map;
-    view_ = grahpics_view;
+    view_ = graphics_view;
     scene_ = new QGraphicsScene();
     view_->setOptimizationFlags(QGraphicsView::DontSavePainterState);
 
@@ -47,7 +40,7 @@ void Renderer::setup(Map *map, QGraphicsView *grahpics_view)
     connect(this, SIGNAL(clear()), this, SLOT(clearScene()), Qt::QueuedConnection);
     connect(this, SIGNAL(add(QGraphicsItemGroup*)), this, SLOT(addGroup(QGraphicsItemGroup*)), Qt::QueuedConnection);
 
-    worker_thread_ = std::thread([this](){run();});
+    worker_thread_ = std::thread(&Renderer::run, this);
 }
 
 void Renderer::setDefaultPen(const QPen &pen)
@@ -57,18 +50,14 @@ void Renderer::setDefaultPen(const QPen &pen)
 
 void Renderer::run()
 {
+    std::unique_lock<std::mutex> l(render_queue_mutex_);
     while(!stop_) {
-        std::unique_lock<std::mutex> l(render_queue_mutex_);
         while(render_queue_.empty() && !stop_)
             render_condition_.wait(l);
 
         if(!render_queue_.empty()) {
             render_queue_.front()();
             render_queue_.pop();
-        }
-
-        if(stop_) {
-            return;
         }
     }
 }
@@ -145,5 +134,3 @@ void Renderer::doUpdate(const QString &layer_name)
     l->update(*g, default_pen_, default_point_alpha_);
     g->setVisible(l->getVisibility());
 }
-
-

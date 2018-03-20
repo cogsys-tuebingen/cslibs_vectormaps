@@ -6,7 +6,6 @@
 #include <QLine>
 #include <QString>
 #include <QColor>
-#include <QObject>
 #include <QGraphicsItemGroup>
 #include <QPen>
 

@@ -2,29 +2,22 @@
 #define RENDERER_H
 
 #include <QObject>
+#include <QString>
 #include <QRectF>
 #include <QPen>
+
 #include <mutex>
 #include <thread>
 #include <queue>
 #include <condition_variable>
-#include <atomic>
 #include <functional>
 
 class QGraphicsView;
 class QGraphicsScene;
-class QGraphicsPathItem;
 class QGraphicsItemGroup;
 
 namespace cslibs_vectormaps {
 class Map;
-class View;
-
-/// forward declarations for rendering
-class VectorLayerModel;
-class CornerLayerModel;
-class PointLayerModel;
-
 
 class Renderer : QObject
 {
@@ -34,8 +27,7 @@ public:
     Renderer();
     ~Renderer();
 
-    void setup(Map *map,
-               QGraphicsView *grahpics_view);
+    void setup(Map *map, QGraphicsView *graphics_view);
 
     void setDefaultPen(const QPen &pen);
 
