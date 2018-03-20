@@ -3,6 +3,10 @@
 
 #include "layer_model.h"
 
+#include <cslibs_vectormaps/dxf/dxf_map.h>
+
+#include <QPointF>
+
 namespace cslibs_vectormaps {
 class PointLayerModel : public LayerModel
 {

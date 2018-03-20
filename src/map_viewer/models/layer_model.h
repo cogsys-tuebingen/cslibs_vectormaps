@@ -1,15 +1,12 @@
 #ifndef LAYERMODEL_H
 #define LAYERMODEL_H
 
-#include <cslibs_vectormaps/dxf/dxf_map.h>
-
-#include <QLine>
 #include <QString>
 #include <QColor>
 #include <QGraphicsItemGroup>
 #include <QPen>
 
-#include <array>
+#include <string>
 #include <memory>
 
 namespace cslibs_vectormaps {
@@ -18,8 +15,6 @@ class LayerModel
 public:
     typedef std::shared_ptr<LayerModel> Ptr;
     typedef std::shared_ptr<LayerModel const> ConstPtr;
-    typedef std::vector<QLineF>         QLineFList;
-    typedef std::vector<QPointF>        QPointFList;
 
     LayerModel();
     virtual ~LayerModel();

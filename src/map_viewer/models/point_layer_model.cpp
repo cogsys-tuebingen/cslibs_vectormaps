@@ -1,5 +1,7 @@
 #include "point_layer_model.h"
 
+#include <QBrush>
+
 using namespace cslibs_vectormaps;
 
 PointLayerModel::PointLayerModel()

@@ -1,5 +1,10 @@
 #include "corner_layer_model.h"
 
+#include <QGraphicsEllipseItem>
+#include <QBrush>
+
+#include <cassert>
+
 using namespace cslibs_vectormaps;
 
 CornerLayerModel::CornerLayerModel()

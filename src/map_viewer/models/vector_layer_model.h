@@ -3,13 +3,19 @@
 
 #include "layer_model.h"
 
+#include <cslibs_vectormaps/dxf/dxf_map.h>
+
+#include <QLineF>
+
+#include <vector>
+
 namespace cslibs_vectormaps {
 class VectorLayerModel : public LayerModel
 {
 public:
     typedef std::shared_ptr<VectorLayerModel>        Ptr;
     typedef std::shared_ptr<VectorLayerModel const>  ConstPtr;
-    typedef std::vector<QPointF>                     QPointFList;
+    typedef std::vector<QLineF>                      QLineFList;
 
     VectorLayerModel();
     virtual ~VectorLayerModel();
@@ -27,7 +33,6 @@ public:
 
 private:
     dxf::DXFMap::Vectors vectors_;
-
 };
 }
 
