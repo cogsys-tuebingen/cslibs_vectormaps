@@ -43,10 +43,14 @@ void Map::setLayer(const LayerModel::Ptr &layer)
     updated();
 }
 
-void Map::setLayers(const std::vector<LayerModel::Ptr> &layers)
+void Map::replaceLayers(const std::vector<LayerModel::Ptr> &layers)
 {
-    for (const LayerModel::Ptr& layer : layers)
-        setLayer(layer);
+    std::unique_lock<std::mutex> l(layers_mutex_);
+    layers_.clear();
+    for (const LayerModel::Ptr& layer : layers) {
+        layers_[layer->getName<std::string>()] = layer;
+    }
+    updated();
 }
 
 dxf::DXFMap::Point Map::getMin() const

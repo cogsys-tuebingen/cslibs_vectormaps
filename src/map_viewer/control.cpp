@@ -6,6 +6,7 @@
 #include "models/vector_layer_model.h"
 #include "models/point_layer_model.h"
 #include "models/corner_layer_model.h"
+#include "models/polygon_layer_model.h"
 
 #include "algorithms/corner_detection.h"
 #include "algorithms/rasterization.h"
@@ -228,14 +229,14 @@ void Control::executeRtreeVectormapExport(const RtreeVectormapConversionParamete
     map_->getLayers(layers);
 
     // get all line segments from visible layers
-    dxf::DXFMap::Vectors vectors;
+    dxf::DXFMap::Vectors segments;
     for(LayerModel::Ptr &l : layers) {
         if(l->getVisibility()) {
             VectorLayerModel::Ptr lv = LayerModel::as<VectorLayerModel>(l);
             if(lv) {
-                dxf::DXFMap::Vectors v;
-                lv->getVectors(v);
-                vectors.insert(vectors.end(), v.begin(), v.end());
+                dxf::DXFMap::Vectors s;
+                lv->getVectors(s);
+                segments.insert(segments.end(), s.begin(), s.end());
             }
         }
     }
@@ -243,8 +244,23 @@ void Control::executeRtreeVectormapExport(const RtreeVectormapConversionParamete
     openProgressDialog("R-tree vectormap export");
     progress(-1);
 
-    RtreeVectormapConversion rtree_vector_conversion(params);
-    if(!rtree_vector_conversion(vectors, map_->getMin(), map_->getMax(), [this](const int p){progress(p);}, *map_))
+    RtreeVectormapConversion converter(params);
+    dxf::DXFMap::Vectors rounded_segments = converter.round_segments(segments);
+    std::vector<std::array<dxf::DXFMap::Vector, 2>> doors = converter.find_doors(rounded_segments);
+    std::vector<dxf::DXFMap::Points> rooms = converter.find_rooms(doors);
+
+    std::vector<LayerModel::Ptr> roomlayers;
+    std::size_t i = 0;
+    for (std::vector<dxf::DXFMap::Point>& room : rooms) {
+        PolygonLayerModel::Ptr layer(new PolygonLayerModel);
+        std::string layername = "Room #" + std::to_string(++i);
+        layer->setName(layername);
+        layer->setPolygon(room);
+        roomlayers.push_back(layer);
+    }
+    map_->replaceLayers(roomlayers);std::cout << "lulo\n";
+
+    if(!converter(segments, map_->getMin(), map_->getMax(), [this](const int p){progress(p);}))
         notification("Conversion failed!");
 
     closeProgressDialog();

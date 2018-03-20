@@ -29,7 +29,7 @@ public:
 
     void setLayer(const LayerModel::Ptr &layer);
 
-    void setLayers(const std::vector<LayerModel::Ptr> &layers);
+    void replaceLayers(const std::vector<LayerModel::Ptr> &layers);
 
     dxf::DXFMap::Point getMin() const;
 

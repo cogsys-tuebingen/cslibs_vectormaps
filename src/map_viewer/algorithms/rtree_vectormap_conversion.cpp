@@ -3,7 +3,6 @@
 #include <cslibs_vectormaps/maps/rtree_vector_map.h>
 
 #include <boost/geometry/geometries/point_xy.hpp>
-#include <boost/geometry/arithmetic/arithmetic.hpp>
 #include <boost/geometry/algorithms/distance.hpp>
 #include <boost/math/constants/constants.hpp>
 
@@ -30,6 +29,42 @@
 
 using namespace cslibs_vectormaps;
 
+namespace {
+
+using point_t = boost::geometry::model::d2::point_xy<double>;
+using segment_t = boost::geometry::model::segment<point_t>;
+
+// some utility boost::geometry is lacking
+point_t add(const point_t& p1, const point_t& p2)
+{
+    point_t p = p1;
+    boost::geometry::add_point(p, p2);
+    return p;
+}
+
+point_t subtract(const point_t& p1, const point_t& p2)
+{
+    point_t p = p1;
+    boost::geometry::subtract_point(p, p2);
+    return p;
+}
+
+point_t multiply(const point_t& p, double v)
+{
+    point_t p2 = p;
+    boost::geometry::multiply_value(p2, v);
+    return p2;
+}
+
+point_t divide(const point_t& p, double v)
+{
+    point_t p2 = p;
+    boost::geometry::divide_value(p2, v);
+    return p2;
+}
+
+};
+
 RtreeVectormapConversion::RtreeVectormapConversion(const RtreeVectormapConversionParameter& parameters) :
     parameters_(parameters)
 {
@@ -38,8 +73,7 @@ RtreeVectormapConversion::RtreeVectormapConversion(const RtreeVectormapConversio
 bool RtreeVectormapConversion::operator()(const std::vector<segment_t>& segments,
                                           const point_t& min,
                                           const point_t& max,
-                                          progress_t progress,
-                                          Map& mapviewer_map)
+                                          progress_t progress)
 {
     auto ends_with = [](const std::string& value, const std::string& ending) {
         return ending.size() <= value.size()
@@ -50,80 +84,12 @@ bool RtreeVectormapConversion::operator()(const std::vector<segment_t>& segments
     VectorMap::Ptr map(new RtreeVectorMap(bounding, true));
 
     progress(-1);
-    std::vector<segment_t> rounded_segments = round_segments(segments, parameters_);
-    std::vector<std::vector<point_t>> rooms = find_rooms(rounded_segments, parameters_);
 
-    std::vector<LayerModel::Ptr> oldlayers;
-    mapviewer_map.getLayers(oldlayers);
-
-
-    //dynamic_cast<RtreeVectorMap&>(*map).create(converted_vectors, parameters_);
     const bool compress = ends_with(parameters_.path, std::string(".gzip"));
     return map->save(parameters_.path, compress);
 }
 
-namespace {
-
-struct node_t;
-
-using point_t = boost::geometry::model::d2::point_xy<double>;
-using segment_t = boost::geometry::model::segment<point_t>;
-
-struct corner_t {
-    point_t point;
-    node_t* node;
-};
-
-struct edge_t {
-    corner_t* start;
-    corner_t* target;
-    bool door, checked;
-};
-
-struct node_t {
-    std::vector<edge_t> edges;
-};
-
-// for sorting points
-struct point_compare {
-    bool operator()(const point_t& l, const point_t& r) const
-    {
-        return l.x() < r.x() || l.x() == r.x() && l.y() < r.y();
-    }
-};
-
-}
-
-// some other utility boost::geometry is lacking
-static inline point_t operator+(const point_t& p1, const point_t& p2)
-{
-    point_t p = p1;
-    boost::geometry::add_point(p, p2);
-    return p;
-}
-
-static inline point_t operator-(const point_t& p1, const point_t& p2)
-{
-    point_t p = p1;
-    boost::geometry::subtract_point(p, p2);
-    return p;
-}
-
-static inline point_t operator*(const point_t& p, double v)
-{
-    point_t p2 = p;
-    boost::geometry::multiply_value(p2, v);
-    return p2;
-}
-
-static inline point_t operator/(const point_t& p, double v)
-{
-    point_t p2 = p;
-    boost::geometry::divide_value(p2, v);
-    return p2;
-}
-
-static void get_corners(const std::vector<segment_t>& segments, const RtreeVectormapConversionParameter& params, std::vector<double>& positions, std::vector<std::vector<double>>& lines)
+void RtreeVectormapConversion::get_corners(const std::vector<segment_t>& segments, const RtreeVectormapConversionParameter& params, std::vector<double>& positions, std::vector<std::vector<double>>& lines)
 {
     std::map<double, std::set<double>> corner_map;
 
@@ -146,7 +112,7 @@ static void get_corners(const std::vector<segment_t>& segments, const RtreeVecto
     }
 }
 
-static std::size_t merge_nodes(const RtreeVectormapConversionParameter& params, const std::vector<double>& cpositions, const std::vector<std::vector<double>>& clines, std::map<point_t, corner_t*, point_compare>& corner_lookup)
+std::size_t RtreeVectormapConversion::merge_nodes(const RtreeVectormapConversionParameter& params, const std::vector<double>& cpositions, const std::vector<std::vector<double>>& clines, std::map<point_t, corner_t*, point_compare>& corner_lookup)
 {
     double maxdist = params.merge_max_proximity * params.map_precision;
     std::size_t merged = 0;
@@ -193,7 +159,7 @@ static std::size_t merge_nodes(const RtreeVectormapConversionParameter& params, 
     return merged;
 }
 
-static std::size_t sort_edges_delete_duplicates(std::vector<node_t>& nodes)
+std::size_t RtreeVectormapConversion::sort_edges_delete_duplicates(std::vector<node_t>& nodes)
 {
     std::size_t erased = 0;
     for (node_t& node : nodes) {
@@ -223,8 +189,9 @@ static std::size_t sort_edges_delete_duplicates(std::vector<node_t>& nodes)
     return erased;
 }
 
-std::vector<segment_t> RtreeVectormapConversion::round_segments(const std::vector<segment_t>& segments, const RtreeVectormapConversionParameter& params) const
+std::vector<segment_t> RtreeVectormapConversion::round_segments(const std::vector<segment_t>& segments) const
 {
+    const RtreeVectormapConversionParameter& params = parameters_;
     std::vector<segment_t> roundedsegments;
     for (const segment_t& segment : segments) {
         segment_t roundedsegment = segment;
@@ -240,108 +207,121 @@ std::vector<segment_t> RtreeVectormapConversion::round_segments(const std::vecto
     return roundedsegments;
 }
 
-std::vector<std::vector<point_t>> RtreeVectormapConversion::find_rooms(const std::vector<segment_t>& rounded_segments, const RtreeVectormapConversionParameter& params) const
+std::vector<segment_t> RtreeVectormapConversion::clean_segments(const std::vector<segment_t>& rounded_segments) const
 {
-    // first of all, make a new vector that only contains successive
-    // segments, no overlapping segments. we can only replace exact vertical
-    // or exact horizontal overlappings at the moment.
-    std::vector<segment_t> clean_segments;
-    {
-        // sort original segments into std::vectors (vertical, horizontal, other)
-        std::vector<segment_t> vertical, horizontal;
-        for (const segment_t& segment : rounded_segments) {
-            if (segment.first.x() == segment.second.x()) {
-                segment_t s = {
-                    {segment.first.x(), std::min(segment.first.y(), segment.second.y())},
-                    {segment.second.x(), std::max(segment.first.y(), segment.second.y())}
-                };
-                vertical.push_back(s);
-            } else if (segment.first.y() == segment.second.y()) {
-                segment_t s = {
-                    {std::min(segment.first.x(), segment.second.x()), segment.first.y()},
-                    {std::max(segment.first.x(), segment.second.x()), segment.second.y()}
-                };
-                horizontal.push_back(s);
-            } else {
-                clean_segments.push_back(segment);
-            }
+    // make a new vector that only contains successive segments, no overlapping
+    // segments. we can only replace exact vertical or exact horizontal
+    // overlappings at the moment.
+    std::vector<segment_t> cleaned_segments;
+
+    // sort original segments into std::vectors (vertical, horizontal, other)
+    std::vector<segment_t> vertical, horizontal;
+    for (const segment_t& segment : rounded_segments) {
+        if (segment.first.x() == segment.second.x()) {
+            segment_t s = {
+                {segment.first.x(), std::min(segment.first.y(), segment.second.y())},
+                {segment.second.x(), std::max(segment.first.y(), segment.second.y())}
+            };
+            vertical.push_back(s);
+        } else if (segment.first.y() == segment.second.y()) {
+            segment_t s = {
+                {std::min(segment.first.x(), segment.second.x()), segment.first.y()},
+                {std::max(segment.first.x(), segment.second.x()), segment.second.y()}
+            };
+            horizontal.push_back(s);
+        } else {
+            cleaned_segments.push_back(segment);
         }
-        // sort the std::vectors
-        std::sort(vertical.begin(), vertical.end(), [](const segment_t& s1, const segment_t& s2) {
-            return s1.first.x() < s2.first.x() || s1.first.x() == s2.first.x() && (s1.first.y() < s2.first.y()/* || s1.first.y() == s2.first.y() && s1.second.y() < s2.second.y()*/);
-        });
-        std::sort(horizontal.begin(), horizontal.end(), [](const segment_t& s1, const segment_t& s2) {
-            return s1.first.y() < s2.first.y() || s1.first.y() == s2.first.y() && (s1.first.x() < s2.first.x()/* || s1.first.x() == s2.first.x() && s1.second.x() < s2.second.x()*/);
-        });
-        // finally, detect overlapping segments and replace those
-        std::size_t overlaps = 0;
-        for (std::size_t i = 0, n = vertical.size(), j; i < n; i = j) {
-            double maxy = vertical[i].second.y();
-            std::set<double> ys = {vertical[i].first.y(), vertical[i].second.y()};
-            for (j = i + 1; j < n && vertical[i].first.x() == vertical[j].first.x(); j++) {
-                if (vertical[j].first.y() < maxy) {
-                    ys.insert(vertical[j].first.y());
-                    ys.insert(vertical[j].second.y());
-                    if (vertical[j].second.y() > maxy)
-                        maxy = vertical[j].second.y();
-                } else {
-                    break;
-                }
-            }
-            bool begin = true;
-            double y_last;
-            for (double y : ys) {
-                if (begin) {
-                    begin = false;
-                } else {
-                    segment_t s = {{vertical[i].first.x(), y_last}, {vertical[i].first.x(), y}};
-                    clean_segments.push_back(s);
-                }
-                y_last = y;
-            }
-            if (i + 1 < j) {
-                overlaps++;
-            }
-        }
-        for (std::size_t i = 0, n = horizontal.size(), j; i < n; i = j) {
-            double maxx = horizontal[i].second.x();
-            std::set<double> xs = {horizontal[i].first.x(), horizontal[i].second.x()};
-            for (j = i + 1; j < n && horizontal[i].first.y() == horizontal[j].first.y(); j++) {
-                if (horizontal[j].first.x() < maxx) {
-                    xs.insert(horizontal[j].first.x());
-                    xs.insert(horizontal[j].second.x());
-                    if (horizontal[j].second.x() > maxx)
-                        maxx = horizontal[j].second.x();
-                } else {
-                    break;
-                }
-            }
-            bool begin = true;
-            double x_last;
-            for (double x : xs) {
-                if (begin) {
-                    begin = false;
-                } else {
-                    segment_t s = {{x_last, horizontal[i].first.y()}, {x, horizontal[i].first.y()}};
-                    clean_segments.push_back(s);
-                }
-                x_last = x;
-            }
-            if (i + 1 < j) {
-                overlaps++;
-            }
-        }
-        std::cout << "Eliminated " << overlaps << " overlaps\n";
     }
+    // sort the std::vectors
+    std::sort(vertical.begin(), vertical.end(), [](const segment_t& s1, const segment_t& s2) {
+        return s1.first.x() < s2.first.x()
+            || s1.first.x() == s2.first.x()
+               && (s1.first.y() < s2.first.y()/*
+                   || s1.first.y() == s2.first.y()
+                      && s1.second.y() < s2.second.y()*/);
+    });
+    std::sort(horizontal.begin(), horizontal.end(), [](const segment_t& s1, const segment_t& s2) {
+        return s1.first.y() < s2.first.y()
+            || s1.first.y() == s2.first.y()
+               && (s1.first.x() < s2.first.x()/*
+                   || s1.first.x() == s2.first.x()
+                      && s1.second.x() < s2.second.x()*/);
+    });
+    // finally, detect overlapping segments and replace those
+    std::size_t overlaps = 0;
+    for (std::size_t i = 0, n = vertical.size(), j; i < n; i = j) {
+        double maxy = vertical[i].second.y();
+        std::set<double> ys = {vertical[i].first.y(), vertical[i].second.y()};
+        for (j = i + 1; j < n && vertical[i].first.x() == vertical[j].first.x(); j++) {
+            if (vertical[j].first.y() < maxy) {
+                ys.insert(vertical[j].first.y());
+                ys.insert(vertical[j].second.y());
+                if (vertical[j].second.y() > maxy)
+                    maxy = vertical[j].second.y();
+            } else {
+                break;
+            }
+        }
+        bool begin = true;
+        double y_last;
+        for (double y : ys) {
+            if (begin) {
+                begin = false;
+            } else {
+                segment_t s = {{vertical[i].first.x(), y_last}, {vertical[i].first.x(), y}};
+                cleaned_segments.push_back(s);
+            }
+            y_last = y;
+        }
+        if (i + 1 < j) {
+            overlaps++;
+        }
+    }
+    for (std::size_t i = 0, n = horizontal.size(), j; i < n; i = j) {
+        double maxx = horizontal[i].second.x();
+        std::set<double> xs = {horizontal[i].first.x(), horizontal[i].second.x()};
+        for (j = i + 1; j < n && horizontal[i].first.y() == horizontal[j].first.y(); j++) {
+            if (horizontal[j].first.x() < maxx) {
+                xs.insert(horizontal[j].first.x());
+                xs.insert(horizontal[j].second.x());
+                if (horizontal[j].second.x() > maxx)
+                    maxx = horizontal[j].second.x();
+            } else {
+                break;
+            }
+        }
+        bool begin = true;
+        double x_last;
+        for (double x : xs) {
+            if (begin) {
+                begin = false;
+            } else {
+                segment_t s = {{x_last, horizontal[i].first.y()}, {x, horizontal[i].first.y()}};
+                cleaned_segments.push_back(s);
+            }
+            x_last = x;
+        }
+        if (i + 1 < j) {
+            overlaps++;
+        }
+    }
+    std::cout << "Eliminated " << overlaps << " overlaps\n";
+    return cleaned_segments;
+}
+
+std::vector<std::array<segment_t, 2>> RtreeVectormapConversion::find_doors(const std::vector<segment_t>& cleaned_segments)
+{
+    const RtreeVectormapConversionParameter& params = parameters_;
 
     // get corners from line segments
     std::vector<double> cpositions;
     std::vector<std::vector<double>> clines;
-    get_corners(clean_segments, params, cpositions, clines);
+    get_corners(cleaned_segments, params, cpositions, clines);
 
     // make vector of all corners and vector of all nodes
-    std::vector<node_t> nodes;
-    std::vector<corner_t> corners;
+    nodes.clear();
+    corners.clear();
     for (std::size_t i = 0, n = cpositions.size(); i < n; i++) {
         for (double p2 : clines[i]) {
             nodes.push_back({});
@@ -357,14 +337,14 @@ std::vector<std::vector<point_t>> RtreeVectormapConversion::find_rooms(const std
     }
 
     // make map for efficiently looking up corners by specifying coordinates
-    std::map<point_t, corner_t*, point_compare> corner_lookup;
+    corner_lookup.clear();
     for (std::size_t i = 0, n = corners.size(); i < n; i++) {
         corners[i].node = &nodes[i];
         corner_lookup[corners[i].point] = &corners[i];
     }
 
     // then, connect those nodes. Each node's vector of connected nodes is populated.
-    for (const segment_t& segment : clean_segments) {
+    for (const segment_t& segment : cleaned_segments) {
         corner_t* c1 = corner_lookup[segment.first];
         corner_t* c2 = corner_lookup[segment.second];
         edge_t e1 = {c2, c1, false, false};
@@ -382,7 +362,7 @@ std::vector<std::vector<point_t>> RtreeVectormapConversion::find_rooms(const std
     std::cout << "Deleted " << erased1 << " duplicate edges\n";
 
     // find doors
-    std::vector<std::array<const edge_t, 2>> doors;
+    std::vector<std::array<segment_t, 2>> doors;
     {
         double door_depth_min = params.door_depth_min;
         double door_depth_max = params.door_depth_max;
@@ -433,7 +413,7 @@ std::vector<std::vector<point_t>> RtreeVectormapConversion::find_rooms(const std
                     secondnode->edges[0].target->node == &firstnode ? 1 : 0
                 ];
                 auto edge_to_vector = [](const edge_t& e) {
-                    return e.target->point - e.start->point;
+                    return subtract(e.target->point, e.start->point);
                 };
                 if (check_door_side(edge_to_vector(e1), edge_to_vector(e2), edge_to_vector(e3)))
                     return true;
@@ -471,8 +451,8 @@ std::vector<std::vector<point_t>> RtreeVectormapConversion::find_rooms(const std
             const point_t& v21 = (*it1)->start->point;
             const point_t& v22 = (*it1)->target->point;
             // r = middle + t * v
-            point_t middle = (v21 + v22) * .5;
-            point_t v2 = v22 - v21;
+            point_t middle = multiply(add(v21, v22), .5);
+            point_t v2 = subtract(v22, v21);
             point_t v = {-v2.y(), v2.x()}; // 90 deg turn
             double v_length = std::sqrt(v.x() * v.x() + v.y() * v.y());
 
@@ -486,24 +466,25 @@ std::vector<std::vector<point_t>> RtreeVectormapConversion::find_rooms(const std
                 };
                 const point_t& w21 = (*it2)->start->point;
                 const point_t& w22 = (*it2)->target->point;
-                point_t w2 = w22 - w21;
+                point_t w2 = subtract(w22, w21);
                 double det = cross(v, w2);
                 // check if vectors are neither parallel nor collinear
                 if (det == 0.)
                     continue;
                 // check that second side is cut by ray
-                double u = cross(w21 - middle, v) / det;
+                double u = cross(subtract(w21, middle), v) / det;
                 if (u < 0. || u > 1.)
                     continue;
                 // check distance to second side
-                double d = cross(w21 - middle, w2) * v_length / det;
+                double d = cross(subtract(w21, middle), w2) * v_length / det;
                 if (d < door_width_min || d > door_width_max)
                     continue;
                 // check that sides are approximately parallel
                 if (!check_angle(v, w2))
                     continue;
                 // we found a door! add it and remove candidates
-                doors.push_back({**it1, **it2});
+                std::array<segment_t, 2> s = {segment_t{v21, v22}, segment_t{w21, w22}};
+                doors.push_back(s);
                 door_side_candidates.erase(it2);
                 it1 = door_side_candidates.erase(it1);
                 goto next_door_side_candidate;
@@ -514,12 +495,16 @@ next_door_side_candidate:
         }
         std::cout << "Found " << doors.size() << " doors!\n";
     }
+    return doors;
+}
 
+std::vector<std::vector<point_t>> RtreeVectormapConversion::find_rooms(const std::vector<std::array<segment_t, 2>>& doors)
+{
     // add two additional connections per door that connect the door's sides
-    for (const std::array<const edge_t, 2>& door : doors) {
-        for (std::size_t side = 0; side < 2; side++)  {
-            corner_t* c1 = door[side].start;
-            corner_t* c2 = door[(side + 1) % 2].target;
+    for (const std::array<segment_t, 2>& door : doors) {
+        for (std::size_t side = 0; side < 2; side++) {
+            corner_t* c1 = corner_lookup[door[side].first];
+            corner_t* c2 = corner_lookup[door[(side + 1) % 2].second];
             edge_t e1 = {c2, c1, true, false};
             edge_t e2 = {c1, c2, true, false};
             c1->node->edges.push_back(e2);
@@ -533,9 +518,9 @@ next_door_side_candidate:
 
     // iterate through all the doors and try to find rooms!
     std::vector<std::vector<point_t>> rooms;
-    for (const std::array<const edge_t, 2>& door : doors) {
+    for (const std::array<segment_t, 2>& door : doors) {
         // first, find a face of the door that's not the door's right or left side
-        node_t* door_nodes[] = {door[0].target->node, door[1].target->node};
+        node_t* door_nodes[] = {corner_lookup[door[0].second]->node, corner_lookup[door[1].second]->node};
         for (node_t* door_node : door_nodes) {
             node_t* last_node = door_node;
             node_t* current_node = nullptr; // initialized to suppress warning
@@ -543,7 +528,11 @@ next_door_side_candidate:
             for (const edge_t& door_edge : door_node->edges) {
                 if (door_edge.door) {
                     current_node = door_edge.target->node;
-                    std::cout << "start traversing from door edge " << door_edge.start->point.x() << '|' << door_edge.start->point.y() << "->" << door_edge.target->point.x() << '|' << door_edge.target->point.y() << '\n';
+                    std::cout << "start traversing from door edge "
+                              << door_edge.start->point.x() << '|'
+                              << door_edge.start->point.y() << "->"
+                              << door_edge.target->point.x() << '|'
+                              << door_edge.target->point.y() << '\n';
                     break;
                 }
             }
@@ -572,7 +561,11 @@ next_door_side_candidate:
                         edge = newedge;
                         if (edge->door) {
                             if (edge->checked) {
-                                std::cout << "room might have already been found at door edge " << edge->start->point.x() << '|' << edge->start->point.y() << "->" << edge->target->point.x() << '|' << edge->target->point.y() << '\n';
+                                std::cout << "room might have already been found at door edge "
+                                          << edge->start->point.x() << '|'
+                                          << edge->start->point.y() << "->"
+                                          << edge->target->point.x() << '|'
+                                          << edge->target->point.y() << '\n';
                                 goto next_door_face;
                             }
                             edge->checked = true;
