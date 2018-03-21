@@ -43,13 +43,10 @@ void Map::setLayer(const LayerModel::Ptr &layer)
     updated();
 }
 
-void Map::replaceLayers(const std::vector<LayerModel::Ptr> &layers)
+void Map::removeLayer(const std::string &name)
 {
     std::unique_lock<std::mutex> l(layers_mutex_);
-    layers_.clear();
-    for (const LayerModel::Ptr& layer : layers) {
-        layers_[layer->getName<std::string>()] = layer;
-    }
+    layers_.erase(name);
     updated();
 }
 

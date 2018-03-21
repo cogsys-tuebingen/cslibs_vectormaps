@@ -17,6 +17,7 @@
 #include <cslibs_vectormaps/dxf/dxf_map.h>
 
 #include <iostream>
+#include <algorithm>
 
 using namespace cslibs_vectormaps;
 
@@ -233,11 +234,14 @@ void Control::executeRtreeVectormapExport(const RtreeVectormapConversionParamete
     for(LayerModel::Ptr &l : layers) {
         if(l->getVisibility()) {
             VectorLayerModel::Ptr lv = LayerModel::as<VectorLayerModel>(l);
-            if(lv) {
+            if (lv) {
                 dxf::DXFMap::Vectors s;
                 lv->getVectors(s);
                 segments.insert(segments.end(), s.begin(), s.end());
             }
+            PolygonLayerModel::Ptr pv = LayerModel::as<PolygonLayerModel>(l);
+            if (pv)
+                map_->removeLayer(l->getName<std::string>());
         }
     }
 
@@ -246,19 +250,22 @@ void Control::executeRtreeVectormapExport(const RtreeVectormapConversionParamete
 
     RtreeVectormapConversion converter(params);
     dxf::DXFMap::Vectors rounded_segments = converter.round_segments(segments);
-    std::vector<std::array<dxf::DXFMap::Vector, 2>> doors = converter.find_doors(rounded_segments);
+    dxf::DXFMap::Vectors cleaned_segments = converter.clean_segments(rounded_segments);
+    std::vector<std::array<dxf::DXFMap::Vector, 2>> doors = converter.find_doors(cleaned_segments);
     std::vector<dxf::DXFMap::Points> rooms = converter.find_rooms(doors);
 
-    std::vector<LayerModel::Ptr> roomlayers;
+    for (dxf::DXFMap::Points& room : rooms)
+        for (dxf::DXFMap::Point& point : room)
+            point = converter.from_integer_coords(point);
+
     std::size_t i = 0;
     for (std::vector<dxf::DXFMap::Point>& room : rooms) {
         PolygonLayerModel::Ptr layer(new PolygonLayerModel);
         std::string layername = "Room #" + std::to_string(++i);
         layer->setName(layername);
         layer->setPolygon(room);
-        roomlayers.push_back(layer);
+        map_->setLayer(layer);
     }
-    map_->replaceLayers(roomlayers);std::cout << "lulo\n";
 
     if(!converter(segments, map_->getMin(), map_->getMax(), [this](const int p){progress(p);}))
         notification("Conversion failed!");

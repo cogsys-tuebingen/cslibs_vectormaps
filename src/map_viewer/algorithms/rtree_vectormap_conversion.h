@@ -76,6 +76,8 @@ public:
     // modifies graph to add doors and to mark them
     std::vector<std::vector<point_t>> find_rooms(const std::vector<std::array<segment_t, 2>>& doors);
 
+    point_t from_integer_coords(point_t& p) const;
+
     bool operator()(const std::vector<segment_t>& vectors,
                     const point_t& min,
                     const point_t& max,

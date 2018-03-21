@@ -63,7 +63,7 @@ point_t divide(const point_t& p, double v)
     return p2;
 }
 
-};
+}
 
 RtreeVectormapConversion::RtreeVectormapConversion(const RtreeVectormapConversionParameter& parameters) :
     parameters_(parameters)
@@ -586,4 +586,12 @@ next_door_face:
     }
     std::cout << "Found " << rooms.size() << " rooms\n";
     return rooms;
+}
+
+point_t RtreeVectormapConversion::from_integer_coords(point_t& p) const
+{
+    double scale = parameters_.map_precision;
+    if (scale == 0.)
+        return p;
+    return divide(p, scale);
 }
