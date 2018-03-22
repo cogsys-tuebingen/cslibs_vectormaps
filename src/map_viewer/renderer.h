@@ -14,7 +14,7 @@
 
 class QGraphicsView;
 class QGraphicsScene;
-class QGraphicsItemGroup;
+class QGraphicsItem;
 
 namespace cslibs_vectormaps {
 class Map;
@@ -38,12 +38,12 @@ public:
 signals:
     void finished();
     void clear();
-    void add(QGraphicsItemGroup *g);
+    void add(QGraphicsItem *g);
 
 private slots:
     void postRendering();
     void clearScene();
-    void addGroup(QGraphicsItemGroup *g);
+    void addItem(QGraphicsItem *g);
 
 private:
     QGraphicsView  *view_;
@@ -51,9 +51,8 @@ private:
     std::mutex      scene_mutex_;
     QRectF          scene_rect_;
 
-    std::map<QString, QGraphicsItemGroup*>   groups_;
+    std::map<QString, QGraphicsItem*> items_;
     QPen                                     default_pen_;
-    double                                   default_point_alpha_;
 
     Map                                     *map_;
 

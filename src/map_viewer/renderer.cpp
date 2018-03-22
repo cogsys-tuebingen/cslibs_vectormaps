@@ -10,7 +10,6 @@
 using namespace cslibs_vectormaps;
 
 Renderer::Renderer() :
-    default_point_alpha_(0.6),
     stop_(false)
 {
 }
@@ -38,7 +37,7 @@ void Renderer::setup(Map *map, QGraphicsView *graphics_view)
 
     connect(this, SIGNAL(finished()), this, SLOT(postRendering()), Qt::QueuedConnection);
     connect(this, SIGNAL(clear()), this, SLOT(clearScene()), Qt::QueuedConnection);
-    connect(this, SIGNAL(add(QGraphicsItemGroup*)), this, SLOT(addGroup(QGraphicsItemGroup*)), Qt::QueuedConnection);
+    connect(this, SIGNAL(add(QGraphicsItem*)), this, SLOT(addItem(QGraphicsItem*)), Qt::QueuedConnection);
 
     worker_thread_ = std::thread(&Renderer::run, this);
 }
@@ -96,7 +95,7 @@ void Renderer::clearScene()
     scene_->clear();
 }
 
-void Renderer::addGroup(QGraphicsItemGroup *g)
+void Renderer::addItem(QGraphicsItem *g)
 {
     scene_->addItem(g);
 }
@@ -104,7 +103,7 @@ void Renderer::addGroup(QGraphicsItemGroup *g)
 void Renderer::doRepaint()
 {
     clear();
-    groups_.clear();
+    items_.clear();
 
     std::vector<LayerModel::Ptr> layers;
     map_->getLayers(layers);
@@ -116,21 +115,20 @@ void Renderer::doRepaint()
 
 void Renderer::doRepaint(const QString &layer_name)
 {
-    LayerModel::ConstPtr l = map_->getLayer(layer_name);
+    LayerModel::Ptr l = map_->getLayer(layer_name);
 
-    QGraphicsItemGroup *g = new QGraphicsItemGroup;
-    l->render(*g, default_pen_, default_point_alpha_);
-    groups_[layer_name] = g;
-    g->setVisible(l->getVisibility());
+    QGraphicsItem *i = l->render(default_pen_);
+    items_[layer_name] = i;
+    i->setVisible(l->getVisibility());
 
-    add(g);
+    add(i);
 }
 
 void Renderer::doUpdate(const QString &layer_name)
 {
-    LayerModel::ConstPtr l = map_->getLayer(layer_name);
-    QGraphicsItemGroup *g = groups_[layer_name];
+    LayerModel::Ptr l = map_->getLayer(layer_name);
+    QGraphicsItem *i = items_[layer_name];
 
-    l->update(*g, default_pen_, default_point_alpha_);
-    g->setVisible(l->getVisibility());
+    l->update(*i, default_pen_);
+    i->setVisible(l->getVisibility());
 }

@@ -40,14 +40,12 @@ void Map::setLayer(const LayerModel::Ptr &layer)
 {
     std::unique_lock<std::mutex> l(layers_mutex_);
     layers_[layer->getName<std::string>()] = layer;
-    updated();
 }
 
 void Map::removeLayer(const std::string &name)
 {
     std::unique_lock<std::mutex> l(layers_mutex_);
     layers_.erase(name);
-    updated();
 }
 
 dxf::DXFMap::Point Map::getMin() const

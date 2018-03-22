@@ -114,6 +114,7 @@ void View::update()
     ui_->actionExport_vectormap->setEnabled(true);
     ui_->actionExport_rtree_vectormap->setEnabled(true);
 
+    view_->setMap(map_);
     view_->show();
 }
 

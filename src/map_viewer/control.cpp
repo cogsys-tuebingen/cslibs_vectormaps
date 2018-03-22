@@ -162,6 +162,7 @@ void Control::executeCornerDetection(const CornerDetectionParameter &params)
 
     map_->setLayer(layer_corners);
     map_->setLayer(layer_end_points);
+    map_->updated();
 
     // and there goes the progress
     closeProgressDialog();
@@ -266,6 +267,7 @@ void Control::executeRtreeVectormapExport(const RtreeVectormapConversionParamete
         layer->setPolygon(room);
         map_->setLayer(layer);
     }
+    map_->updated();
 
     if(!converter(segments, map_->getMin(), map_->getMax(), [this](const int p){progress(p);}))
         notification("Conversion failed!");

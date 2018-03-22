@@ -1,10 +1,12 @@
 #include "point_layer_model.h"
 
 #include <QBrush>
+#include <QGraphicsEllipseItem>
+#include <QGraphicsItemGroup>
 
 using namespace cslibs_vectormaps;
 
-PointLayerModel::PointLayerModel()
+PointLayerModel::PointLayerModel(double alpha) : alpha_(alpha)
 {
 
 }
@@ -39,31 +41,38 @@ void PointLayerModel::getPoints(QPointFList &points) const
         points.emplace_back(QPointF(p.x(), p.y()));
 }
 
-void PointLayerModel::render(QGraphicsItemGroup &group, const QPen& pen, double point_alpha) const
+QGraphicsItem* PointLayerModel::render(const QPen& pen)
 {
     QPen p(pen);
     p.setColor(Qt::black);
     QColor c(getColor());
-    c.setAlphaF(point_alpha);
+    c.setAlphaF(alpha_);
     QBrush b(c);
 
     std::vector<QPointF> points;
     getPoints(points);
+    QGraphicsItemGroup *group = new QGraphicsItemGroup;
     for(const QPointF &point : points) {
         QGraphicsEllipseItem *i = new QGraphicsEllipseItem(point.x() - 0.1, point.y() - 0.1, 0.2, 0.2);
         i->setPen(p);
         i->setBrush(b);
-        group.addToGroup(i);
+        group->addToGroup(i);
     }
+    return group;
 }
 
-void PointLayerModel::update(QGraphicsItemGroup &group, const QPen& pen, double point_alpha) const
+void PointLayerModel::update(QGraphicsItem &item, const QPen& pen)
 {
+    QPen p(pen);
+    p.setColor(Qt::black);
     QColor c(getColor());
-    c.setAlphaF(point_alpha);
+    c.setAlphaF(alpha_);
     QBrush b(c);
+
+    QGraphicsItemGroup& group = static_cast<QGraphicsItemGroup&>(item);
     QList<QGraphicsItem*> children = group.childItems();
     for(auto *child : children) {
+        static_cast<QGraphicsEllipseItem*>(child)->setPen(p);
         static_cast<QGraphicsEllipseItem*>(child)->setBrush(b);
     }
 }

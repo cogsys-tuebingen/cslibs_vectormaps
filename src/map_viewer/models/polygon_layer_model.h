@@ -7,6 +7,8 @@
 
 #include <QVector>
 #include <QPointF>
+#include <QGraphicsPolygonItem>
+#include <QMouseEvent>
 
 namespace cslibs_vectormaps {
 
@@ -15,11 +17,11 @@ public:
     typedef std::shared_ptr<PolygonLayerModel>        Ptr;
     typedef std::shared_ptr<PolygonLayerModel const>  ConstPtr;
 
-    PolygonLayerModel();
+    PolygonLayerModel(double alpha = 1.0);
     virtual ~PolygonLayerModel();
 
-    void render(QGraphicsItemGroup &group, const QPen& pen, double point_alpha) const;
-    void update(QGraphicsItemGroup &group, const QPen& pen, double point_alpha) const;
+    QGraphicsItem* render(const QPen& pen);
+    void update(QGraphicsItem &group, const QPen& pen);
 
     void setPolygon(const dxf::DXFMap::Points& polygon);
     void getPolygon(dxf::DXFMap::Points& polygon) const;
@@ -27,8 +29,15 @@ public:
     void setPolygon(const QVector<QPointF>& polygon);
     void getPolygon(QVector<QPointF>& polygon) const;
 
-private:
+protected:
     dxf::DXFMap::Points polygon_;
+    double alpha_;
+};
+
+class ConsciousPolygonItem : public QGraphicsPolygonItem {
+public:
+    PolygonLayerModel& model_;
+    ConsciousPolygonItem(PolygonLayerModel& model);
 };
 
 }

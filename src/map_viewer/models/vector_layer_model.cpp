@@ -1,6 +1,7 @@
 #include "vector_layer_model.h"
 
 #include <QGraphicsLineItem>
+#include <QGraphicsItemGroup>
 
 using namespace cslibs_vectormaps;
 
@@ -43,24 +44,26 @@ void VectorLayerModel::getVectors(QLineFList &vectors) const
     }
 }
 
-void VectorLayerModel::render(QGraphicsItemGroup &group, const QPen& pen, double point_alpha) const
+QGraphicsItem* VectorLayerModel::render(const QPen& pen)
 {
     QPen p(pen);
     p.setColor(getColor());
     std::vector<QLineF> lines;
     getVectors(lines);
+    QGraphicsItemGroup *group = new QGraphicsItemGroup;
     for(const auto &l : lines) {
         QGraphicsLineItem *i = new QGraphicsLineItem(l);
         i->setPen(p);
-        group.addToGroup(i);
+        group->addToGroup(i);
     }
+    return group;
 }
 
-void VectorLayerModel::update(QGraphicsItemGroup &group, const QPen& pen, double point_alpha) const
+void VectorLayerModel::update(QGraphicsItem &item, const QPen& pen)
 {
-    QColor c(getColor());
     QPen p(pen);
-    p.setColor(c);
+    p.setColor(getColor());
+    QGraphicsItemGroup& group = static_cast<QGraphicsItemGroup&>(item);
     QList<QGraphicsItem*> children = group.childItems();
     for(auto *child : children) {
         static_cast<QGraphicsLineItem*>(child)->setPen(p);

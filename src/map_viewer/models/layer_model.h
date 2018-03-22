@@ -3,7 +3,7 @@
 
 #include <QString>
 #include <QColor>
-#include <QGraphicsItemGroup>
+#include <QGraphicsItem>
 #include <QPen>
 
 #include <string>
@@ -19,8 +19,8 @@ public:
     LayerModel();
     virtual ~LayerModel();
 
-    virtual void render(QGraphicsItemGroup &group, const QPen& pen, double point_alpha) const = 0;
-    virtual void update(QGraphicsItemGroup &group, const QPen& pen, double point_alpha) const = 0;
+    virtual QGraphicsItem* render(const QPen& pen) = 0;
+    virtual void update(QGraphicsItem &item, const QPen& pen) = 0;
 
     void setVisible(const bool visible);
     bool getVisibility() const;

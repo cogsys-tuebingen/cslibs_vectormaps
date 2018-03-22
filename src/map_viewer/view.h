@@ -7,7 +7,7 @@
 #include <memory>
 
 class QGraphicsScene;
-class QGraphicsView;
+class QInteractiveGraphicsView;
 class QGraphicsPathItem;
 class QLayerListItem;
 class QProgressDialog;
@@ -68,7 +68,7 @@ private slots:
 private:
     //// qt
     Ui::map_viewer                    *ui_;
-    QGraphicsView                     *view_;
+    QInteractiveGraphicsView          *view_;
     QProgressDialog                   *progress_;
 
     using QLayerListItemPtr = std::shared_ptr<QLayerListItem>;

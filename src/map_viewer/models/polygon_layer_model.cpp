@@ -2,11 +2,10 @@
 
 #include <QBrush>
 #include <QPolygonF>
-#include <QGraphicsPolygonItem>
 
 using namespace cslibs_vectormaps;
 
-PolygonLayerModel::PolygonLayerModel()
+PolygonLayerModel::PolygonLayerModel(double alpha) : alpha_(alpha)
 {
 }
 
@@ -37,28 +36,31 @@ void PolygonLayerModel::getPolygon(QVector<QPointF>& polygon) const
         polygon.push_back(QPointF(p.x(), p.y()));
 }
 
-void PolygonLayerModel::render(QGraphicsItemGroup& group, const QPen& pen, double point_alpha) const
+QGraphicsItem* PolygonLayerModel::render(const QPen& pen)
 {
-    QPen p(pen);
-    p.setColor(getColor());
+    ConsciousPolygonItem* i = new ConsciousPolygonItem(*this);
+
     QVector<QPointF> polygon_points;
     getPolygon(polygon_points);
     QPolygonF qpolygon(polygon_points);
-    QGraphicsPolygonItem* i = new QGraphicsPolygonItem(qpolygon);
-    i->setPen(p);
-    group.addToGroup(i);
+    i->setPolygon(qpolygon);
+
+    update(*i, pen);
+    return i;
 }
 
-void PolygonLayerModel::update(QGraphicsItemGroup& group, const QPen& pen, double point_alpha) const
+void PolygonLayerModel::update(QGraphicsItem& item, const QPen& pen)
 {
     QColor c(getColor());
     QPen p(pen);
     p.setColor(c);
-    c.setAlphaF(point_alpha);
+    c.setAlphaF(alpha_);
     QBrush b(c);
-    QList<QGraphicsItem*> children = group.childItems();
-    for(auto* child : children) {
-        static_cast<QGraphicsPolygonItem*>(child)->setPen(p);
-        static_cast<QGraphicsPolygonItem*>(child)->setBrush(b);
-    }
+    QGraphicsPolygonItem& polygon = static_cast<QGraphicsPolygonItem&>(item);
+    polygon.setPen(p);
+    polygon.setBrush(b);
+}
+
+ConsciousPolygonItem::ConsciousPolygonItem(PolygonLayerModel& model) : model_(model)
+{
 }
