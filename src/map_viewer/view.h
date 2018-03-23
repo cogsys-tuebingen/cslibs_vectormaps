@@ -23,6 +23,8 @@ class  Control;
 class  Renderer;
 class  Parameters;
 struct CornerDetectionParameter;
+struct FindDoorsParameter;
+struct FindRoomsParameter;
 struct RasterizationParameter;
 struct VectormapConversionParameter;
 struct RtreeVectormapConversionParameter;
@@ -42,6 +44,8 @@ public:
 signals:
     void openFile(const QString &path);
     void runCornerDetection(const CornerDetectionParameter &params);
+    void runFindDoors(const FindDoorsParameter &params);
+    void runFindRooms(const FindRoomsParameter &params);
     void runGridmapExport(const RasterizationParameter &params);
     void runVectormapExport(const VectormapConversionParameter &params);
     void runRtreeVectormapExport(const RtreeVectormapConversionParameter &params);
@@ -60,8 +64,8 @@ private slots:
     void actionExport_vectormap();
     void actionExport_rtree_vectormap();
     void actionRun_corner_detection();
-    void actionBuild_topology();
     void actionFind_doors();
+    void actionFind_rooms();
 
     void updateLayer(const QString &name);
 

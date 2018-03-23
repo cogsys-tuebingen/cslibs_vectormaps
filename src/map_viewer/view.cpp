@@ -17,6 +17,7 @@
 #include "qt/QInteractiveGraphicsView.hpp"
 #include "qt/QLayerListItem.hpp"
 #include "qt/QCornerParamDialog.hpp"
+#include "qt/QDoorParamDialog.hpp"
 #include "qt/QGridmapParamDialog.hpp"
 #include "qt/QVectormapParamDialog.hpp"
 #include "qt/QRtreeVectormapParamDialog.hpp"
@@ -61,6 +62,8 @@ View::View() :
     connect(ui_->actionExport_rtree_vectormap, SIGNAL(triggered()), this, SLOT(actionExport_rtree_vectormap()));
     connect(ui_->buttonHideLayerList, SIGNAL(clicked(bool)), this, SLOT(hideLayerList()));
     connect(ui_->actionRun_corner_detection, SIGNAL(triggered()), this, SLOT(actionRun_corner_detection()));
+    connect(ui_->actionFind_doors, SIGNAL(triggered()), this, SLOT(actionFind_doors()));
+    connect(ui_->actionFind_rooms, SIGNAL(triggered()), this, SLOT(actionFind_rooms()));
 }
 
 View::~View()
@@ -110,6 +113,8 @@ void View::update()
     renderer_->repaint();
 
     ui_->actionRun_corner_detection->setEnabled(true);
+    ui_->actionFind_doors->setEnabled(true);
+    ui_->actionFind_rooms->setEnabled(true);
     ui_->actionExport_gridmap->setEnabled(true);
     ui_->actionExport_vectormap->setEnabled(true);
     ui_->actionExport_rtree_vectormap->setEnabled(true);
@@ -212,6 +217,7 @@ void View::actionExport_rtree_vectormap()
     param_dialog.setup(params);
     if(param_dialog.exec() == QDialog::Accepted) {
         param_dialog.get(params);
+        params.find_doors_parameter = &parameters_->getFindDoorsParameters();
         parameters_->setRtreeVectormapConversionParameters(params);
         runRtreeVectormapExport(params);
     }
@@ -236,14 +242,24 @@ void View::actionRun_corner_detection()
     }
 }
 
-void View::actionBuild_topology()
-{
-
-}
-
 void View::actionFind_doors()
 {
+    QDoorParamDialog param_dialog;
+    FindDoorsParameter& params = parameters_->getFindDoorsParameters();
+    param_dialog.setup(params);
+    if(param_dialog.exec() == QDialog::Accepted) {
+        param_dialog.get(params);
+        parameters_->setFindDoorsParameters(params);
+        runFindDoors(params);
+    }
+}
 
+void View::actionFind_rooms()
+{
+    FindRoomsParameter& params = parameters_->getFindRoomsParameters();
+    params.find_doors_parameter = &parameters_->getFindDoorsParameters();
+    params.graph = &control_->doors_graph_;
+    runFindRooms(params);
 }
 
 void View::updateLayer(const QString &name)

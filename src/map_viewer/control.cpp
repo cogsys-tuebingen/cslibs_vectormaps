@@ -7,8 +7,12 @@
 #include "models/point_layer_model.h"
 #include "models/corner_layer_model.h"
 #include "models/polygon_layer_model.h"
+#include "models/door_layer_model.h"
+#include "models/room_layer_model.h"
 
 #include "algorithms/corner_detection.h"
+#include "algorithms/find_doors.h"
+#include "algorithms/find_rooms.h"
 #include "algorithms/rasterization.h"
 #include "algorithms/vectormap_conversion.h"
 #include "algorithms/rtree_vectormap_conversion.h"
@@ -17,7 +21,7 @@
 #include <cslibs_vectormaps/dxf/dxf_map.h>
 
 #include <iostream>
-#include <algorithm>
+#include <random>
 
 using namespace cslibs_vectormaps;
 
@@ -55,6 +59,10 @@ void Control::setup(Map *map,
     connect(view, SIGNAL(openFile(QString)), this, SLOT(openDXF(QString)));
     connect(view, SIGNAL(runCornerDetection(const CornerDetectionParameter&)),
             this, SLOT(runCornerDetection(const CornerDetectionParameter&)));
+    connect(view, SIGNAL(runFindDoors(const FindDoorsParameter&)),
+            this, SLOT(runFindDoors(const FindDoorsParameter&)));
+    connect(view, SIGNAL(runFindRooms(const FindRoomsParameter&)),
+            this, SLOT(runFindRooms(const FindRoomsParameter&)));
     connect(view, SIGNAL(runGridmapExport(const RasterizationParameter&)),
             this, SLOT(runGridmapExport(const RasterizationParameter&)));
     connect(view, SIGNAL(runVectormapExport(const VectormapConversionParameter&)),
@@ -79,6 +87,20 @@ void Control::runCornerDetection(const CornerDetectionParameter &params)
 {
     doWork([params, this]() {
         executeCornerDetection(params);
+    });
+}
+
+void Control::runFindDoors(const FindDoorsParameter &params)
+{
+    doWork([params, this]() {
+        executeFindDoors(params);
+    });
+}
+
+void Control::runFindRooms(const FindRoomsParameter &params)
+{
+    doWork([params, this]() {
+        executeFindRooms(params);
     });
 }
 
@@ -168,6 +190,103 @@ void Control::executeCornerDetection(const CornerDetectionParameter &params)
     closeProgressDialog();
 }
 
+void Control::executeFindDoors(const FindDoorsParameter &params)
+{
+    std::vector<LayerModel::Ptr> layers;
+    map_->getLayers(layers);
+
+    // get all line segments from visible layers
+    dxf::DXFMap::Vectors segments;
+    for(LayerModel::Ptr &l : layers) {
+        if(l->getVisibility()) {
+            VectorLayerModel::Ptr lv = LayerModel::as<VectorLayerModel>(l);
+            if (lv) {
+                dxf::DXFMap::Vectors s;
+                lv->getVectors(s);
+                segments.insert(segments.end(), s.begin(), s.end());
+            }
+            DoorLayerModel::Ptr ld = LayerModel::as<DoorLayerModel>(l);
+            if (ld)
+                map_->removeLayer(l->getName<std::string>());
+        }
+    }
+
+    openProgressDialog("Find doors");
+
+    FindDoors doorfinder(params);
+    std::vector<segment_t> rounded_segments = doorfinder.round_segments(segments);
+    std::vector<segment_t> cleaned_segments = doorfinder.clean_segments(rounded_segments);
+    // doors_graph_ is stored for finding rooms
+    std::vector<FindDoors::door_t> doors = doorfinder.find_doors(doors_graph_, cleaned_segments);
+
+    std::size_t i = 0;
+    for (const FindDoors::door_t& door : doors) {
+        std::vector<point_t> polygon;
+        for (const segment_t& side : door) {
+            polygon.push_back(doorfinder.to_map_coords(side.first));
+            polygon.push_back(doorfinder.to_map_coords(side.second));
+        }
+
+        DoorLayerModel::Ptr layer(new DoorLayerModel);
+        std::string layername = "Door #" + std::to_string(++i);
+        layer->setName(layername);
+        layer->setPolygon(polygon);
+        layer->setDoor(door);
+        map_->setLayer(layer);
+    }
+    map_->updated();
+
+    closeProgressDialog();
+}
+
+void Control::executeFindRooms(const FindRoomsParameter &params)
+{
+    std::vector<LayerModel::Ptr> layers;
+    map_->getLayers(layers);
+
+    // get all line segments from visible layers
+    std::vector<FindDoors::door_t> doors;
+    for (LayerModel::Ptr& l : layers) {
+        if (l->getVisibility()) {
+            RoomLayerModel::Ptr lr = LayerModel::as<RoomLayerModel>(l);
+            if (lr)
+                map_->removeLayer(l->getName<std::string>());
+
+            DoorLayerModel::Ptr ld = LayerModel::as<DoorLayerModel>(l);
+            if (ld) {
+                FindDoors::door_t door;
+                ld->getDoor(door);
+                doors.push_back(door);
+            }
+        }
+    }
+
+    openProgressDialog("Find doors");
+
+    FindRooms roomfinder(params);
+    FindDoors doorfinder(*params.find_doors_parameter);
+    std::vector<std::vector<point_t>> rooms = roomfinder.find_rooms(doors);
+
+    std::size_t i = 0;
+    std::mt19937_64 mt;
+    std::uniform_real_distribution<float> dist(0.f, 1.f);
+    for (std::vector<point_t>& room : rooms) {
+        std::vector<point_t> polygon = room;
+        for (point_t& point : polygon)
+            point = doorfinder.to_map_coords(point);
+
+        RoomLayerModel::Ptr layer(new RoomLayerModel);
+        std::string layername = "Room #" + std::to_string(++i);
+        layer->setName(layername);
+        layer->setPolygon(polygon);
+        layer->setColor(QColor::fromHsvF(dist(mt), 1.f, 0.5f));
+        map_->setLayer(layer);
+    }
+    map_->updated();
+
+    closeProgressDialog();
+}
+
 void Control::executeGridmapExport(const RasterizationParameter &params)
 {
     std::vector<LayerModel::Ptr> layers;
@@ -230,19 +349,25 @@ void Control::executeRtreeVectormapExport(const RtreeVectormapConversionParamete
     std::vector<LayerModel::Ptr> layers;
     map_->getLayers(layers);
 
+    FindDoors doorfinder(*params.find_doors_parameter);
+
     // get all line segments from visible layers
     dxf::DXFMap::Vectors segments;
-    for(LayerModel::Ptr &l : layers) {
-        if(l->getVisibility()) {
+    std::vector<std::vector<point_t>> rooms;
+    for (LayerModel::Ptr& l : layers) {
+        if (l->getVisibility()) {
             VectorLayerModel::Ptr lv = LayerModel::as<VectorLayerModel>(l);
             if (lv) {
-                dxf::DXFMap::Vectors s;
+                std::vector<segment_t> s;
                 lv->getVectors(s);
                 segments.insert(segments.end(), s.begin(), s.end());
             }
-            PolygonLayerModel::Ptr pv = LayerModel::as<PolygonLayerModel>(l);
-            if (pv)
-                map_->removeLayer(l->getName<std::string>());
+            RoomLayerModel::Ptr lr = LayerModel::as<RoomLayerModel>(l);
+            if (lr) {
+                std::vector<point_t> room;
+                lr->getPolygon(room);
+                rooms.push_back(room);
+            }
         }
     }
 
@@ -250,27 +375,12 @@ void Control::executeRtreeVectormapExport(const RtreeVectormapConversionParamete
     progress(-1);
 
     RtreeVectormapConversion converter(params);
-    dxf::DXFMap::Vectors rounded_segments = converter.round_segments(segments);
-    dxf::DXFMap::Vectors cleaned_segments = converter.clean_segments(rounded_segments);
-    std::vector<std::array<dxf::DXFMap::Vector, 2>> doors = converter.find_doors(cleaned_segments);
-    std::vector<dxf::DXFMap::Points> rooms = converter.find_rooms(doors);
 
-    for (dxf::DXFMap::Points& room : rooms)
-        for (dxf::DXFMap::Point& point : room)
-            point = converter.from_integer_coords(point);
-
-    std::size_t i = 0;
-    for (std::vector<dxf::DXFMap::Point>& room : rooms) {
-        PolygonLayerModel::Ptr layer(new PolygonLayerModel);
-        std::string layername = "Room #" + std::to_string(++i);
-        layer->setName(layername);
-        layer->setPolygon(room);
-        map_->setLayer(layer);
-    }
-    map_->updated();
-
-    if(!converter(segments, map_->getMin(), map_->getMax(), [this](const int p){progress(p);}))
-        notification("Conversion failed!");
+    converter.index_rooms(rooms);
+    converter.index_segments(segments);
+    converter.drop_outliers();
+    if (!converter.save(map_->getMin(), map_->getMax()))
+        notification("Writing map failed!");
 
     closeProgressDialog();
 }

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>404</width>
-    <height>278</height>
+    <height>47</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -22,44 +22,9 @@
     </widget>
    </item>
    <item row="1" column="3">
-    <widget class="QLabel" name="label_merge_max_proximity">
+    <widget class="QLabel" name="label_max_elements_per_node">
      <property name="text">
-      <string>Merge close points [m]:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="3">
-    <widget class="QLabel" name="label_door_depth_min">
-     <property name="text">
-      <string>Door depth min [m]:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="3">
-    <widget class="QLabel" name="label_door_depth_max">
-     <property name="text">
-      <string>Door depth max [m]:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="3">
-    <widget class="QLabel" name="label_door_width_min">
-     <property name="text">
-      <string>Door width min [m]:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="5" column="3">
-    <widget class="QLabel" name="label_door_width_max">
-     <property name="text">
-      <string>Door width max [m]:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="6" column="3">
-    <widget class="QLabel" name="label_door_angle_diff_max">
-     <property name="text">
-      <string>Door angle difference max [°]:</string>
+      <string>Maximum number of elements per node:</string>
      </property>
     </widget>
    </item>
@@ -94,30 +59,18 @@
     </layout>
    </item>
    <item row="1" column="7">
-    <widget class="QDoubleSpinBox" name="doubleSpinBox_merge_max_proximity">
-     <property name="minimumSize">
-      <size>
-       <width>50</width>
-       <height>0</height>
-      </size>
-     </property>
+    <widget class="QDoubleSpinBox" name="doubleSpinBox_max_elements_per_node">
      <property name="maximumSize">
       <size>
        <width>16777215</width>
        <height>16777215</height>
       </size>
      </property>
-     <property name="layoutDirection">
-      <enum>Qt::LeftToRight</enum>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-     </property>
      <property name="decimals">
-      <number>3</number>
+      <number>0</number>
      </property>
      <property name="minimum">
-      <double>0.000000000000000</double>
+      <double>2.000000000000000</double>
      </property>
      <property name="maximum">
       <double>1000.000000000000000</double>
@@ -125,95 +78,6 @@
     </widget>
    </item>
    <item row="2" column="7">
-    <widget class="QDoubleSpinBox" name="doubleSpinBox_door_depth_min">
-     <property name="maximumSize">
-      <size>
-       <width>16777215</width>
-       <height>16777215</height>
-      </size>
-     </property>
-     <property name="decimals">
-      <number>3</number>
-     </property>
-     <property name="minimum">
-      <double>0.000000000000000</double>
-     </property>
-     <property name="maximum">
-      <double>1000.000000000000000</double>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="7">
-    <widget class="QDoubleSpinBox" name="doubleSpinBox_door_depth_max">
-     <property name="maximumSize">
-      <size>
-       <width>16777215</width>
-       <height>16777215</height>
-      </size>
-     </property>
-     <property name="decimals">
-      <number>3</number>
-     </property>
-     <property name="minimum">
-      <double>0.000000000000000</double>
-     </property>
-     <property name="maximum">
-      <double>1000.000000000000000</double>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="7">
-    <widget class="QDoubleSpinBox" name="doubleSpinBox_door_width_min">
-     <property name="maximumSize">
-      <size>
-       <width>16777215</width>
-       <height>16777215</height>
-      </size>
-     </property>
-     <property name="decimals">
-      <number>3</number>
-     </property>
-     <property name="minimum">
-      <double>0.000000000000000</double>
-     </property>
-     <property name="maximum">
-      <double>1000.000000000000000</double>
-     </property>
-    </widget>
-   </item>
-   <item row="5" column="7">
-    <widget class="QDoubleSpinBox" name="doubleSpinBox_door_width_max">
-     <property name="maximumSize">
-      <size>
-       <width>16777215</width>
-       <height>16777215</height>
-      </size>
-     </property>
-     <property name="decimals">
-      <number>3</number>
-     </property>
-     <property name="minimum">
-      <double>0.000000000000000</double>
-     </property>
-     <property name="maximum">
-      <double>1000.000000000000000</double>
-     </property>
-    </widget>
-   </item>
-   <item row="6" column="7">
-    <widget class="QDoubleSpinBox" name="doubleSpinBox_door_angle_diff_max">
-     <property name="maximumSize">
-      <size>
-       <width>16777215</width>
-       <height>16777215</height>
-      </size>
-     </property>
-     <property name="maximum">
-      <double>90.000000000000000</double>
-     </property>
-    </widget>
-   </item>
-   <item row="7" column="7">
     <widget class="QDialogButtonBox" name="buttonBox">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -230,7 +94,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>RtreeVectormapParamDialog</receiver>
+   <receiver>DoorParamDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -246,7 +110,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>RtreeVectormapParamDialog</receiver>
+   <receiver>DoorParamDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

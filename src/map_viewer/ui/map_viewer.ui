@@ -226,7 +226,7 @@
     </property>
     <addaction name="actionRun_corner_detection"/>
     <addaction name="actionFind_doors"/>
-    <addaction name="actionBuild_topology"/>
+    <addaction name="actionFind_rooms"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuTools"/>
@@ -255,15 +255,15 @@
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>Find doors ...</string>
+    <string>Find doors...</string>
    </property>
   </action>
-  <action name="actionBuild_topology">
+  <action name="actionFind_rooms">
    <property name="enabled">
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>Build topology ...</string>
+    <string>Find rooms...</string>
    </property>
   </action>
   <action name="actionExport_gridmap">
