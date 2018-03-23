@@ -12,7 +12,7 @@
 #include <functional>
 #include <array>
 #include <map>
-#include <utility>
+#include <tuple>
 
 namespace cslibs_vectormaps {
 
@@ -34,9 +34,11 @@ public:
 private:
     using box_t = boost::geometry::model::box<point_t>;
     using ring_t = boost::geometry::model::ring<point_t>;
+
     const RtreeVectormapConversionParameter& parameters_;
+
     // the tree's parameters do not have any impact on bulk-insertion as
-    // suggested here: https://lists.boost.org/boost-users/2014/10/83212.php
+    // noted here: https://lists.boost.org/boost-users/2014/10/83212.php
     boost::geometry::index::rtree<std::tuple<box_t, box_t, std::size_t>, boost::geometry::index::rstar<16>> rtree_;
     std::vector<ring_t> rooms_;
     std::vector<segment_t> segments_;

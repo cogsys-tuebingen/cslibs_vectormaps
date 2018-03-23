@@ -3,12 +3,21 @@
 
 #include "vector_map.h"
 
+#include <boost/geometry/index/rtree.hpp>
+
 #include <string>
+#include <utility>
 
 namespace cslibs_vectormaps {
 
 class RtreeVectorMap : public VectorMap {
+protected:
+    using box_t = boost::geometry::model::box<VectorMap::Point>;
+    using ring_t = boost::geometry::model::ring<VectorMap::Point>;
+
 public:
+    typedef std::shared_ptr<RtreeVectorMap> Ptr;
+
     RtreeVectorMap(const BoundingBox& bounding, bool debug);
 
     virtual ~RtreeVectorMap();
@@ -35,9 +44,17 @@ public:
                                         std::vector<float> &ranges,
                                         const float default_mesaurement = 0.f) const final;
 
+    void insert(const Vectors& segments,
+                const std::vector<ring_t>& rooms,
+                const std::vector<std::vector<std::size_t>>& segment_indices);
+
     virtual unsigned int handleInsertion();
     virtual void doLoad(const YAML::Node& node);
     virtual void doSave(YAML::Node& node) const;
+
+protected:
+    boost::geometry::index::rtree<std::pair<box_t, std::vector<const Vector*>>, boost::geometry::index::rstar<16>> rtree_;
+    std::vector<ring_t> room_rings_;
 };
 
 }

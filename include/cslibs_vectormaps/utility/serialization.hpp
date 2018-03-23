@@ -1,8 +1,11 @@
 #ifndef SERIALIZATION_HPP
 #define SERIALIZATION_HPP
 
-#include <cslibs_boost_geometry/types.hpp>
 #include <yaml-cpp/yaml.h>
+
+#include <cstddef>
+#include <cstdint>
+#include <vector>
 
 namespace cslibs_vectormaps {
 namespace serialization {
@@ -14,82 +17,33 @@ struct Serializer {
         unsigned char bytes[sizeof(T)];
     };
 
-    const static unsigned int size = sizeof(T);
+    const static std::size_t size = sizeof(T);
 
-    Serializer(const T _value = 0)
+    Serializer() : bytes()
     {
-        for(unsigned int i = 0 ; i < sizeof(T) ; ++i)
-            bytes[i] = 0;
-
-        value = _value;
     }
 };
-
-
-typedef cslibs_boost_geometry::types::Line2dSet
-Vectors;
-
-typedef cslibs_boost_geometry::types::Line2d
-Vector;
-
-typedef cslibs_boost_geometry::types::Point2d
-Point;
 
 template<typename T>
 inline void serialize(const std::vector<T> &data,
                       YAML::Binary &binary)
 {
-    Serializer<unsigned int> id;
-    Serializer<T>            td;
+    Serializer<std::uint32_t> id;
+    Serializer<T>             td;
 
     unsigned int bsize = id.size + data.size() * td.size;
     std::vector<unsigned char> bytes(bsize);
     unsigned char *bytes_ptr = bytes.data();
 
     id.value = data.size();
-    for(unsigned int i = 0 ; i < id.size ; ++i, ++bytes_ptr)
+    for(std::size_t i = 0 ; i < id.size ; ++i, ++bytes_ptr)
         *bytes_ptr = id.bytes[i];
 
     for(const T& element : data) {
         td.value = element;
-        for(unsigned int i = 0 ; i < td.size ; ++i, ++bytes_ptr)
+        for(std::size_t i = 0 ; i < td.size ; ++i, ++bytes_ptr)
             *bytes_ptr = td.bytes[i];
     }
-    binary.swap(bytes);
-}
-
-inline void serialize(const Vectors &data,
-                      YAML::Binary  &binary)
-{
-    Serializer<unsigned int> id;
-    Serializer<double>       sd;
-
-    unsigned int bsize = id.size + data.size() * 4 * sd.size;
-    std::vector<unsigned char> bytes(bsize);
-    unsigned char *bytes_ptr = bytes.data();
-
-    id.value = data.size();
-    for(unsigned int i = 0 ; i < id.size ; ++i, ++bytes_ptr)
-        *bytes_ptr = id.bytes[i];
-
-    for(const Vector& vector : data) {
-        sd.value = vector.first.x();
-        for(unsigned int i = 0 ; i < sd.size ; ++i, ++bytes_ptr)
-            *bytes_ptr = sd.bytes[i];
-
-        sd.value = vector.first.y();
-        for(unsigned int i = 0 ; i < sd.size ; ++i, ++bytes_ptr)
-            *bytes_ptr = sd.bytes[i];
-
-        sd.value = vector.second.x();
-        for(unsigned int i = 0 ; i < sd.size ; ++i, ++bytes_ptr)
-            *bytes_ptr = sd.bytes[i];
-
-        sd.value = vector.second.y();
-        for(unsigned int i = 0 ; i < sd.size ; ++i, ++bytes_ptr)
-            *bytes_ptr = sd.bytes[i];
-    }
-
     binary.swap(bytes);
 }
 
@@ -97,66 +51,26 @@ template<typename T>
 inline bool deserialize(const YAML::Binary &binary,
                         std::vector<T> &data)
 {
-    Serializer<unsigned int> id;
-    Serializer<T>            td;
+    Serializer<std::uint32_t> id;
+    Serializer<T>             td;
 
     if(binary.size() < id.size)
         return false;
 
     const unsigned char* binary_ptr = binary.data();
-    for(unsigned int i = 0 ; i < id.size ; ++i, ++binary_ptr)
+    for(std::size_t i = 0 ; i < id.size ; ++i, ++binary_ptr)
         id.bytes[i] = *binary_ptr;
 
-    unsigned int size = id.value;
+    std::size_t size = id.value;
     if((binary.size() - id.size) < size * td.size)
         return false;
 
     data.resize(size);
     for(T& entry : data) {
-        for(unsigned int i = 0 ; i < td.size ; ++i, ++binary_ptr)
+        for(std::size_t i = 0 ; i < td.size ; ++i, ++binary_ptr)
             td.bytes[i] = *binary_ptr;
         entry = td.value;
     }
-    return true;
-}
-
-inline bool deserialize(const YAML::Binary &binary,
-                        Vectors &data)
-{
-    Serializer<unsigned int> id;
-    Serializer<double>       sd;
-
-    if(binary.size() < id.size)
-        return false;
-
-    const unsigned char* binary_ptr = binary.data();
-    for(unsigned int i = 0 ; i < id.size ; ++i, ++binary_ptr)
-        id.bytes[i] = *binary_ptr;
-
-    unsigned int size = id.value;
-    if((binary.size() - id.size) < size * sd.size * 4)
-        return false;
-
-    data.resize(size);
-    for(Vector& vector : data) {
-        for(unsigned int i = 0 ; i < sd.size ; ++i, ++binary_ptr)
-            sd.bytes[i] = *binary_ptr;
-        vector.first.x(sd.value);
-
-        for(unsigned int i = 0 ; i < sd.size ; ++i, ++binary_ptr)
-            sd.bytes[i] = *binary_ptr;
-        vector.first.y(sd.value);
-
-        for(unsigned int i = 0 ; i < sd.size ; ++i, ++binary_ptr)
-            sd.bytes[i] = *binary_ptr;
-        vector.second.x(sd.value);
-
-        for(unsigned int i = 0 ; i < sd.size ; ++i, ++binary_ptr)
-            sd.bytes[i] = *binary_ptr;
-        vector.second.y(sd.value);
-
-    }
-
     return true;
 }
 
