@@ -1,13 +1,17 @@
 #include <cslibs_vectormaps/maps/rtree_vector_map.h>
 
 #include <cslibs_vectormaps/utility/serialization.hpp>
+#include <cslibs_boost_geometry/algorithms.h>
 
 #include <boost/geometry/algorithms/area.hpp>
+#include <boost/geometry/algorithms/comparable_distance.hpp>
+#include <boost/geometry/algorithms/envelope.hpp>
 
 #include <limits>
 #include <cstdint>
 
 using namespace cslibs_vectormaps;
+using namespace cslibs_boost_geometry;
 
 RtreeVectorMap::RtreeVectorMap(const BoundingBox& bounding, bool debug) :
     VectorMap(bounding, std::numeric_limits<double>::max(), debug)
@@ -35,15 +39,25 @@ const void* RtreeVectorMap::cell(const Point& pos) const
         }
     }
 
-
     return cell_ptr;
 }
 
 double RtreeVectorMap::minSquaredDistanceNearbyStructure(const Point& pos,
-                                         const void* cell,
-                                         double angle) const
+                                                         const void* cell_ptr,
+                                                         double angle) const
 {
-    return 0.;
+    double min_squared_dist = std::numeric_limits<double>::max();
+
+    if (cell_ptr == nullptr)
+        return min_squared_dist;
+
+    const std::tuple<box_t, std::vector<const Vector*>, double>& cell =
+        *static_cast<const std::tuple<box_t, std::vector<const Vector*>, double>*>(cell_ptr);
+    for (const Vector* line : std::get<1>(cell)) {
+        double squared_dist = boost::geometry::comparable_distance(pos, *line);
+        if (squared_dist < min_squared_dist)
+            min_squared_dist = squared_dist;
+    }
 }
 
 double RtreeVectorMap::minDistanceNearbyStructure(const Point& pos) const
@@ -75,11 +89,16 @@ bool RtreeVectorMap::retrieve(const Point& pos,
 }
 
 double RtreeVectorMap::intersectScanRay(const Vector& ray,
-                                        const void* cell,
+                                        const void* cell_ptr,
                                         double angle,
                                         double max_range) const
 {
-    return 0.;
+    if (!cell_ptr)
+        return max_range;
+
+    const std::tuple<box_t, std::vector<const Vector*>, double>& cell =
+        *static_cast<const std::tuple<box_t, std::vector<const Vector*>, double>*>(cell_ptr);
+    return algorithms::nearestIntersectionDistance<double, types::Point2d>(ray, std::get<1>(cell), max_range);
 }
 
 int RtreeVectorMap::intersectScanPattern(
