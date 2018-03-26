@@ -42,7 +42,7 @@ public:
                                    const double thresh = 0.15) const = 0;
 
     virtual double minSquaredDistanceNearbyStructure(const Point& pos,
-                                                     const void* cell,
+                                                     const void* cell_ptr,
                                                      double angle) const = 0;
 
     virtual double minDistanceNearbyStructure(const Point &pos) const = 0;
@@ -56,7 +56,7 @@ public:
                             Vectors     &lines) const = 0;
 
     virtual double intersectScanRay(const Vector& ray,
-                                    const void* cell,
+                                    const void* cell_ptr,
                                     double angle,
                                     double max_range) const = 0;
 

@@ -125,10 +125,10 @@ protected:
     virtual unsigned int handleInsertion();
 
     bool        isInView(const Vector& line, Point center, std::size_t t) const;
-    void        findPossibleLines(const Point &center, const BoundingBox &cell_bounding, VectorPtrs &necessary_lines);
+    void        findPossibleLines(const Point &center, const BoundingBox &cell_bounding, VectorPtrs &necessary_lines) const;
     int         removeHiddenLines(const Point &center, const BoundingBox &cell_bounding, VectorPtrs &visible_lines) const;
     void        findVisibleLinesByRaycasting(const Point &center, const BoundingBox &cell_bounding, const VectorPtrs &visible_lines,
-                                             std::set<cslibs_boost_geometry::types::Line2d*> &visible) const;
+                                             std::set<const Vector*> &visible) const;
     constexpr static double _2M_PI =  2.0 * M_PI;
     constexpr static double _1_2MPI = 1.0 / (2.0*M_PI);
 

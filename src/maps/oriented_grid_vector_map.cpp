@@ -96,7 +96,7 @@ unsigned int OrientedGridVectorMap::handleInsertion()
                 dropped += removeHiddenLines(center, cell_bounding, possible_lines);
 
                 // need to check the four corners to guarantee seeing every vector
-                std::set<Vector*> visible_lines;
+                std::set<const Vector*> visible_lines;
                 double sample_resolution = 1.0;
                 unsigned int sampling_steps = std::ceil(resolution_ / sample_resolution);
                 double sample_width_step = resolution_ / (double) sampling_steps;
@@ -119,7 +119,7 @@ unsigned int OrientedGridVectorMap::handleInsertion()
                 for(unsigned int t = 0 ; t < theta_bins_ ; ++t) {
                     VectorPtrs cell;
 
-                    for(Vector* line : possible_lines) {
+                    for(const Vector* line : possible_lines) {
                         /*Point current_center((min.x() + max.x()) * 0.5,
                                              (min.y() + max.y()) * 0.5);*/
                         if(isInView(*line, center, t)) {
@@ -164,7 +164,7 @@ unsigned int OrientedGridVectorMap::handleInsertion()
                     dropped += removeHiddenLines(center, cell_bounding, possible_lines);
 
                     // need to check the four corners too guarantee seeing every vector
-                    std::set<Vector*> visible_lines;
+                    std::set<const Vector*> visible_lines;
                     double sample_resolution = 1.0;
                     unsigned int sampling_steps = std::ceil(resolution_ / sample_resolution);
                     double sample_width_step = resolution_ / (double) sampling_steps;
@@ -187,7 +187,7 @@ unsigned int OrientedGridVectorMap::handleInsertion()
                     for(unsigned int t = 0 ; t < theta_bins_ ; ++t) {
                         VectorPtrs cell;
 
-                        for(Vector* line : possible_lines) {
+                        for(const Vector* line : possible_lines) {
                             /*Point current_center((min.x() + max.x()) * 0.5,
                                                  (min.y() + max.y()) * 0.5);*/
                             if(isInView(*line, center, t)) {
@@ -216,9 +216,9 @@ unsigned int OrientedGridVectorMap::handleInsertion()
     return assigned;
 }
 
-void OrientedGridVectorMap::findPossibleLines(const Point &center, const BoundingBox &cell_bounding, VectorPtrs &necessary_lines)
+void OrientedGridVectorMap::findPossibleLines(const Point &center, const BoundingBox &cell_bounding, VectorPtrs &necessary_lines) const
 {
-    for(Vector& line : data_) {
+    for(const Vector& line : data_) {
         if(algorithms::touches<Point>(line, cell_bounding)) {
             necessary_lines.push_back(&line);
         }
@@ -243,10 +243,10 @@ int OrientedGridVectorMap::removeHiddenLines(const Point& center,
     //    std::sort(necessary_lines.begin(), necessary_lines.end(), by_length());
 
     // find necessary lines
-    std::list<Vector*> visible_lines;//(necessary_lines.begin(), necessary_lines.end());
-    std::vector<Vector*> necessary_lines;
+    std::list<const Vector*> visible_lines;//(necessary_lines.begin(), necessary_lines.end());
+    std::vector<const Vector*> necessary_lines;
 
-    for(Vector* line : possible_lines) {
+    for(const Vector* line : possible_lines) {
         if(algorithms::touches<Point>(*line, bb)) {
             necessary_lines.push_back(line);
         } else {
@@ -258,7 +258,7 @@ int OrientedGridVectorMap::removeHiddenLines(const Point& center,
 
     int dropped = 0;
     for(auto line_it = visible_lines.begin(); line_it != visible_lines.end(); ++line_it) {
-        Vector& line = **line_it;
+        const Vector& line = **line_it;
 
         // now check if *line* completely covers other lines
         for(auto other_it = visible_lines.begin(); other_it != visible_lines.end();) {
@@ -266,7 +266,7 @@ int OrientedGridVectorMap::removeHiddenLines(const Point& center,
                 ++other_it;
                 continue;
             }
-            Vector& other = **other_it;
+            const Vector& other = **other_it;
 
             bool covered = true; // iff every line between corners and *other* crosses *line*
             for(unsigned int c = 0; c < 4; ++c) {
@@ -303,16 +303,16 @@ int OrientedGridVectorMap::removeHiddenLines(const Point& center,
 void OrientedGridVectorMap::findVisibleLinesByRaycasting(const Point& center,
                                                          const BoundingBox& cell_bounding,
                                                          const VectorPtrs& possible_lines,
-                                                         std::set<Vector*> &visible) const
+                                                         std::set<const Vector*> &visible) const
 {
     double max_range = 1e10;
     double angular_res = algorithms::rad(2.0);
     for(double theta = -M_PI; theta < M_PI; theta += angular_res) {
         Vector ray(center, Point(max_range * std::cos(theta), max_range * std::sin(theta)));
         double min_dist = std::numeric_limits<double>::max();
-        Vector* min_line = nullptr;
+        const Vector* min_line = nullptr;
 
-        for(Vector* other : possible_lines) {
+        for(const Vector* other : possible_lines) {
             std::vector<Point> intersections;
             boost::geometry::intersection(ray, *other, intersections);
             if(!intersections.empty()) {

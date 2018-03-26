@@ -28,7 +28,7 @@ public:
                            const double thresh = 0.15) const override;
 
     double minSquaredDistanceNearbyStructure(const Point& pos,
-                                             const void* cell,
+                                             const void* cell_ptr,
                                              double angle) const override;
 
     double minDistanceNearbyStructure(const Point &pos) const override;
@@ -42,7 +42,7 @@ public:
                     Vectors &lines) const override;
 
     double intersectScanRay(const Vector& ray,
-                            const void* cell,
+                            const void* cell_ptr,
                             double angle,
                             double max_range) const override;
 
