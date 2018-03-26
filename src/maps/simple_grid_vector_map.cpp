@@ -27,6 +27,30 @@ SimpleGridVectorMap::~SimpleGridVectorMap()
 {
 }
 
+const void* SimpleGridVectorMap::cell(const Point& pos) const
+{
+    return &grid_[grid_dimensions_.index(row(pos), col(pos))];
+}
+
+double SimpleGridVectorMap::minSquaredDistanceNearbyStructure(const Point& pos,
+                                                              const void* cell_ptr,
+                                                              double angle) const
+{
+    double min_dist = std::numeric_limits<double>::max();
+    const VectorPtrs &cell = *static_cast<const VectorPtrs*>(cell_ptr);
+
+    if (cell.size() == 0)
+        return -1.0;
+
+    for (const Vector* line : cell) {
+        double dist = algorithms::distance<double, Point>(pos, *line);
+        if (min_dist > dist)
+            min_dist = dist;
+    }
+
+    return min_dist;
+}
+
 double SimpleGridVectorMap::minDistanceNearbyStructure(const Point &pos) const
 {
     if(tools::pointOutsideMap(pos, min_corner_, max_corner_)) {
@@ -177,6 +201,15 @@ int SimpleGridVectorMap::intersectScanPattern(
     int intersection_count = vectors.size() * pattern.size();
 
     return intersection_count;
+}
+
+double SimpleGridVectorMap::intersectScanRay(const Vector& ray,
+                                             const void* cell_ptr,
+                                             double angle,
+                                             double max_range) const
+{
+    const VectorPtrs& cell = *static_cast<const VectorPtrs*>(cell_ptr);
+    return algorithms::nearestIntersectionDistance<double, types::Point2d>(ray, cell, max_range);
 }
 
 void SimpleGridVectorMap::intersectScanPattern(const Point        &position,

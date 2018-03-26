@@ -2,6 +2,8 @@
 
 #include <cslibs_vectormaps/utility/serialization.hpp>
 
+#include <boost/geometry/algorithms/area.hpp>
+
 #include <limits>
 #include <cstdint>
 
@@ -15,6 +17,33 @@ RtreeVectorMap::RtreeVectorMap(const BoundingBox& bounding, bool debug) :
 
 RtreeVectorMap::~RtreeVectorMap()
 {
+}
+
+const void* RtreeVectorMap::cell(const Point& pos) const
+{
+    namespace bg = boost::geometry;
+    namespace bgi = bg::index;
+
+    double max_area_ratio = 0.;
+    const void* cell_ptr = nullptr;
+
+    // std::ref to make sure closure works: https://stackoverflow.com/a/35412456/1007605
+    for (auto it = rtree_.qbegin(bgi::intersects(pos)), end = rtree_.qend(); it != end; ++it) {
+        if (std::get<2>(*it) > max_area_ratio) {
+            max_area_ratio = std::get<2>(*it);
+            cell_ptr = &*it;
+        }
+    }
+
+
+    return cell_ptr;
+}
+
+double RtreeVectorMap::minSquaredDistanceNearbyStructure(const Point& pos,
+                                         const void* cell,
+                                         double angle) const
+{
+    return 0.;
 }
 
 double RtreeVectorMap::minDistanceNearbyStructure(const Point& pos) const
@@ -43,6 +72,14 @@ bool RtreeVectorMap::retrieve(const Point& pos,
                               Vectors& lines) const
 {
     return false;
+}
+
+double RtreeVectorMap::intersectScanRay(const Vector& ray,
+                                        const void* cell,
+                                        double angle,
+                                        double max_range) const
+{
+    return 0.;
 }
 
 int RtreeVectorMap::intersectScanPattern(
@@ -77,7 +114,7 @@ void RtreeVectorMap::insert(const Vectors& segments,
 
     // We bulk-insert into the R-tree so that the efficient packing algorithm is
     // used. All values have to be passed to the constructor at once.
-    std::vector<std::pair<box_t, std::vector<const Vector*>>> values(room_rings.size());
+    std::vector<std::tuple<box_t, std::vector<const Vector*>, double>> values(room_rings.size());
     std::size_t iroom = 0;
     for (const std::vector<Point>& room : room_rings) {
         const ring_t& ring = room_rings[iroom];
@@ -86,7 +123,7 @@ void RtreeVectorMap::insert(const Vectors& segments,
         std::size_t nsegment = 0;
         for (std::size_t segment_index : room_segment_indices[iroom])
             segment_pointers[nsegment++] = &data_[segment_index];
-        values[iroom] = std::make_pair(envelope, segment_pointers);
+        values[iroom] = std::make_tuple(envelope, segment_pointers, bg::area(ring) / bg::area(envelope));
         iroom++;
     }
 
@@ -154,12 +191,12 @@ void RtreeVectorMap::doSave(YAML::Node& node) const
     room_indices.reserve(data_.size());
 
     // the next line should work with Boost >= 1.59.0 (instead of the 3 lines that follow)
-    //for (const std::pair<box_t, std::vector<const Vector*>>& room : rtree_) {
-    auto dummy_pred = [](const std::pair<box_t, std::vector<const Vector*>>&){ return true; };
+    //for (const std::tuple<box_t, std::vector<const Vector*>, double>& room : rtree_) {
+    auto dummy_pred = [](const std::tuple<box_t, std::vector<const Vector*>, double>&){ return true; };
     for (auto it = rtree_.qbegin(bgi::satisfies(dummy_pred)), end = rtree_.qend(); it != end; ++it) {
-        const std::pair<box_t, std::vector<const Vector*>>& node = *it;
-        room_sizes.push_back(node.second.size());
-        for (const Vector* segment : node.second) {
+        const std::tuple<box_t, std::vector<const Vector*>, double>& node = *it;
+        room_sizes.push_back(std::get<1>(node).size());
+        for (const Vector* segment : std::get<1>(node)) {
             room_indices.push_back(static_cast<std::uint32_t>(segment - data_.data()));
         }
     }

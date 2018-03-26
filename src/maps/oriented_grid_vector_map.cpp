@@ -330,6 +330,11 @@ void OrientedGridVectorMap::findVisibleLinesByRaycasting(const Point& center,
     }
 }
 
+const void* OrientedGridVectorMap::cell(const Point& pos) const
+{
+    return &grid_[grid_dimensions_.index(row(pos), col(pos), 0)];
+}
+
 bool OrientedGridVectorMap::isInView(const Vector& line, Point center, std::size_t t) const
 {
     // take the general fov and shift it to center
@@ -343,6 +348,23 @@ bool OrientedGridVectorMap::isInView(const Vector& line, Point center, std::size
 double OrientedGridVectorMap::angularResolution() const
 {
     return angular_resolution_;
+}
+
+double OrientedGridVectorMap::minSquaredDistanceNearbyStructure(const Point& pos,
+                                                                const void* cell_ptr,
+                                                                const double angle) const
+{
+    unsigned int theta = angle2index(angle);
+    double min_squared_dist = std::numeric_limits<double>::max();
+    const VectorPtrs& cell = static_cast<const VectorPtrs*>(cell_ptr)[theta];
+
+    for (const Vector* line : cell) {
+        double squared_dist = boost::geometry::comparable_distance(pos, *line);
+        if (squared_dist < min_squared_dist)
+            min_squared_dist = squared_dist;
+    }
+
+    return min_squared_dist;
 }
 
 double OrientedGridVectorMap::minDistanceNearbyStructure(const Point &pos,
@@ -597,6 +619,15 @@ bool OrientedGridVectorMap::retrieve(const unsigned int row,
     }
 
     return lines.size() > 0;
+}
+
+double OrientedGridVectorMap::intersectScanRay(const Vector &ray,
+                                               const void* cell_ptr,
+                                               const double angle,
+                                               const double max_range) const
+{
+    const VectorPtrs& cell = static_cast<const VectorPtrs*>(cell_ptr)[angle2index(angle)];
+    return algorithms::nearestIntersectionDistance<double, types::Point2d>(ray, cell, max_range);
 }
 
 double OrientedGridVectorMap::intersectScanRay(const Vector &ray,

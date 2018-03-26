@@ -59,6 +59,7 @@ public:
 
     double angularResolution() const;
 
+    const void* cell(const Point& pos) const override;
 
     bool   retrieveFiltered(const Point &pos,
                             const double orientation,
@@ -78,11 +79,20 @@ public:
                     const double angle,
                     Vectors &lines) const;
 
+    double intersectScanRay(const Vector& ray,
+                            const void* cell_ptr,
+                            const double angle,
+                            const double max_range = 0.0) const override;
+
     double intersectScanRay(const Vector &ray,
                             const unsigned int row,
                             const unsigned int col,
                             const double angle,
                             const double max_range = 0.0) const;
+
+    double minSquaredDistanceNearbyStructure(const Point& pos,
+                                             const void* cell_ptr,
+                                             double angle) const override;
 
     double minDistanceNearbyStructure(const Point &pos,
                                       const unsigned int row,

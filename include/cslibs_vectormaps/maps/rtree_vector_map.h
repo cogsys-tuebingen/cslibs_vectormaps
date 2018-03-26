@@ -6,7 +6,7 @@
 #include <boost/geometry/index/rtree.hpp>
 
 #include <string>
-#include <utility>
+#include <tuple>
 
 namespace cslibs_vectormaps {
 
@@ -22,38 +22,49 @@ public:
 
     virtual ~RtreeVectorMap();
 
-    virtual bool   structureNearby(const Point &pos,
-                                   const double thresh = 0.15) const final;
+    const void* cell(const Point& pos) const override;
 
-    virtual double minDistanceNearbyStructure(const Point &pos) const final;
+    bool   structureNearby(const Point &pos,
+                           const double thresh = 0.15) const override;
 
-    virtual double minSquaredDistanceNearbyStructure(const Point &pos) const final;
+    double minSquaredDistanceNearbyStructure(const Point& pos,
+                                             const void* cell,
+                                             double angle) const override;
 
-    virtual bool   retrieveFiltered(const Point &pos,
-                                    Vectors &lines) const final;
+    double minDistanceNearbyStructure(const Point &pos) const override;
 
-    virtual bool   retrieve(const Point &pos,
-                            Vectors &lines) const final;
+    double minSquaredDistanceNearbyStructure(const Point &pos) const override;
 
-    virtual int    intersectScanPattern(const Point   &position,
-                                        const Vectors &pattern,
-                                        IntersectionSet& intersections) const final;
+    bool   retrieveFiltered(const Point &pos,
+                            Vectors &lines) const override;
 
-    virtual void   intersectScanPattern(const Point &position,
-                                        const Vectors &pattern,
-                                        std::vector<float> &ranges,
-                                        const float default_mesaurement = 0.f) const final;
+    bool   retrieve(const Point &pos,
+                    Vectors &lines) const override;
+
+    double intersectScanRay(const Vector& ray,
+                            const void* cell,
+                            double angle,
+                            double max_range) const override;
+
+    int    intersectScanPattern(const Point   &position,
+                                const Vectors &pattern,
+                                IntersectionSet& intersections) const override;
+
+    void   intersectScanPattern(const Point &position,
+                                const Vectors &pattern,
+                                std::vector<float> &ranges,
+                                const float default_mesaurement = 0.f) const override;
 
     void insert(const Vectors& segments,
                 const std::vector<ring_t>& rooms,
                 const std::vector<std::vector<std::size_t>>& segment_indices);
 
-    virtual unsigned int handleInsertion();
-    virtual void doLoad(const YAML::Node& node);
-    virtual void doSave(YAML::Node& node) const;
+    unsigned int handleInsertion() override;
+    void doLoad(const YAML::Node& node) override;
+    void doSave(YAML::Node& node) const override;
 
 protected:
-    boost::geometry::index::rtree<std::pair<box_t, std::vector<const Vector*>>, boost::geometry::index::rstar<16>> rtree_;
+    boost::geometry::index::rtree<std::tuple<box_t, std::vector<const Vector*>, double>, boost::geometry::index::rstar<16>> rtree_;
     std::vector<ring_t> room_rings_;
 };
 

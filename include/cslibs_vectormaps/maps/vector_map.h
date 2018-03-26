@@ -36,8 +36,14 @@ public:
     unsigned int   insert(const Vectors &set,
                           const Polygon &valid = Polygon());
 
+    virtual const void* cell(const Point& p) const = 0;
+
     virtual bool   structureNearby(const Point &pos,
                                    const double thresh = 0.15) const = 0;
+
+    virtual double minSquaredDistanceNearbyStructure(const Point& pos,
+                                                     const void* cell,
+                                                     double angle) const = 0;
 
     virtual double minDistanceNearbyStructure(const Point &pos) const = 0;
 
@@ -48,6 +54,11 @@ public:
 
     virtual bool   retrieve(const Point &pos,
                             Vectors     &lines) const = 0;
+
+    virtual double intersectScanRay(const Vector& ray,
+                                    const void* cell,
+                                    double angle,
+                                    double max_range) const = 0;
 
     virtual int    intersectScanPattern(const Point        &position,
                                         const Vectors      &pattern,
