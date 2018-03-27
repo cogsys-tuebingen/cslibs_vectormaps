@@ -27,9 +27,9 @@ class RtreeVectormapConversion {
 public:
     RtreeVectormapConversion(const RtreeVectormapConversionParameter& parameters);
 
-    void index_rooms(std::vector<std::vector<point_t>> rooms);
-    void index_segments(std::vector<segment_t> segments);
-    void drop_outliers();
+    void index_rooms(const std::vector<std::vector<point_t>>& rooms);
+    bool index_segments(const std::vector<segment_t>& segments);
+    bool drop_outliers();
     bool save(point_t min, point_t max) const;
 private:
     using box_t = boost::geometry::model::box<point_t>;

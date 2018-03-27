@@ -6,9 +6,15 @@
 #include <boost/geometry/algorithms/area.hpp>
 #include <boost/geometry/algorithms/comparable_distance.hpp>
 #include <boost/geometry/algorithms/envelope.hpp>
+#if BOOST_VERSION < 105500
+#include <boost/function_output_iterator.hpp>
+#endif
 
 #include <limits>
 #include <cstdint>
+
+// workarounds for older Boost versions according to
+// https://stackoverflow.com/a/27799356/1007605
 
 using namespace cslibs_vectormaps;
 using namespace cslibs_boost_geometry;
@@ -31,13 +37,21 @@ const void* RtreeVectorMap::cell(const Point& pos) const
     double max_area_ratio = 0.;
     const void* cell_ptr = nullptr;
 
-    // std::ref to make sure closure works: https://stackoverflow.com/a/35412456/1007605
+#if BOOST_VERSION >= 105500
     for (auto it = rtree_.qbegin(bgi::intersects(pos)), end = rtree_.qend(); it != end; ++it) {
-        if (std::get<2>(*it) > max_area_ratio) {
-            max_area_ratio = std::get<2>(*it);
-            cell_ptr = &*it;
+        const cell_t& cell = *it;
+#else
+    rtree_.query(bgi::intersects(pos), boost::make_function_output_iterator([&](const cell_t& cell) {
+#endif
+        if (std::get<2>(cell) > max_area_ratio) {
+            max_area_ratio = std::get<2>(cell);
+            cell_ptr = &cell;
         }
+#if BOOST_VERSION >= 105500
     }
+#else
+    }));
+#endif
 
     return cell_ptr;
 }
@@ -51,8 +65,7 @@ double RtreeVectorMap::minSquaredDistanceNearbyStructure(const Point& pos,
     if (cell_ptr == nullptr)
         return min_squared_dist;
 
-    const std::tuple<box_t, std::vector<const Vector*>, double>& cell =
-        *static_cast<const std::tuple<box_t, std::vector<const Vector*>, double>*>(cell_ptr);
+    const cell_t& cell = *static_cast<const cell_t*>(cell_ptr);
     for (const Vector* line : std::get<1>(cell)) {
         double squared_dist = boost::geometry::comparable_distance(pos, *line);
         if (squared_dist < min_squared_dist)
@@ -96,8 +109,7 @@ double RtreeVectorMap::intersectScanRay(const Vector& ray,
     if (!cell_ptr)
         return max_range;
 
-    const std::tuple<box_t, std::vector<const Vector*>, double>& cell =
-        *static_cast<const std::tuple<box_t, std::vector<const Vector*>, double>*>(cell_ptr);
+    const cell_t& cell = *static_cast<const cell_t*>(cell_ptr);
     return algorithms::nearestIntersectionDistance<double, types::Point2d>(ray, std::get<1>(cell), max_range);
 }
 
@@ -133,7 +145,7 @@ void RtreeVectorMap::insert(const Vectors& segments,
 
     // We bulk-insert into the R-tree so that the efficient packing algorithm is
     // used. All values have to be passed to the constructor at once.
-    std::vector<std::tuple<box_t, std::vector<const Vector*>, double>> values(room_rings.size());
+    std::vector<cell_t> values(room_rings.size());
     std::size_t iroom = 0;
     for (const std::vector<Point>& room : room_rings) {
         const ring_t& ring = room_rings[iroom];
@@ -209,16 +221,26 @@ void RtreeVectorMap::doSave(YAML::Node& node) const
     room_sizes.reserve(room_rings_.size());
     room_indices.reserve(data_.size());
 
-    // the next line should work with Boost >= 1.59.0 (instead of the 3 lines that follow)
-    //for (const std::tuple<box_t, std::vector<const Vector*>, double>& room : rtree_) {
-    auto dummy_pred = [](const std::tuple<box_t, std::vector<const Vector*>, double>&){ return true; };
+#if BOOST_VERSION >= 105900
+    for (const cell_t& room : rtree_) {
+#else
+    auto dummy_pred = [](const cell_t&) { return true; };
+ #if BOOST_VERSION >= 105500
     for (auto it = rtree_.qbegin(bgi::satisfies(dummy_pred)), end = rtree_.qend(); it != end; ++it) {
-        const std::tuple<box_t, std::vector<const Vector*>, double>& node = *it;
-        room_sizes.push_back(std::get<1>(node).size());
-        for (const Vector* segment : std::get<1>(node)) {
+        const cell_t& cell = *it;
+ #else
+    rtree_.query(bgi::satisfies(dummy_pred), boost::make_function_output_iterator([&](const cell_t& cell) {
+ #endif
+#endif
+        room_sizes.push_back(std::get<1>(cell).size());
+        for (const Vector* segment : std::get<1>(cell)) {
             room_indices.push_back(static_cast<std::uint32_t>(segment - data_.data()));
         }
+#if BOOST_VERSION >= 105500
     }
+#else
+    }));
+#endif
 
     YAML::Binary room_sizes_binary;
     serialization::serialize(room_sizes, room_sizes_binary);

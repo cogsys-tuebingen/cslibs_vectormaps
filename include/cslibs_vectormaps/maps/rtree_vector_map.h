@@ -14,6 +14,7 @@ class RtreeVectorMap : public VectorMap {
 protected:
     using box_t = boost::geometry::model::box<VectorMap::Point>;
     using ring_t = boost::geometry::model::ring<VectorMap::Point>;
+    using cell_t = std::tuple<box_t, std::vector<const Vector*>, double>;
 
 public:
     typedef std::shared_ptr<RtreeVectorMap> Ptr;
@@ -64,7 +65,7 @@ public:
     void doSave(YAML::Node& node) const override;
 
 protected:
-    boost::geometry::index::rtree<std::tuple<box_t, std::vector<const Vector*>, double>, boost::geometry::index::rstar<16>> rtree_;
+    boost::geometry::index::rtree<cell_t, boost::geometry::index::rstar<16>> rtree_;
     std::vector<ring_t> room_rings_;
 };
 

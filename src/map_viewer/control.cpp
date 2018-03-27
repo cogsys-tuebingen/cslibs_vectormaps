@@ -261,7 +261,7 @@ void Control::executeFindRooms(const FindRoomsParameter &params)
         }
     }
 
-    openProgressDialog("Find doors");
+    openProgressDialog("Find rooms");
 
     FindRooms roomfinder(params);
     FindDoors doorfinder(*params.find_doors_parameter);
@@ -349,8 +349,6 @@ void Control::executeRtreeVectormapExport(const RtreeVectormapConversionParamete
     std::vector<LayerModel::Ptr> layers;
     map_->getLayers(layers);
 
-    FindDoors doorfinder(*params.find_doors_parameter);
-
     // get all line segments from visible layers
     dxf::DXFMap::Vectors segments;
     std::vector<std::vector<point_t>> rooms;
@@ -377,9 +375,9 @@ void Control::executeRtreeVectormapExport(const RtreeVectormapConversionParamete
     RtreeVectormapConversion converter(params);
 
     converter.index_rooms(rooms);
-    converter.index_segments(segments);
-    converter.drop_outliers();
-    if (!converter.save(map_->getMin(), map_->getMax()))
+    if (!converter.index_segments(segments)
+    || !converter.drop_outliers()
+    || !converter.save(map_->getMin(), map_->getMax()))
         notification("Writing map failed!");
 
     closeProgressDialog();
