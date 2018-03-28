@@ -10,6 +10,7 @@
 #include <tuple>
 #include <string>
 #include <algorithm>
+#include <iostream>
 
 using namespace cslibs_vectormaps;
 

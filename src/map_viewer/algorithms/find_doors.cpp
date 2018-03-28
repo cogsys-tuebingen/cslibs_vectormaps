@@ -405,7 +405,7 @@ std::vector<FindDoors::door_t> FindDoors::find_doors(graph_t& graph, const std::
         }
         return false;
     };
-    std::list<const edge_t*> door_side_candidates;
+    std::vector<const edge_t*> side_candidates;
     for (node_t& firstnode : graph.nodes) {
         // find all nodes that connect exactly two edges. those can be corner points of doors.
         if (firstnode.edges.size() != 2)
@@ -414,13 +414,16 @@ std::vector<FindDoors::door_t> FindDoors::find_doors(graph_t& graph, const std::
         // three edges might form one of the two walls on either side of
         // the door
         if (check_node(firstnode, firstnode.edges[1], firstnode.edges[0]))
-            door_side_candidates.push_back(&firstnode.edges[0]);
+            side_candidates.push_back(&firstnode.edges[0]);
         if (check_node(firstnode, firstnode.edges[0], firstnode.edges[1]))
-            door_side_candidates.push_back(&firstnode.edges[1]);
+            side_candidates.push_back(&firstnode.edges[1]);
     }
-    std::cout << "Found " << door_side_candidates.size() << " door side candidates\n";
-
-    for (auto it1 = door_side_candidates.begin(), end = door_side_candidates.end(); it1 != door_side_candidates.end();) {
+    std::cout << "Found " << side_candidates.size() << " door side candidates\n";
+    
+    std::size_t ncandidates = side_candidates.size();
+    std::vector<std::size_t> side_candidate_partners(ncandidates, static_cast<std::size_t>(-1));
+    std::vector<double> side_candidate_distances(ncandidates, std::numeric_limits<double>::max());
+    for (std::size_t i1 = 0; i1 < ncandidates; i1++) {
         // we search for the other side of the door frame by drawing
         // a ray r from the middle of the edge like this:
         //     v1
@@ -433,8 +436,8 @@ std::vector<FindDoors::door_t> FindDoors::find_doors(graph_t& graph, const std::
         // If r cuts another possible door frame side nearly
         // perpendicularly and that intersection point is not too far
         // and not too close from v2, we found a door.
-        const point_t& v21 = (*it1)->start->point;
-        const point_t& v22 = (*it1)->target->point;
+        const point_t& v21 = side_candidates[i1]->start->point;
+        const point_t& v22 = side_candidates[i1]->target->point;
         // r = middle + t * v
         point_t middle = multiply(add(v21, v22), .5);
         point_t v2 = subtract(v22, v21);
@@ -442,15 +445,16 @@ std::vector<FindDoors::door_t> FindDoors::find_doors(graph_t& graph, const std::
         double v_length = std::sqrt(v.x() * v.x() + v.y() * v.y());
 
         // check all other candidates
-        for (auto it2 = door_side_candidates.begin(); it2 != end; ++it2) {
-            if (it2 == it1)
+        
+        for (std::size_t i2 = 0; i2 < ncandidates; i2++) {
+            if (i2 == i1)
                 continue;
             // line intersection adapted from https://stackoverflow.com/a/565282/1007605
             auto cross = [](const point_t& v, const point_t& w) {
                 return v.x() * w.y() - v.y() * w.x();
             };
-            const point_t& w21 = (*it2)->start->point;
-            const point_t& w22 = (*it2)->target->point;
+            const point_t& w21 = side_candidates[i2]->start->point;
+            const point_t& w22 = side_candidates[i2]->target->point;
             point_t w2 = subtract(w22, w21);
             double det = cross(v, w2);
             // check if vectors are neither parallel nor collinear
@@ -467,16 +471,27 @@ std::vector<FindDoors::door_t> FindDoors::find_doors(graph_t& graph, const std::
             // check that sides are approximately parallel
             if (!check_angle(v, w2))
                 continue;
-            // we found a door! add it and remove candidates
+            // we found a match! if there are multiple matches we only keep the closest
+            if (d < side_candidate_distances[i1]) {
+                side_candidate_distances[i1] = d;
+                side_candidate_partners[i1] = i2;
+            }
+            if (d < side_candidate_distances[i2]) {
+                side_candidate_distances[i2] = d;
+                side_candidate_partners[i2] = i1;
+            }
+        }
+    }
+    for (std::size_t i1 = 0; i1 < ncandidates; i1++) {
+        std::size_t i2 = side_candidate_partners[i1];
+        if (i2 != static_cast<std::size_t>(-1) && i1 < i2) {
+            const point_t& v21 = side_candidates[i1]->start->point;
+            const point_t& v22 = side_candidates[i1]->target->point;
+            const point_t& w21 = side_candidates[i2]->start->point;
+            const point_t& w22 = side_candidates[i2]->target->point;
             std::array<segment_t, 2> s = {segment_t{v21, v22}, segment_t{w21, w22}};
             doors.push_back(s);
-            door_side_candidates.erase(it2);
-            it1 = door_side_candidates.erase(it1);
-            goto next_door_side_candidate;
         }
-        ++it1;
-next_door_side_candidate:
-        ;
     }
     std::cout << "Found " << doors.size() << " doors!\n";
 
