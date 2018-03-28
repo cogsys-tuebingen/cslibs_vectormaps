@@ -2,9 +2,9 @@
 #define VIEW_H
 
 #include <QMainWindow>
-#include <QPen>
-#include <QStringListModel>
+#include <QString>
 #include <memory>
+#include <vector>
 
 class QGraphicsScene;
 class QInteractiveGraphicsView;
@@ -77,7 +77,9 @@ private:
 
     using QLayerListItemPtr = std::shared_ptr<QLayerListItem>;
 
-    std::map<QString, QLayerListItemPtr>    layer_items_;
+    std::vector<QLayerListItemPtr>    layer_items_;
+    std::vector<QLayerListItemPtr>    door_items_;
+    std::vector<QLayerListItemPtr>    room_items_;
 
     //// models
     Map                                    *map_;
@@ -86,7 +88,6 @@ private:
     Parameters                             *parameters_;
 
     void renderLayer(const QString &name);
-
 };
 }
 

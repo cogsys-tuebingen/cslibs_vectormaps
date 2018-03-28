@@ -3,6 +3,8 @@
 #include "map.h"
 #include "models/vector_layer_model.h"
 #include "models/point_layer_model.h"
+#include "models/door_layer_model.h"
+#include "models/room_layer_model.h"
 
 #include "renderer.h"
 
@@ -96,18 +98,31 @@ void View::update()
     map_->getLayers(layers);
 
     /// clear the layout
-    for(auto &l : layer_items_) {
-        ui_->layerListLayout->removeWidget(l.second.get());
-    }
+    for(auto &l : layer_items_)
+        ui_->layerListLayout->removeWidget(l.get());
+    for(auto &l : door_items_)
+        ui_->doorListLayout->removeWidget(l.get());
+    for(auto &l : room_items_)
+        ui_->roomListLayout->removeWidget(l.get());
     layer_items_.clear();
+    door_items_.clear();
+    room_items_.clear();
 
     /// create new items
-    for(auto &l : layers) {
+    for(LayerModel::Ptr &l : layers) {
         QLayerListItem *i = new QLayerListItem;
         i->setModel(l);
-        ui_->layerListLayout->addWidget(i);
-        connect(i,SIGNAL(hasChanged(QString)), this, SLOT(updateLayer(QString)));
-        layer_items_[l->getName<QString>()].reset(i);
+        if (LayerModel::as<DoorLayerModel>(l)) {
+            ui_->doorListLayout->addWidget(i);
+            layer_items_.push_back(QLayerListItemPtr(i));
+        } else if (LayerModel::as<RoomLayerModel>(l)) {
+            ui_->roomListLayout->addWidget(i);
+            room_items_.push_back(QLayerListItemPtr(i));
+        } else {
+            ui_->layerListLayout->addWidget(i);
+            door_items_.push_back(QLayerListItemPtr(i));
+        }
+        connect(i, SIGNAL(hasChanged(QString)), this, SLOT(updateLayer(QString)));
     }
 
     renderer_->repaint();
@@ -161,10 +176,10 @@ void View::closeProgressDialog()
 
 void View::hideLayerList()
 {
-    if(ui_->layers->isHidden())
-        ui_->layers->show();
+    if(ui_->tabWidget->isHidden())
+        ui_->tabWidget->show();
     else
-        ui_->layers->hide();
+        ui_->tabWidget->hide();
 }
 
 
