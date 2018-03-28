@@ -219,6 +219,18 @@ void Control::executeFindDoors(const FindDoorsParameter &params)
     // doors_graph_ is stored for finding rooms
     std::vector<FindDoors::door_t> doors = doorfinder.find_doors(doors_graph_, cleaned_segments);
 
+    std::size_t ndoors = doors.size();
+    std::size_t ndigits = 1;
+    while (ndoors /= 10)
+        ndigits++;
+    auto to_string = [&ndigits](std::size_t x) {
+        std::size_t i = ndigits;
+        std::string s(ndigits, '0');
+        do s[--i] = '0' + x % 10;
+        while (x /= 10);
+        return s;
+    };
+
     std::size_t i = 0;
     for (const FindDoors::door_t& door : doors) {
         std::vector<point_t> polygon;
@@ -228,7 +240,7 @@ void Control::executeFindDoors(const FindDoorsParameter &params)
         }
 
         DoorLayerModel::Ptr layer(new DoorLayerModel);
-        std::string layername = "Door #" + std::to_string(++i);
+        std::string layername = "Door #" + to_string(++i);
         layer->setName(layername);
         layer->setPolygon(polygon);
         layer->setDoor(door);
@@ -267,6 +279,18 @@ void Control::executeFindRooms(const FindRoomsParameter &params)
     FindDoors doorfinder(*params.find_doors_parameter);
     std::vector<std::vector<point_t>> rooms = roomfinder.find_rooms(doors);
 
+    std::size_t nrooms = rooms.size();
+    std::size_t ndigits = 1;
+    while (nrooms /= 10)
+        ndigits++;
+    auto to_string = [&ndigits](std::size_t x) {
+        std::size_t i = ndigits;
+        std::string s(ndigits, '0');
+        do s[--i] = '0' + x % 10;
+        while (x /= 10);
+        return s;
+    };
+
     std::size_t i = 0;
     std::mt19937_64 mt;
     std::uniform_real_distribution<float> dist(0.f, 1.f);
@@ -276,7 +300,7 @@ void Control::executeFindRooms(const FindRoomsParameter &params)
             point = doorfinder.to_map_coords(point);
 
         RoomLayerModel::Ptr layer(new RoomLayerModel);
-        std::string layername = "Room #" + std::to_string(++i);
+        std::string layername = "Room #" + to_string(++i);
         layer->setName(layername);
         layer->setPolygon(polygon);
         layer->setColor(QColor::fromHsvF(dist(mt), 1.f, 0.5f));

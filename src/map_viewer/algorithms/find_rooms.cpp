@@ -35,7 +35,7 @@ std::vector<std::vector<point_t>> FindRooms::find_rooms(const std::vector<FindDo
             d::node_t* last_node = door_node;
             d::node_t* current_node = nullptr; // initialized to suppress warning
             // find door segment first
-            for (const d::edge_t& door_edge : door_node->edges) {
+            for (d::edge_t& door_edge : door_node->edges) {
                 if (door_edge.door) {
                     current_node = door_edge.target->node;
                     std::cout << "start traversing from door edge "
@@ -43,6 +43,7 @@ std::vector<std::vector<point_t>> FindRooms::find_rooms(const std::vector<FindDo
                               << door_edge.start->point.y() << "->"
                               << door_edge.target->point.x() << '|'
                               << door_edge.target->point.y() << '\n';
+                    door_edge.checked = true;
                     break;
                 }
             }
@@ -88,7 +89,6 @@ std::vector<std::vector<point_t>> FindRooms::find_rooms(const std::vector<FindDo
                 room.push_back(edge->start->point);
             } while (current_node != door_node);
             room.push_back(edge->target->point);
-            if (room.size() < 900) // TODO: remove that shit, find the corridors for real
             rooms.push_back(room);
 next_door_face:
             ;
