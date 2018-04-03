@@ -497,22 +497,6 @@ std::vector<FindDoors::door_t> FindDoors::find_doors(graph_t& graph, const std::
     }
     std::cout << "Found " << doors.size() << " doors!\n";
 
-    // add two additional connections per door that connect the door's sides
-    for (const FindDoors::door_t& door : doors) {
-        for (std::size_t side = 0; side < 2; side++) {
-            corner_t* c1 = graph.corner_lookup[door[side].first];
-            corner_t* c2 = graph.corner_lookup[door[(side + 1) % 2].second];
-            edge_t e1 = {c2, c1, true, false};
-            edge_t e2 = {c1, c2, true, false};
-            c1->node->edges.push_back(e2);
-            c2->node->edges.push_back(e1);
-        }
-    }
-
-    // sort each node's edges in counter-clockwise order and remove duplicate edges again
-    std::size_t erased2 = sort_edges_delete_duplicates(graph.nodes);
-    std::cout << "Deleted " << erased2 << " duplicate edges\n";
-
     return doors;
 }
 

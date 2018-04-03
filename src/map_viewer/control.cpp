@@ -197,20 +197,18 @@ void Control::executeFindDoors(const FindDoorsParameter &params)
     std::vector<LayerModel::Ptr> layers;
     map_->getLayers(layers);
 
-    // get all line segments from visible layers, delete doors
+    // get all line segments from visible layers, delete all doors
     dxf::DXFMap::Vectors segments;
     for(LayerModel::Ptr &l : layers) {
-        if(l->getVisibility()) {
-            VectorLayerModel::Ptr lv = LayerModel::as<VectorLayerModel>(l);
-            if (lv) {
-                dxf::DXFMap::Vectors s;
-                lv->getVectors(s);
-                segments.insert(segments.end(), s.begin(), s.end());
-            }
-            DoorLayerModel::Ptr ld = LayerModel::as<DoorLayerModel>(l);
-            if (ld)
-                map_->removeLayer(l->getName<std::string>());
+        VectorLayerModel::Ptr lv = LayerModel::as<VectorLayerModel>(l);
+        if (lv && lv->getVisibility()) {
+            dxf::DXFMap::Vectors s;
+            lv->getVectors(s);
+            segments.insert(segments.end(), s.begin(), s.end());
         }
+        DoorLayerModel::Ptr ld = LayerModel::as<DoorLayerModel>(l);
+        if (ld)
+            map_->removeLayer(l->getName<std::string>());
     }
 
     openProgressDialog("Find doors");
@@ -258,21 +256,18 @@ void Control::executeFindRooms(const FindRoomsParameter &params)
     std::vector<LayerModel::Ptr> layers;
     map_->getLayers(layers);
 
-    // get all doors from visible layers, delete rooms
+    // get visible doors, delete all rooms
     std::vector<FindDoors::door_t> doors;
     for (LayerModel::Ptr& l : layers) {
-        if (l->getVisibility()) {
-            RoomLayerModel::Ptr lr = LayerModel::as<RoomLayerModel>(l);
-            if (lr)
-                map_->removeLayer(l->getName<std::string>());
-
-            DoorLayerModel::Ptr ld = LayerModel::as<DoorLayerModel>(l);
-            if (ld) {
-                FindDoors::door_t door;
-                ld->getDoor(door);
-                doors.push_back(door);
-            }
+        DoorLayerModel::Ptr ld = LayerModel::as<DoorLayerModel>(l);
+        if (ld && ld->getVisibility()) {
+            FindDoors::door_t door;
+            ld->getDoor(door);
+            doors.push_back(door);
         }
+        RoomLayerModel::Ptr lr = LayerModel::as<RoomLayerModel>(l);
+        if (lr)
+            map_->removeLayer(l->getName<std::string>());
     }
 
     openProgressDialog("Find rooms");

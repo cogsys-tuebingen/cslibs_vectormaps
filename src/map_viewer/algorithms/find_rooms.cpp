@@ -14,17 +14,33 @@ std::vector<std::vector<point_t>> FindRooms::find_rooms(const std::vector<FindDo
     typedef FindDoors d;
     d::graph_t& graph = *parameter_.graph;
 
-    // reset door checked state in all door edges
-    for (const FindDoors::door_t& door : doors) {
-        point_t points[] = {door[0].first, door[0].second, door[1].first, door[1].second};
-        for (point_t point : points) {
-            d::corner_t* c = graph.corner_lookup[point];
-            for (d::edge_t& edge : c->node->edges) {
-                if (edge.door) // check not necessary
-                    edge.checked = false;
+    // remove eventual door edges from previous call
+    for (d::node_t& node : graph.nodes) {
+        for (auto it = node.edges.begin(), end = node.edges.end(); it != end;) {
+            if (it->door) {
+                it = node.edges.erase(it);
+                end = node.edges.end();
+            } else {
+                ++it;
             }
         }
     }
+
+    // add two additional edges per door that connect the door's sides
+    for (const d::door_t& door : doors) {
+        for (std::size_t side = 0; side < 2; side++) {
+            d::corner_t* c1 = graph.corner_lookup[door[side].first];
+            d::corner_t* c2 = graph.corner_lookup[door[(side + 1) % 2].second];
+            d::edge_t e1 = {c2, c1, true, false};
+            d::edge_t e2 = {c1, c2, true, false};
+            c1->node->edges.push_back(e2);
+            c2->node->edges.push_back(e1);
+        }
+    }
+
+    // sort each node's edges in counter-clockwise order and remove duplicate edges again
+    std::size_t erased2 = d::sort_edges_delete_duplicates(graph.nodes);
+    std::cout << "Deleted " << erased2 << " duplicate edges\n";
 
     // iterate through all the doors and try to find rooms!
     std::vector<std::vector<point_t>> rooms;
