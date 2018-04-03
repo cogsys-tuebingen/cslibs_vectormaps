@@ -230,8 +230,8 @@ unsigned int SimpleGridVectorMap::handleInsertion()
     unsigned int assigned = 0;
 
     if(debug_) {
-        /*std::cout << "rows: " << rows_ << "\n"
-                     "cols: " << cols_ << "\n";*/
+        std::cout << "rows: " << rows_ << "\n"
+                     "cols: " << cols_ << "\n";
     }
 
     if(valid_area_.outer().empty()) {
@@ -244,7 +244,7 @@ unsigned int SimpleGridVectorMap::handleInsertion()
                 BoundingBox cell_bounding(min, max);
 
                 for(Vector& line : data_) {
-                    if(boost::geometry::intersects(line, cell_bounding)) {
+                    if(algorithms::touches<Point>(line, cell_bounding)) {
                         grid_[grid_dimensions_.index(i,j)].push_back(&line);
                         ++assigned;
                     }
@@ -264,7 +264,7 @@ unsigned int SimpleGridVectorMap::handleInsertion()
 
                 if(algorithms::covered_by<Point>(cell_bounding_poly, valid_area_)) {
                     for(Vector& line : data_) {
-                        if(boost::geometry::intersects(line, cell_bounding)) {
+                        if(algorithms::touches<Point>(line, cell_bounding)) {
                             grid_[grid_dimensions_.index(i,j)].push_back(&line);
                             ++assigned;
                         }

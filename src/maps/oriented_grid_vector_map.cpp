@@ -220,7 +220,7 @@ unsigned int OrientedGridVectorMap::handleInsertion()
 void OrientedGridVectorMap::findPossibleLines(const Point &center, const BoundingBox &cell_bounding, VectorPtrs &necessary_lines) const
 {
     for(const Vector& line : data_) {
-        if(boost::geometry::intersects(line, cell_bounding)) {
+        if(algorithms::touches<Point>(line, cell_bounding)) {
             necessary_lines.push_back(&line);
         }
     }
@@ -248,7 +248,7 @@ int OrientedGridVectorMap::removeHiddenLines(const Point& center,
     std::vector<const Vector*> necessary_lines;
 
     for(const Vector* line : possible_lines) {
-        if(boost::geometry::intersects(*line, bb)) {
+        if(algorithms::touches<Point>(*line, bb)) {
             necessary_lines.push_back(line);
         } else {
             visible_lines.push_back(line);
@@ -343,7 +343,7 @@ bool OrientedGridVectorMap::isInView(const Vector& line, Point center, std::size
     boost::geometry::subtract_point(linecopy.first, center);
     boost::geometry::subtract_point(linecopy.second, center);
 
-    return boost::geometry::intersects(linecopy, fovs_[t]);
+    return algorithms::touches<Point>(linecopy, fovs_[t]);
 }
 
 double OrientedGridVectorMap::angularResolution() const
