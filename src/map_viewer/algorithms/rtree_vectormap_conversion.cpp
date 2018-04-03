@@ -4,6 +4,7 @@
 
 #include <cslibs_vectormaps/maps/rtree_vector_map.h>
 
+#include <boost/version.hpp>
 #include <boost/geometry/algorithms/envelope.hpp>
 #include <boost/geometry/algorithms/distance.hpp>
 

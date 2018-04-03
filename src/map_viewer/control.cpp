@@ -22,6 +22,8 @@
 
 #include <iostream>
 #include <random>
+#include <iterator>
+#include <algorithm>
 
 using namespace cslibs_vectormaps;
 
@@ -195,7 +197,7 @@ void Control::executeFindDoors(const FindDoorsParameter &params)
     std::vector<LayerModel::Ptr> layers;
     map_->getLayers(layers);
 
-    // get all line segments from visible layers
+    // get all line segments from visible layers, delete doors
     dxf::DXFMap::Vectors segments;
     for(LayerModel::Ptr &l : layers) {
         if(l->getVisibility()) {
@@ -256,7 +258,7 @@ void Control::executeFindRooms(const FindRoomsParameter &params)
     std::vector<LayerModel::Ptr> layers;
     map_->getLayers(layers);
 
-    // get all line segments from visible layers
+    // get all doors from visible layers, delete rooms
     std::vector<FindDoors::door_t> doors;
     for (LayerModel::Ptr& l : layers) {
         if (l->getVisibility()) {
@@ -353,7 +355,11 @@ void Control::executeVectormapExport(const VectormapConversionParameter &params)
             if(lv) {
                 dxf::DXFMap::Vectors v;
                 lv->getVectors(v);
-                vectors.insert(vectors.end(), v.begin(), v.end());
+
+                std::copy_if(v.begin(), v.end(), std::back_inserter(vectors), [](const segment_t& s) {
+                    // bad data might have zero-length segments, exclude those
+                    return s.first.x() != s.second.x() || s.first.y() != s.second.y();
+                });
             }
         }
     }
@@ -380,9 +386,13 @@ void Control::executeRtreeVectormapExport(const RtreeVectormapConversionParamete
         if (l->getVisibility()) {
             VectorLayerModel::Ptr lv = LayerModel::as<VectorLayerModel>(l);
             if (lv) {
-                std::vector<segment_t> s;
-                lv->getVectors(s);
-                segments.insert(segments.end(), s.begin(), s.end());
+                std::vector<segment_t> v;
+                lv->getVectors(v);
+
+                std::copy_if(v.begin(), v.end(), std::back_inserter(segments), [](const segment_t& s) {
+                    // bad data might have zero-length segments, exclude those
+                    return s.first.x() != s.second.x() || s.first.y() != s.second.y();
+                });
             }
             RoomLayerModel::Ptr lr = LayerModel::as<RoomLayerModel>(l);
             if (lr) {

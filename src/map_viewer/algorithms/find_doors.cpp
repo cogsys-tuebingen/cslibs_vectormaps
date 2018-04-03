@@ -84,7 +84,9 @@ void FindDoors::get_corners(const std::vector<segment_t>& segments, const FindDo
 
 std::size_t FindDoors::merge_nodes(const FindDoorsParameter& params, const std::vector<double>& cpositions, const std::vector<std::vector<double>>& clines, std::map<point_t, corner_t*, point_compare>& corner_lookup)
 {
-    double maxdist = params.merge_max_proximity * params.map_precision;
+    double maxdist = params.merge_max_proximity;
+    if (params.map_precision != 0.)
+        maxdist *= params.map_precision;
     std::size_t merged = 0;
     auto mergenode = [&corner_lookup](point_t p1, point_t p2) {
         corner_t* c1 = corner_lookup[p1];

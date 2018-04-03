@@ -4,7 +4,10 @@
 /// COMPONENT
 #include <cslibs_boost_geometry/algorithms.hpp>
 #include <cslibs_vectormaps/utility/tools.hpp>
+#include <boost/geometry/algorithms/intersects.hpp>
 #include <boost/geometry/algorithms/comparable_distance.hpp>
+
+#include <iostream>
 
 using namespace cslibs_vectormaps;
 using namespace cslibs_boost_geometry;
@@ -36,19 +39,16 @@ double SimpleGridVectorMap::minSquaredDistanceNearbyStructure(const Point& pos,
                                                               const void* cell_ptr,
                                                               double angle) const
 {
-    double min_dist = std::numeric_limits<double>::max();
+    double min_squared_dist = std::numeric_limits<double>::max();
     const VectorPtrs &cell = *static_cast<const VectorPtrs*>(cell_ptr);
 
-    if (cell.size() == 0)
-        return -1.0;
-
     for (const Vector* line : cell) {
-        double dist = algorithms::distance<double, Point>(pos, *line);
-        if (min_dist > dist)
-            min_dist = dist;
+        double squared_dist = boost::geometry::comparable_distance(pos, *line);
+        if (min_squared_dist > squared_dist)
+            min_squared_dist = squared_dist;
     }
 
-    return min_dist;
+    return min_squared_dist;
 }
 
 double SimpleGridVectorMap::minDistanceNearbyStructure(const Point &pos) const
@@ -230,8 +230,8 @@ unsigned int SimpleGridVectorMap::handleInsertion()
     unsigned int assigned = 0;
 
     if(debug_) {
-        std::cerr << "rows: " << rows_ << "\n"
-                     "cols: " << cols_ << "\n";
+        /*std::cout << "rows: " << rows_ << "\n"
+                     "cols: " << cols_ << "\n";*/
     }
 
     if(valid_area_.outer().empty()) {
@@ -244,13 +244,11 @@ unsigned int SimpleGridVectorMap::handleInsertion()
                 BoundingBox cell_bounding(min, max);
 
                 for(Vector& line : data_) {
-                    if(algorithms::touches<Point>(line, cell_bounding)) {
+                    if(boost::geometry::intersects(line, cell_bounding)) {
                         grid_[grid_dimensions_.index(i,j)].push_back(&line);
                         ++assigned;
                     }
                 }
-                min.x(min.x() + resolution_);
-                max.x(max.x() + resolution_);
             }
         }
     } else {
@@ -264,20 +262,18 @@ unsigned int SimpleGridVectorMap::handleInsertion()
                 Polygon     cell_bounding_poly =
                         algorithms::toPolygon<Point>(min, max);
 
-                for(Vector& line : data_) {
-                    if(algorithms::covered_by<Point>(cell_bounding_poly, valid_area_)) {
-                        if(algorithms::touches<Point>(line, cell_bounding)) {
+                if(algorithms::covered_by<Point>(cell_bounding_poly, valid_area_)) {
+                    for(Vector& line : data_) {
+                        if(boost::geometry::intersects(line, cell_bounding)) {
                             grid_[grid_dimensions_.index(i,j)].push_back(&line);
                             ++assigned;
                         }
-                    } else {
-                        if(debug_) {
-                            std::cout << "Cell out of valid area!\n";
-                        }
+                    }
+                } else {
+                    if(debug_) {
+                        std::cout << "Cell out of valid area!\n";
                     }
                 }
-                min.x(min.x() + resolution_);
-                max.x(max.x() + resolution_);
             }
         }
     }

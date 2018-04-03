@@ -73,7 +73,7 @@ void CornerLayerModel::update(QGraphicsItem &item, const QPen& pen)
 
     QGraphicsItemGroup& group = static_cast<QGraphicsItemGroup&>(item);
     QList<QGraphicsItem*> children = group.childItems();
-    for(std::size_t i = 0; i < children.size(); ++i) {
+    for(int i = 0; i < children.size(); ++i) {
         QGraphicsEllipseItem *item = static_cast<QGraphicsEllipseItem*>(children[i]);
         const double &corner = cornerness[i];
         color.setAlphaF(corner * alpha_);

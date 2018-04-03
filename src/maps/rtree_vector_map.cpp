@@ -3,6 +3,7 @@
 #include <cslibs_vectormaps/utility/serialization.hpp>
 #include <cslibs_boost_geometry/algorithms.h>
 
+#include <boost/version.hpp>
 #include <boost/geometry/algorithms/area.hpp>
 #include <boost/geometry/algorithms/comparable_distance.hpp>
 #include <boost/geometry/algorithms/envelope.hpp>
@@ -71,6 +72,8 @@ double RtreeVectorMap::minSquaredDistanceNearbyStructure(const Point& pos,
         if (squared_dist < min_squared_dist)
             min_squared_dist = squared_dist;
     }
+
+    return min_squared_dist;
 }
 
 double RtreeVectorMap::minDistanceNearbyStructure(const Point& pos) const
@@ -147,14 +150,13 @@ void RtreeVectorMap::insert(const Vectors& segments,
     // used. All values have to be passed to the constructor at once.
     std::vector<cell_t> values(room_rings.size());
     std::size_t iroom = 0;
-    for (const std::vector<Point>& room : room_rings) {
-        const ring_t& ring = room_rings[iroom];
-        box_t envelope = bg::return_envelope<box_t>(ring);
+    for (const ring_t& room_ring : room_rings) {
+        box_t envelope = bg::return_envelope<box_t>(room_ring);
         std::vector<const Vector*> segment_pointers(room_segment_indices[iroom].size());
         std::size_t nsegment = 0;
         for (std::size_t segment_index : room_segment_indices[iroom])
             segment_pointers[nsegment++] = &data_[segment_index];
-        values[iroom] = std::make_tuple(envelope, segment_pointers, bg::area(ring) / bg::area(envelope));
+        values[iroom] = std::make_tuple(envelope, segment_pointers, bg::area(room_ring) / bg::area(envelope));
         iroom++;
     }
 
@@ -164,6 +166,7 @@ void RtreeVectorMap::insert(const Vectors& segments,
 
 unsigned int RtreeVectorMap::handleInsertion()
 {
+    return 0;
 }
 
 void RtreeVectorMap::doLoad(const YAML::Node& node)

@@ -7,6 +7,7 @@
 #include <boost/geometry.hpp>
 
 #include <utility>
+#include <iostream>
 
 using namespace cslibs_vectormaps;
 using namespace cslibs_boost_geometry;
@@ -219,7 +220,7 @@ unsigned int OrientedGridVectorMap::handleInsertion()
 void OrientedGridVectorMap::findPossibleLines(const Point &center, const BoundingBox &cell_bounding, VectorPtrs &necessary_lines) const
 {
     for(const Vector& line : data_) {
-        if(algorithms::touches<Point>(line, cell_bounding)) {
+        if(boost::geometry::intersects(line, cell_bounding)) {
             necessary_lines.push_back(&line);
         }
     }
@@ -247,7 +248,7 @@ int OrientedGridVectorMap::removeHiddenLines(const Point& center,
     std::vector<const Vector*> necessary_lines;
 
     for(const Vector* line : possible_lines) {
-        if(algorithms::touches<Point>(*line, bb)) {
+        if(boost::geometry::intersects(*line, bb)) {
             necessary_lines.push_back(line);
         } else {
             visible_lines.push_back(line);
@@ -342,7 +343,7 @@ bool OrientedGridVectorMap::isInView(const Vector& line, Point center, std::size
     boost::geometry::subtract_point(linecopy.first, center);
     boost::geometry::subtract_point(linecopy.second, center);
 
-    return algorithms::touches<Point>(linecopy, fovs_[t]);
+    return boost::geometry::intersects(linecopy, fovs_[t]);
 }
 
 double OrientedGridVectorMap::angularResolution() const
@@ -745,7 +746,7 @@ int OrientedGridVectorMap::intersectScanPattern (
     for(const Vector& line : pattern) {
         double dx = line.second.x() - line.first.x();
         double dy = line.second.y() - line.first.y();
-        double angle = atan2(dy, dx);
+        double angle = std::atan2(dy, dx);
         unsigned int theta = angle2index(angle);
         auto &cell = grid_.at(grid_dimensions_.index(row, col, theta));
 
@@ -825,7 +826,7 @@ void OrientedGridVectorMap::intersectScanPattern(const Point   &pos,
         const Vector& line = pattern[i];
         double dx = line.second.x() - line.first.x();
         double dy = line.second.y() - line.first.y();
-        double angle = atan2(dy, dx);
+        double angle = std::atan2(dy, dx);
         unsigned int theta = angle2index(angle);
         const VectorPtrs &cell = grid_.at(grid_dimensions_.index(row, col, theta));
 
