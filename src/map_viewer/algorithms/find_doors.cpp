@@ -131,6 +131,22 @@ std::size_t FindDoors::merge_nodes(const FindDoorsParameter& params, const std::
     return merged;
 }
 
+std::size_t FindDoors::delete_inner_edges(std::vector<node_t>& nodes)
+{
+    std::size_t deleted = 0;
+    for (node_t& node : nodes) {
+        for (auto it = node.edges.begin(); it != node.edges.end();) {
+            if (it->target->node == &node) {
+                it = node.edges.erase(it);
+                deleted++;
+            } else {
+                ++it;
+            }
+        }
+    }
+    return deleted;
+}
+
 std::size_t FindDoors::sort_edges_delete_duplicates(std::vector<node_t>& nodes)
 {
     std::size_t erased = 0;
@@ -146,8 +162,9 @@ std::size_t FindDoors::sort_edges_delete_duplicates(std::vector<node_t>& nodes)
             for (std::size_t s = node.edges.size(), i = 0; i < s && s > 1; i++) {
                 std::size_t toerase = 0;
                 for (std::size_t j = i; j < s - (i == 0)
+                && node.edges[j].target->node == node.edges[(j + 1) % s].target->node/*
                 && node.edges[j].target->point.x() == node.edges[(j + 1) % s].target->point.x()
-                && node.edges[j].target->point.y() == node.edges[(j + 1) % s].target->point.y();) {
+                && node.edges[j].target->point.y() == node.edges[(j + 1) % s].target->point.y()*/;) {
                     toerase++;
                     j++;
                 }
@@ -200,7 +217,7 @@ std::vector<segment_t> FindDoors::clean_segments(const std::vector<segment_t>& r
     // make a new vector that only contains successive segments, no overlapping
     // segments. we can only replace exact vertical or exact horizontal
     // overlappings at the moment.
-    std::vector<segment_t> cleaned_segments;
+    std::vector<segment_t> non_overlapping_segments;
 
     // sort original segments into std::vectors (vertical, horizontal, other)
     std::vector<segment_t> vertical, horizontal;
@@ -218,7 +235,7 @@ std::vector<segment_t> FindDoors::clean_segments(const std::vector<segment_t>& r
             };
             horizontal.push_back(s);
         } else {
-            cleaned_segments.push_back(segment);
+            non_overlapping_segments.push_back(segment);
         }
     }
     // sort the std::vectors
@@ -239,63 +256,62 @@ std::vector<segment_t> FindDoors::clean_segments(const std::vector<segment_t>& r
     // finally, detect overlapping segments and replace those
     std::size_t overlaps = 0;
     for (std::size_t i = 0, n = vertical.size(), j; i < n; i = j) {
+        double miny = vertical[i].first.y();
         double maxy = vertical[i].second.y();
-        std::set<double> ys = {vertical[i].first.y(), vertical[i].second.y()};
         for (j = i + 1; j < n && vertical[i].first.x() == vertical[j].first.x(); j++) {
             if (vertical[j].first.y() < maxy) {
-                ys.insert(vertical[j].first.y());
-                ys.insert(vertical[j].second.y());
                 if (vertical[j].second.y() > maxy)
                     maxy = vertical[j].second.y();
+                overlaps++;
             } else {
                 break;
             }
         }
-        bool begin = true;
-        double y_last;
-        for (double y : ys) {
-            if (begin) {
-                begin = false;
-            } else {
-                segment_t s = {{vertical[i].first.x(), y_last}, {vertical[i].first.x(), y}};
-                cleaned_segments.push_back(s);
-            }
-            y_last = y;
-        }
-        if (i + 1 < j) {
-            overlaps++;
-        }
+        segment_t s = {{vertical[i].first.x(), miny}, {vertical[i].first.x(), maxy}};
+        non_overlapping_segments.push_back(s);
     }
     for (std::size_t i = 0, n = horizontal.size(), j; i < n; i = j) {
+        double minx = horizontal[i].first.x();
         double maxx = horizontal[i].second.x();
-        std::set<double> xs = {horizontal[i].first.x(), horizontal[i].second.x()};
         for (j = i + 1; j < n && horizontal[i].first.y() == horizontal[j].first.y(); j++) {
             if (horizontal[j].first.x() < maxx) {
-                xs.insert(horizontal[j].first.x());
-                xs.insert(horizontal[j].second.x());
                 if (horizontal[j].second.x() > maxx)
                     maxx = horizontal[j].second.x();
+                overlaps++;
             } else {
                 break;
             }
         }
-        bool begin = true;
-        double x_last;
-        for (double x : xs) {
-            if (begin) {
-                begin = false;
-            } else {
-                segment_t s = {{x_last, horizontal[i].first.y()}, {x, horizontal[i].first.y()}};
-                cleaned_segments.push_back(s);
-            }
-            x_last = x;
+        segment_t s = {{minx, horizontal[i].first.y()}, {maxx, horizontal[i].first.y()}};
+        non_overlapping_segments.push_back(s);
+    }
+    std::cout << "Merged " << overlaps << " overlapping segments\n";
+
+    // replace intersecting line segments by multiple new segments that end in a common intersection point
+    // use a spatial index because finding intersecting line segments globally is hard
+    namespace bgi = boost::geometry::index;
+    bgi::rtree<segment_t, bgi::rstar<16>> rtree(non_overlapping_segments);
+    auto point_eq = [](const point_t& p1, const point_t& p2) {
+        return p1.x() == p2.x() && p1.y() == p2.y();
+    };
+    auto segment_eq = [&point_eq](const segment_t& s1, const segment_t& s2) {
+        return point_eq(s1.first, s2.first) && point_eq(s1.second, s2.second);
+    };
+    std::vector<segment_t> clean_segments;
+    for (const segment_t& query_segment : non_overlapping_segments) {
+        std::vector<point_t> intersections;
+        for (auto qit = rtree.qbegin(bgi::intersects(query_segment)), end = rtree.qend(); qit != end; ++qit) {
+            const segment_t& result_segment = *qit;
+            boost::geometry::intersection(result_segment, query_segment, intersections);
         }
-        if (i + 1 < j) {
-            overlaps++;
+        std::set<point_t, point_compare> newpoints(intersections.begin(), intersections.end());
+        for (auto pit1 = newpoints.begin(), pit2 = std::next(pit1), end = newpoints.end(); pit2 != end; ++pit1, ++pit2) {
+            clean_segments.push_back({*pit1, *pit2});
         }
     }
-    std::cout << "Eliminated " << overlaps << " overlaps\n";
-    return cleaned_segments;
+    std::cout << "Created " << (clean_segments.size() - non_overlapping_segments.size()) << " new segments because of intersections\n";
+
+    return clean_segments;
 }
 
 std::vector<FindDoors::door_t> FindDoors::find_doors(graph_t& graph, const std::vector<segment_t>& cleaned_segments)
@@ -344,6 +360,10 @@ std::vector<FindDoors::door_t> FindDoors::find_doors(graph_t& graph, const std::
     // merge nodes that are close to each other
     std::size_t merged = merge_nodes(params, cpositions, clines, graph.corner_lookup);
     std::cout << "Merged " << merged << " nodes into neighboring nodes\n";
+
+    // this can lead to redundant edges, remove those
+    std::size_t deleted = delete_inner_edges(graph.nodes);
+    std::cout << "Deleted " << deleted << " redundant edges connecting corners of the same node\n";
 
     // sort each node's edges in counter-clockwise order and remove duplicate edges (those can happen because of shitty map data)
     std::size_t erased1 = sort_edges_delete_duplicates(graph.nodes);

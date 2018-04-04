@@ -3,6 +3,9 @@
 #include <iostream>
 #include <utility>
 
+#include <boost/geometry/geometries/ring.hpp>
+#include <boost/geometry.hpp>
+
 using namespace cslibs_vectormaps;
 
 FindRooms::FindRooms(const FindRoomsParameter &parameter) : parameter_(parameter)
@@ -47,12 +50,15 @@ std::vector<std::vector<point_t>> FindRooms::find_rooms(const std::vector<FindDo
     for (const d::door_t& door : doors) {
         // first, find a face of the door that's not the door's right or left side
         d::node_t* door_nodes[] = {graph.corner_lookup[door[0].second]->node, graph.corner_lookup[door[1].second]->node};
+        d::node_t* other_door_nodes[] = {graph.corner_lookup[door[1].first]->node, graph.corner_lookup[door[0].first]->node};
         for (d::node_t* door_node : door_nodes) {
             d::node_t* last_node = door_node;
             d::node_t* current_node = nullptr; // initialized to suppress warning
+            d::edge_t* edge = nullptr;
             // find door segment first
+            d::node_t* other_door_node = other_door_nodes[door_node == door_nodes[0] ? 0 : 1];
             for (d::edge_t& door_edge : door_node->edges) {
-                if (door_edge.door) {
+                if (door_edge.door && door_edge.target->node == other_door_node) {
                     current_node = door_edge.target->node;
                     std::cout << "start traversing from door edge "
                               << door_edge.start->point.x() << '|'
@@ -60,21 +66,35 @@ std::vector<std::vector<point_t>> FindRooms::find_rooms(const std::vector<FindDo
                               << door_edge.target->point.x() << '|'
                               << door_edge.target->point.y() << '\n';
                     door_edge.checked = true;
+                    edge = &door_edge;
                     break;
                 }
             }
-            std::vector<point_t> room;
-            d::edge_t* edge = nullptr;
+            std::vector<point_t> room = {edge->start->point};
             // traverse room walls in clockwise order
             do {
+                auto point_eq = [](const point_t& p1, const point_t& p2) {
+                    return p1.x() == p2.x() && p1.y() == p2.y();
+                };
+                auto add_point = [&point_eq](std::vector<point_t>& room, const point_t& p) {
+                    if (!point_eq(p, room.back())) {
+                        // add new point only if last point does not compare equal
+                        if (room.size() <= 1 || !point_eq(p, *(room.end() - 2)))
+                            // add new point only if it would not form a spike
+                            room.push_back(p);
+                        else
+                            // otherwise, remove spike
+                            room.pop_back();
+                    }
+                };
                 for (std::size_t i = 0, n = current_node->edges.size(); i < n; i++) {
                     if (current_node->edges[i].target->node == last_node) {
                         d::node_t* new_last_node = current_node;
-                        d::edge_t* newedge = &current_node->edges[++i % n];
+                        d::edge_t* new_edge = &current_node->edges[++i % n];
                         // edge->target->node == current_node can happen when one node comprises multiple corners
                         std::size_t j;
-                        for (j = 0; newedge->target->node == current_node && j < n - 1; j++) {
-                            newedge = &current_node->edges[++i % n];
+                        for (j = 0; new_edge->target->node == current_node && j < n - 1; j++) {
+                            new_edge = &current_node->edges[++i % n];
                         }
                         if (j == n - 1) {
                             // dead end - we have to go back and find another junction
@@ -82,10 +102,10 @@ std::vector<std::vector<point_t>> FindRooms::find_rooms(const std::vector<FindDo
                             std::swap(last_node, current_node);
                             break;
                         }
-                        if (edge != nullptr && edge->target != newedge->start) {
-                            room.push_back(edge->target->point);
+                        if (edge != nullptr) {
+                            add_point(room, edge->target->point);
                         }
-                        edge = newedge;
+                        edge = new_edge;
                         if (edge->door) {
                             if (edge->checked) {
                                 std::cout << "room might have already been found at door edge "
@@ -102,10 +122,24 @@ std::vector<std::vector<point_t>> FindRooms::find_rooms(const std::vector<FindDo
                         break;
                     }
                 }
-                room.push_back(edge->start->point);
+                add_point(room, edge->start->point);
             } while (current_node != door_node);
             room.push_back(edge->target->point);
-            rooms.push_back(room);
+            /*// remove spikes
+            for (auto it = room.begin(), it2 = it + 2; it2 != room.end();) {
+                if (*it == *it2) {
+                    do {
+                        --it;
+                        ++it2;
+                    } while (it2 != room.end() && *it == *it2);
+                    it2 = room.erase(it, it2);
+                    it = it2 - 2;
+                } else {
+                    ++it;
+                    ++it2;
+                }
+            }*/
+            rooms.push_back(room);//if (rooms.size() == 120) std::cout << "\nnoice: " << boost::geometry::wkt(boost::geometry::model::ring<point_t>(room.begin(), room.end())) << "\n\n";
 next_door_face:
             ;
         }

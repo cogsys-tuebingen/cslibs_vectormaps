@@ -71,6 +71,7 @@ public:
     // this method builds a graph from the given segments and returns it for further computation
     std::vector<door_t> find_doors(graph_t& graph, const std::vector<segment_t>& cleaned_segments);
 
+    static std::size_t delete_inner_edges(std::vector<node_t>& nodes);
     static std::size_t sort_edges_delete_duplicates(std::vector<node_t>& nodes);
 
     point_t to_map_coords(const point_t& p) const;
