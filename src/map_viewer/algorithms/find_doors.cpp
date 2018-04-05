@@ -1,6 +1,8 @@
 #include "find_doors.h"
 
-#include <boost/geometry/algorithms/distance.hpp>
+#include <boost/geometry/arithmetic/arithmetic.hpp>
+#include <boost/geometry/algorithms/intersection.hpp>
+#include <boost/geometry/index/rtree.hpp>
 #include <boost/math/constants/constants.hpp>
 
 #include <cstring>
@@ -155,9 +157,22 @@ std::size_t FindDoors::sort_edges_delete_duplicates(std::vector<node_t>& nodes)
         if (node.edges.size() > 0) {
             // in order to sort the edges, we have to determine one of the node's points as a center point.
             const point_t& center = node.edges[0].start->point;
+            // sort edges in anti-clockwise order.
+            // see https://stackoverflow.com/a/6989383 for a bad explanation
             std::sort(node.edges.begin(), node.edges.end(), [&center](const edge_t& e1, const edge_t& e2) {
-                return (e1.target->point.x() - center.x()) * (e2.target->point.y() - center.y())
-                        > (e2.target->point.x() - center.x()) * (e1.target->point.y() - center.y());
+                const point_t& a = e1.target->point;
+                const point_t& b = e2.target->point;
+                if (a.x() - center.x() >= 0 && b.x() - center.x() < 0)
+                    return false;
+                if (a.x() - center.x() < 0 && b.x() - center.x() >= 0)
+                    return true;
+                if (a.x() - center.x() == 0 && b.x() - center.x() == 0) {
+                    if (a.y() - center.y() >= 0 || b.y() - center.y() >= 0)
+                        return a.y() < b.y();
+                    return b.y() < a.y();
+                }
+                return (a.x() - center.x()) * (b.y() - center.y())
+                        > (b.x() - center.x()) * (a.y() - center.y());
             });
             for (std::size_t s = node.edges.size(), i = 0; i < s && s > 1; i++) {
                 std::size_t toerase = 0;
@@ -253,7 +268,7 @@ std::vector<segment_t> FindDoors::clean_segments(const std::vector<segment_t>& r
                       || s1.first.x() == s2.first.x()
                          && s1.second.x() < s2.second.x()*/);
     });
-    // finally, detect overlapping segments and replace those
+    // finally, detect overlapping segments and replace those by single segments
     std::size_t overlaps = 0;
     for (std::size_t i = 0, n = vertical.size(), j; i < n; i = j) {
         double miny = vertical[i].first.y();
@@ -467,7 +482,6 @@ std::vector<FindDoors::door_t> FindDoors::find_doors(graph_t& graph, const std::
         double v_length = std::sqrt(v.x() * v.x() + v.y() * v.y());
 
         // check all other candidates
-        
         for (std::size_t i2 = 0; i2 < ncandidates; i2++) {
             if (i2 == i1)
                 continue;
@@ -506,7 +520,8 @@ std::vector<FindDoors::door_t> FindDoors::find_doors(graph_t& graph, const std::
     }
     for (std::size_t i1 = 0; i1 < ncandidates; i1++) {
         std::size_t i2 = side_candidate_partners[i1];
-        if (i2 != static_cast<std::size_t>(-1) && i1 < i2) {
+        if (i2 != static_cast<std::size_t>(-1) && i1 < i2
+        && side_candidate_partners[i2] == i1) {
             const point_t& v21 = side_candidates[i1]->start->point;
             const point_t& v22 = side_candidates[i1]->target->point;
             const point_t& w21 = side_candidates[i2]->start->point;

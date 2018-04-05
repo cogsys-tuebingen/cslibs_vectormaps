@@ -13,12 +13,12 @@ namespace cslibs_vectormaps {
 
 struct FindDoorsParameter {
     double map_precision = 1000.; // 1 mm
-    double merge_max_proximity = .005;
     enum {ROWS, COLUMNS} find_mode = ROWS; // does not affect result, only maybe runtime
-    double door_depth_min = .05;
-    double door_depth_max = .5;
-    double door_width_min = .5;
-    double door_width_max = 2.5;
+    double merge_max_proximity = .025; // 25 mm
+    double door_depth_min = .05; // 5 cm
+    double door_depth_max = .7; // 70 cm
+    double door_width_min = .5; // 50 cm
+    double door_width_max = 2.5; // 2.5 m
     double door_angle_diff_max = .08726646259971647884618453842443; // 5 deg
 };
 

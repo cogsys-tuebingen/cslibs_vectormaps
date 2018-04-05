@@ -3,9 +3,6 @@
 #include <iostream>
 #include <utility>
 
-#include <boost/geometry/geometries/ring.hpp>
-#include <boost/geometry.hpp>
-
 using namespace cslibs_vectormaps;
 
 FindRooms::FindRooms(const FindRoomsParameter &parameter) : parameter_(parameter)
@@ -45,6 +42,10 @@ std::vector<std::vector<point_t>> FindRooms::find_rooms(const std::vector<FindDo
     std::size_t erased2 = d::sort_edges_delete_duplicates(graph.nodes);
     std::cout << "Deleted " << erased2 << " duplicate edges\n";
 
+    auto point_eq = [](const point_t& p1, const point_t& p2) {
+        return p1.x() == p2.x() && p1.y() == p2.y();
+    };
+
     // iterate through all the doors and try to find rooms!
     std::vector<std::vector<point_t>> rooms;
     for (const d::door_t& door : doors) {
@@ -73,9 +74,6 @@ std::vector<std::vector<point_t>> FindRooms::find_rooms(const std::vector<FindDo
             std::vector<point_t> room = {edge->start->point};
             // traverse room walls in clockwise order
             do {
-                auto point_eq = [](const point_t& p1, const point_t& p2) {
-                    return p1.x() == p2.x() && p1.y() == p2.y();
-                };
                 auto add_point = [&point_eq](std::vector<point_t>& room, const point_t& p) {
                     if (!point_eq(p, room.back())) {
                         // add new point only if last point does not compare equal
@@ -125,21 +123,9 @@ std::vector<std::vector<point_t>> FindRooms::find_rooms(const std::vector<FindDo
                 add_point(room, edge->start->point);
             } while (current_node != door_node);
             room.push_back(edge->target->point);
-            /*// remove spikes
-            for (auto it = room.begin(), it2 = it + 2; it2 != room.end();) {
-                if (*it == *it2) {
-                    do {
-                        --it;
-                        ++it2;
-                    } while (it2 != room.end() && *it == *it2);
-                    it2 = room.erase(it, it2);
-                    it = it2 - 2;
-                } else {
-                    ++it;
-                    ++it2;
-                }
-            }*/
-            rooms.push_back(room);//if (rooms.size() == 120) std::cout << "\nnoice: " << boost::geometry::wkt(boost::geometry::model::ring<point_t>(room.begin(), room.end())) << "\n\n";
+            if (!point_eq(room.back(), room.front()))
+                room.push_back(room.front());
+            rooms.push_back(room);
 next_door_face:
             ;
         }
