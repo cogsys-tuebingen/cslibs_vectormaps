@@ -1,10 +1,17 @@
 #include "find_rooms.h"
 
 #include <boost/version.hpp>
+#if BOOST_VERSION >= 105600
+#if BOOST_VERSION < 106000
 #include <iostream>
-#include <boost/geometry/algorithms/is_valid.hpp> // this goof forgot to include iostream at least until 1.58
-#include <boost/geometry/algorithms/within.hpp> // this gimp does not work if you don't include additional stuff
-#include <boost/geometry.hpp> // so let's include everything
+#endif
+// this goof forgot to include iostream until 1.60
+#include <boost/geometry/algorithms/is_valid.hpp>
+#endif
+// this gimp does not seem to work without additional stuff
+#include <boost/geometry/algorithms/within.hpp>
+// so let's include everything
+#include <boost/geometry.hpp>
 
 #include <iostream>
 #include <utility>
@@ -147,18 +154,20 @@ next_door_face:
     std::vector<ring_t> possible_holes;
     std::size_t invalid = 0;
     for (const ring_t& ring : rings) {
+#if BOOST_VERSION >= 105600
         boost::geometry::validity_failure_type failure;
         if (boost::geometry::is_valid(ring, failure)) {
+#endif
             rooms.push_back(polygon_t());
             rooms.back().outer() = ring;
+#if BOOST_VERSION >= 105600
         } else if (failure == boost::geometry::failure_wrong_orientation) {
             possible_holes.push_back(ring);
-#if BOOST_VERSION < 105600
             invalid++;
-#endif
         } else {
             invalid++;
         }
+#endif
     }
 
     // insert holes into polygons
