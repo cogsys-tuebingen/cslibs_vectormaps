@@ -18,9 +18,14 @@ public:
 
     virtual ~SimpleGridVectorMap();
 
+    const void* cell(const Point& pos) const override;
 
     virtual bool   structureNearby(const Point &pos,
                                    const double thresh = 0.15) const;
+
+    double minSquaredDistanceNearbyStructure(const Point& pos,
+                                             const void* cell_ptr,
+                                             double angle) const override;
 
     virtual double minDistanceNearbyStructure(const Point &pos) const;
 
@@ -31,6 +36,11 @@ public:
 
     virtual bool   retrieve(const Point &pos,
                             Vectors &lines) const;
+
+    double intersectScanRay(const Vector& ray,
+                            const void* cell_ptr,
+                            double angle,
+                            double max_range) const override;
 
     virtual int    intersectScanPattern(const Point   &position,
                                         const Vectors &pattern,

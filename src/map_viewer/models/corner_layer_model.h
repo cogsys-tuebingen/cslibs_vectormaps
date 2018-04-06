@@ -10,8 +10,11 @@ public:
     typedef std::shared_ptr<CornerLayerModel>        Ptr;
     typedef std::shared_ptr<CornerLayerModel const>  ConstPtr;
 
-    CornerLayerModel();
+    CornerLayerModel(double alpha = 0.6);
     virtual ~CornerLayerModel();
+
+    QGraphicsItem* render(const QPen& pen) override;
+    void update(QGraphicsItem &group, const QPen& pen) override;
 
     void setPoints(const dxf::DXFMap::Points &points) override;
     void setPoints(const QPointFList &points) override;

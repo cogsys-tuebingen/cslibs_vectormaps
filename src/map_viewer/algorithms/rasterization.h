@@ -1,15 +1,17 @@
 #ifndef RASTERIZATION_H
 #define RASTERIZATION_H
 
-#include <string>
-#include <array>
 #include <cslibs_vectormaps/dxf/dxf_map.h>
+
 #include <QString>
-#include <QImage>
-#include <QPixmap>
+#include <QPointF>
+#include <QLineF>
+
+#include <array>
 #include <functional>
 
 namespace cslibs_vectormaps {
+
 struct RasterizationParameter {
     double                resolution;
     std::array<double, 3> origin;
@@ -26,19 +28,19 @@ struct RasterizationParameter {
 class Rasterization
 {
 public:
-    using QLineFList  = std::vector<QLineF> ;
+    using QLineFList = std::vector<QLineF>;
     using progress_t = std::function<void(int)>;
-
 
     Rasterization(const RasterizationParameter &parameters);
 
-    bool operator ()(const QLineFList &vectors,
-                     const QPointF    &min,
-                     const QPointF    &max,
-                     progress_t       progress);
+    bool operator()(const QLineFList &vectors,
+                    const QPointF    &min,
+                    const QPointF    &max,
+                    progress_t       progress);
 private:
     RasterizationParameter parameters_;
 };
+
 }
 
 #endif // RASTERIZATION_H

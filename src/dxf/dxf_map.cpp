@@ -33,18 +33,13 @@ bool DXFMap::open(const std::string &path)
 
     dxf_source_ = OGRSFDriverRegistrar::Open(path.c_str());
     if(dxf_source_ == NULL) {
-        std::cerr << "[DXFVectorMap] : Failed to open file '"
-                  << path
-                  << "'!"
-                  << "\n";
+        std::cerr << "[DXFVectorMap] : Failed to open file '" << path << "'!\n";
         return false;
     }
 
     dxf_layer_ = dxf_source_->GetLayerByName("entities");
     if(dxf_layer_ == NULL) {
-        std::cerr << "[DXFVectorMap] : Failed to load "
-                  << "'entities' layer!"
-                  << "\n";
+        std::cerr << "[DXFVectorMap] : Failed to load 'entities' layer!\n";
         return false;
     }
 
@@ -80,7 +75,7 @@ void DXFMap::getPolygon(Polygon &polygon,
 
     if(bounding_polygon_it == polygons.end()) {
         if(debug_)
-            std::cerr << "Couldn't find a bounding polygon!" << "\n";
+            std::cerr << "Couldn't find a bounding polygon!\n";
         polygon = Polygon();
         return;
     }
@@ -298,7 +293,7 @@ inline void geometryToVectors(OGRGeometry     *geometry,
     switch(type) {
     case wkbPoint:
         if(debug)
-            std::cerr << "Single points will not be inserted into vector map!" << "\n";
+            std::cerr << "Single points will not be inserted into vector map!\n";
         break;
     case wkbLineString:
         lineStringToVectors((OGRLineString*) geometry, vectors);
@@ -311,11 +306,11 @@ inline void geometryToVectors(OGRGeometry     *geometry,
         break;
     case wkbPolygon:
         if(debug)
-            std::cerr << "[DXFVectorMap] : Polygon will not be inserted into vector map!" << "\n";
+            std::cerr << "[DXFVectorMap] : Polygon will not be inserted into vector map!\n";
         break;
     default:
         if(debug)
-            std::cerr << "[DXFVectorMap] : Unknown geometry type!" << "\n";
+            std::cerr << "[DXFVectorMap] : Unknown geometry type!\n";
         break;
     }
 }
@@ -328,7 +323,7 @@ inline void geometryToPolygons(OGRGeometry      *geometry,
     switch(type) {
     case wkbPoint:
         if(debug)
-            std::cerr << "Single points will not be inserted into vector map!" << "\n";
+            std::cerr << "Single points will not be inserted into vector map!\n";
         break;
     case wkbLineString:
         lineStringToPolygon((OGRLineString*) geometry, polygons);
@@ -341,11 +336,11 @@ inline void geometryToPolygons(OGRGeometry      *geometry,
         break;
     case wkbPolygon:
         if(debug)
-            std::cerr << "[DXFVectorMap] : Polygon will not be inserted into vector map!" << "\n";
+            std::cerr << "[DXFVectorMap] : Polygon will not be inserted into vector map!\n";
         break;
     default:
         if(debug)
-            std::cerr << "[DXFVectorMap] : Unknown geometry type!" << "\n";
+            std::cerr << "[DXFVectorMap] : Unknown geometry type!\n";
         break;
     }
 }
@@ -357,9 +352,7 @@ bool DXFMap::retrieveBounding()
     dxf_layer_->ResetReading();
     OGREnvelope env;
     if(dxf_layer_->GetExtent(&env) != OGRERR_NONE) {
-        std::cerr << "[DXFVectorMap] : Error retrieving "
-                  << "dimensions of map!"
-                  << "\n";
+        std::cerr << "[DXFVectorMap] : Error retrieving dimensions of map!\n";
         return false;
     }
 
@@ -384,9 +377,8 @@ void DXFMap::retrieveVectors(Vectors &vectors,
     dxf_layer_->ResetReading();
     OGRErr err = dxf_layer_->SetAttributeFilter(attrib_filter.c_str());
     if(err != 0) {
-        std::cerr << "[DXFVectorMap] : Error attribute filter '"<< err << "'!" << "\n";
+        std::cerr << "[DXFVectorMap] : Error attribute filter '"<< err << "'!\n";
     }
-
 
     OGRFeature *feature(NULL);
     while((feature = dxf_layer_->GetNextFeature()) != NULL) {
@@ -406,7 +398,7 @@ void DXFMap::retrievePolygons(Polygons &polygons,
     dxf_layer_->ResetReading();
     OGRErr err = dxf_layer_->SetAttributeFilter(attrib_filter.c_str());
     if(err != 0) {
-        std::cerr << "[DXFVectorMap] : Error attribute filter '"<< err << "'!" << "\n";
+        std::cerr << "[DXFVectorMap] : Error attribute filter '"<< err << "'!\n";
     }
 
     OGRFeature *feature(NULL);

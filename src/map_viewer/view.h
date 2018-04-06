@@ -2,12 +2,12 @@
 #define VIEW_H
 
 #include <QMainWindow>
-#include <QPen>
-#include <QStringListModel>
+#include <QString>
 #include <memory>
+#include <vector>
 
 class QGraphicsScene;
-class QGraphicsView;
+class QInteractiveGraphicsView;
 class QGraphicsPathItem;
 class QLayerListItem;
 class QProgressDialog;
@@ -23,8 +23,11 @@ class  Control;
 class  Renderer;
 class  Parameters;
 struct CornerDetectionParameter;
+struct FindDoorsParameter;
+struct FindRoomsParameter;
 struct RasterizationParameter;
 struct VectormapConversionParameter;
+struct RtreeVectormapConversionParameter;
 
 class View : public QMainWindow
 {
@@ -41,8 +44,11 @@ public:
 signals:
     void openFile(const QString &path);
     void runCornerDetection(const CornerDetectionParameter &params);
+    void runFindDoors(const FindDoorsParameter &params);
+    void runFindRooms(const FindRoomsParameter &params);
     void runGridmapExport(const RasterizationParameter &params);
     void runVectormapExport(const VectormapConversionParameter &params);
+    void runRtreeVectormapExport(const RtreeVectormapConversionParameter &params);
 
 public slots:
     void update();
@@ -56,21 +62,24 @@ private slots:
     void actionOpen();
     void actionExport_gridmap();
     void actionExport_vectormap();
+    void actionExport_rtree_vectormap();
     void actionRun_corner_detection();
-    void actionBuild_topology();
     void actionFind_doors();
+    void actionFind_rooms();
 
     void updateLayer(const QString &name);
 
 private:
     //// qt
     Ui::map_viewer                    *ui_;
-    QGraphicsView                     *view_;
+    QInteractiveGraphicsView          *view_;
     QProgressDialog                   *progress_;
 
     using QLayerListItemPtr = std::shared_ptr<QLayerListItem>;
 
-    std::map<QString, QLayerListItemPtr>    layer_items_;
+    std::vector<QLayerListItemPtr>    layer_items_;
+    std::vector<QLayerListItemPtr>    door_items_;
+    std::vector<QLayerListItemPtr>    room_items_;
 
     //// models
     Map                                    *map_;
@@ -79,7 +88,6 @@ private:
     Parameters                             *parameters_;
 
     void renderLayer(const QString &name);
-
 };
 }
 

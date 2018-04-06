@@ -4,7 +4,10 @@
 /// COMPONENT
 #include <cslibs_boost_geometry/algorithms.hpp>
 #include <cslibs_vectormaps/utility/tools.hpp>
+#include <boost/geometry/algorithms/intersects.hpp>
 #include <boost/geometry/algorithms/comparable_distance.hpp>
+
+#include <iostream>
 
 using namespace cslibs_vectormaps;
 using namespace cslibs_boost_geometry;
@@ -27,12 +30,33 @@ SimpleGridVectorMap::~SimpleGridVectorMap()
 {
 }
 
+const void* SimpleGridVectorMap::cell(const Point& pos) const
+{
+    return &grid_[grid_dimensions_.index(row(pos), col(pos))];
+}
+
+double SimpleGridVectorMap::minSquaredDistanceNearbyStructure(const Point& pos,
+                                                              const void* cell_ptr,
+                                                              double angle) const
+{
+    double min_squared_dist = std::numeric_limits<double>::max();
+    const VectorPtrs &cell = *static_cast<const VectorPtrs*>(cell_ptr);
+
+    for (const Vector* line : cell) {
+        double squared_dist = boost::geometry::comparable_distance(pos, *line);
+        if (min_squared_dist > squared_dist)
+            min_squared_dist = squared_dist;
+    }
+
+    return min_squared_dist;
+}
+
 double SimpleGridVectorMap::minDistanceNearbyStructure(const Point &pos) const
 {
     if(tools::pointOutsideMap(pos, min_corner_, max_corner_)) {
         if(debug_) {
             std::cerr << "[SimpleGridVectorMap] : Position to test "
-                      << "not within grid structured area!" << "\n";
+                         "not within grid structured area!\n";
         }
         return false;
     }
@@ -89,7 +113,7 @@ bool SimpleGridVectorMap::structureNearby(const Point &pos,
     if(tools::pointOutsideMap(pos, min_corner_, max_corner_)) {
         if(debug_) {
             std::cerr << "[SimpleGridVectorMap] : Position to test "
-                      << "not within grid structured area!" << "\n";
+                         "not within grid structured area!\n";
         }
         return false;
     }
@@ -112,7 +136,7 @@ bool SimpleGridVectorMap::retrieveFiltered(const Point &pos,
     if(tools::pointOutsideMap(pos, min_corner_, max_corner_)) {
         if(debug_) {
             std::cerr << "[SimpleGridVectorMap] : Position to test "
-                      << "not within grid structured area!" << "\n";
+                         "not within grid structured area!\n";
         }
         return false;
     }
@@ -146,7 +170,7 @@ bool SimpleGridVectorMap::retrieve(const Point &pos,
     if(tools::pointOutsideMap(pos, min_corner_, max_corner_)) {
         if(debug_) {
             std::cerr << "[SimpleGridVectorMap] : Position to test "
-                      << "not within grid structured area!" << "\n";
+                         "not within grid structured area!\n";
         }
         return false;
     }
@@ -179,6 +203,15 @@ int SimpleGridVectorMap::intersectScanPattern(
     return intersection_count;
 }
 
+double SimpleGridVectorMap::intersectScanRay(const Vector& ray,
+                                             const void* cell_ptr,
+                                             double angle,
+                                             double max_range) const
+{
+    const VectorPtrs& cell = *static_cast<const VectorPtrs*>(cell_ptr);
+    return algorithms::nearestIntersectionDistance<double, types::Point2d>(ray, cell, max_range);
+}
+
 void SimpleGridVectorMap::intersectScanPattern(const Point        &position,
                                                const Vectors      &pattern,
                                                std::vector<float> &ranges,
@@ -197,8 +230,8 @@ unsigned int SimpleGridVectorMap::handleInsertion()
     unsigned int assigned = 0;
 
     if(debug_) {
-        std::cerr << "rows: " << rows_ << "\n";
-        std::cerr << "cols: " << cols_ << "\n";
+        std::cout << "rows: " << rows_ << "\n"
+                     "cols: " << cols_ << "\n";
     }
 
     if(valid_area_.outer().empty()) {
@@ -216,8 +249,6 @@ unsigned int SimpleGridVectorMap::handleInsertion()
                         ++assigned;
                     }
                 }
-                min.x(min.x() + resolution_);
-                max.x(max.x() + resolution_);
             }
         }
     } else {
@@ -231,20 +262,18 @@ unsigned int SimpleGridVectorMap::handleInsertion()
                 Polygon     cell_bounding_poly =
                         algorithms::toPolygon<Point>(min, max);
 
-                for(Vector& line : data_) {
-                    if(algorithms::covered_by<Point>(cell_bounding_poly, valid_area_)) {
+                if(algorithms::covered_by<Point>(cell_bounding_poly, valid_area_)) {
+                    for(Vector& line : data_) {
                         if(algorithms::touches<Point>(line, cell_bounding)) {
                             grid_[grid_dimensions_.index(i,j)].push_back(&line);
                             ++assigned;
                         }
-                    } else {
-                        if(debug_) {
-                            std::cout << "Cell out of valid area!" << "\n";
-                        }
+                    }
+                } else {
+                    if(debug_) {
+                        std::cout << "Cell out of valid area!\n";
                     }
                 }
-                min.x(min.x() + resolution_);
-                max.x(max.x() + resolution_);
             }
         }
     }

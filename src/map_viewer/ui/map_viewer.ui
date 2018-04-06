@@ -77,73 +77,244 @@
        </widget>
       </item>
       <item>
-       <widget class="QGroupBox" name="layers">
+       <widget class="QTabWidget" name="tabWidget">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+         <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
         <property name="minimumSize">
          <size>
-          <width>200</width>
+          <width>250</width>
           <height>0</height>
          </size>
         </property>
-        <property name="title">
-         <string>Layers:</string>
-        </property>
-        <layout class="QVBoxLayout" name="verticalLayout">
-         <item>
-          <widget class="QWidget" name="layerList" native="true">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="minimumSize">
-            <size>
-             <width>200</width>
-             <height>0</height>
-            </size>
-           </property>
-           <layout class="QVBoxLayout" name="layerListLayout">
-            <property name="spacing">
-             <number>0</number>
+        <widget class="QWidget" name="tab_layers">
+         <attribute name="title">
+          <string>Layers</string>
+         </attribute>
+         <layout class="QVBoxLayout" name="tab_layers_layout">
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="QScrollArea" name="scrollArea_layers">
+            <property name="frameShape">
+             <enum>QFrame::NoFrame</enum>
             </property>
-            <property name="sizeConstraint">
-             <enum>QLayout::SetMinimumSize</enum>
+            <property name="widgetResizable">
+             <bool>true</bool>
             </property>
-            <property name="leftMargin">
-             <number>0</number>
+            <widget class="QWidget" name="scrollContents_layers">
+             <property name="geometry">
+              <rect>
+               <x>0</x>
+               <y>0</y>
+               <width>383</width>
+               <height>508</height>
+              </rect>
+             </property>
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <layout class="QVBoxLayout" name="scrollContents_layers_layout">
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
+              <item>
+               <layout class="QVBoxLayout" name="layerListLayout"/>
+              </item>
+              <item>
+               <spacer name="verticalSpacer_layers">
+                <property name="orientation">
+                 <enum>Qt::Vertical</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>20</width>
+                  <height>40</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
+            </widget>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="tab_doors">
+         <attribute name="title">
+          <string>Doors</string>
+         </attribute>
+         <layout class="QVBoxLayout" name="tab_doors_layout">
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="QScrollArea" name="scrollArea_doors">
+            <property name="frameShape">
+             <enum>QFrame::NoFrame</enum>
             </property>
-            <property name="topMargin">
-             <number>0</number>
+            <property name="widgetResizable">
+             <bool>true</bool>
             </property>
-            <property name="rightMargin">
-             <number>0</number>
+            <widget class="QWidget" name="scrollContents_doors">
+             <property name="geometry">
+              <rect>
+               <x>0</x>
+               <y>0</y>
+               <width>383</width>
+               <height>508</height>
+              </rect>
+             </property>
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <layout class="QVBoxLayout" name="scrollContents_doors_layout">
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
+              <item>
+               <layout class="QVBoxLayout" name="doorListLayout"/>
+              </item>
+              <item>
+               <spacer name="verticalSpacer_doors">
+                <property name="orientation">
+                 <enum>Qt::Vertical</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>20</width>
+                  <height>40</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
+            </widget>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="tab_rooms">
+         <attribute name="title">
+          <string>Rooms</string>
+         </attribute>
+         <layout class="QVBoxLayout" name="tab_rooms_layout">
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="QScrollArea" name="scrollArea_rooms">
+            <property name="frameShape">
+             <enum>QFrame::NoFrame</enum>
             </property>
-            <property name="bottomMargin">
-             <number>0</number>
+            <property name="widgetResizable">
+             <bool>true</bool>
             </property>
-           </layout>
-          </widget>
-         </item>
-         <item>
-          <spacer name="verticalSpacer">
-           <property name="orientation">
-            <enum>Qt::Vertical</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>20</width>
-             <height>40</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-        </layout>
+            <widget class="QWidget" name="scrollContents_rooms">
+             <property name="geometry">
+              <rect>
+               <x>0</x>
+               <y>0</y>
+               <width>383</width>
+               <height>508</height>
+              </rect>
+             </property>
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <layout class="QVBoxLayout" name="scrollContents_rooms_layout">
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
+              <item>
+               <layout class="QVBoxLayout" name="roomListLayout"/>
+              </item>
+              <item>
+               <spacer name="verticalSpacer_rooms">
+                <property name="orientation">
+                 <enum>Qt::Vertical</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>20</width>
+                  <height>40</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
+            </widget>
+           </widget>
+          </item>
+         </layout>
+        </widget>
        </widget>
       </item>
      </layout>
@@ -156,7 +327,7 @@
      <x>0</x>
      <y>0</y>
      <width>818</width>
-     <height>22</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -166,6 +337,7 @@
     <addaction name="actionOpen"/>
     <addaction name="actionExport_gridmap"/>
     <addaction name="actionExport_vectormap"/>
+    <addaction name="actionExport_rtree_vectormap"/>
    </widget>
    <widget class="QMenu" name="menuTools">
     <property name="title">
@@ -173,7 +345,7 @@
     </property>
     <addaction name="actionRun_corner_detection"/>
     <addaction name="actionFind_doors"/>
-    <addaction name="actionBuild_topology"/>
+    <addaction name="actionFind_rooms"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuTools"/>
@@ -202,15 +374,15 @@
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>Find doors ...</string>
+    <string>Find doors...</string>
    </property>
   </action>
-  <action name="actionBuild_topology">
+  <action name="actionFind_rooms">
    <property name="enabled">
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>Build topology ...</string>
+    <string>Find rooms...</string>
    </property>
   </action>
   <action name="actionExport_gridmap">
@@ -227,6 +399,14 @@
    </property>
    <property name="text">
     <string>Export vectormap ...</string>
+   </property>
+  </action>
+  <action name="actionExport_rtree_vectormap">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Export rtree vectormap ...</string>
    </property>
   </action>
  </widget>

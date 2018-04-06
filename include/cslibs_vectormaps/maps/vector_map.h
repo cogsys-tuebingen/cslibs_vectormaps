@@ -1,7 +1,7 @@
 #ifndef VECTOR_MAP_H
 #define VECTOR_MAP_H
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <cslibs_boost_geometry/types.hpp>
 
 #include <yaml-cpp/yaml.h>
@@ -12,7 +12,7 @@ class VectorMap
 {
 public:
     /// SOME TYPE DEFINITIONS FOR EASIER USAGE
-    using Ptr = boost::shared_ptr<VectorMap>;
+    using Ptr = std::shared_ptr<VectorMap>;
 
     using Dimension         = cslibs_boost_geometry::types::Dim2d;
     using Point             = cslibs_boost_geometry::types::Point2d;
@@ -36,8 +36,14 @@ public:
     unsigned int   insert(const Vectors &set,
                           const Polygon &valid = Polygon());
 
+    virtual const void* cell(const Point& p) const = 0;
+
     virtual bool   structureNearby(const Point &pos,
                                    const double thresh = 0.15) const = 0;
+
+    virtual double minSquaredDistanceNearbyStructure(const Point& pos,
+                                                     const void* cell_ptr,
+                                                     double angle) const = 0;
 
     virtual double minDistanceNearbyStructure(const Point &pos) const = 0;
 
@@ -48,6 +54,11 @@ public:
 
     virtual bool   retrieve(const Point &pos,
                             Vectors     &lines) const = 0;
+
+    virtual double intersectScanRay(const Vector& ray,
+                                    const void* cell_ptr,
+                                    double angle,
+                                    double max_range) const = 0;
 
     virtual int    intersectScanPattern(const Point        &position,
                                         const Vectors      &pattern,

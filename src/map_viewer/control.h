@@ -1,6 +1,8 @@
 #ifndef CONTROL_H
 #define CONTROL_H
 
+#include "algorithms/find_doors.h"
+
 #include <QObject>
 
 #include <thread>
@@ -12,8 +14,10 @@ namespace cslibs_vectormaps {
 class Map;
 class View;
 struct CornerDetectionParameter;
+struct FindRoomsParameter;
 struct RasterizationParameter;
 struct VectormapConversionParameter;
+struct RtreeVectormapConversionParameter;
 
 class Control : public QObject
 {
@@ -40,8 +44,11 @@ public slots:
      *        visible layers.
      */
     void runCornerDetection(const CornerDetectionParameter &params);
+    void runFindDoors(const FindDoorsParameter &params);
+    void runFindRooms(const FindRoomsParameter &params);
     void runGridmapExport(const RasterizationParameter &params);
     void runVectormapExport(const VectormapConversionParameter &params);
+    void runRtreeVectormapExport(const RtreeVectormapConversionParameter &params);
 
 private:
     Map             *map_;
@@ -54,9 +61,14 @@ private:
 
     void doWork(const std::function<void()>& work);
     void executeCornerDetection(const CornerDetectionParameter &params);
+    void executeFindDoors(const FindDoorsParameter &params);
+    void executeFindRooms(const FindRoomsParameter &params);
     void executeGridmapExport(const RasterizationParameter &params);
     void executeVectormapExport(const VectormapConversionParameter &params);
+    void executeRtreeVectormapExport(const RtreeVectormapConversionParameter &params);
 
+public:
+    FindDoors::graph_t doors_graph_;
 };
 }
 

@@ -1,13 +1,10 @@
 #include "map.h"
-#include "view.h"
-
-#include <QStringList>
-#include <thread>
-#include <functional>
-#include <set>
 
 #include "models/vector_layer_model.h"
 #include "models/point_layer_model.h"
+
+#include <set>
+#include <vector>
 
 using namespace cslibs_vectormaps;
 
@@ -19,16 +16,16 @@ Map::~Map()
 {
 }
 
-LayerModel::Ptr Map::getLayer(const QString &name)
+LayerModel::Ptr Map::getLayer(const QString &name) const
 {
-    std::unique_lock<std::mutex> l(layers_mutex_);
-    return layers_[name.toStdString()];
+    return getLayer(name.toStdString());
 }
 
-LayerModel::Ptr Map::getLayer(const std::string &name)
+LayerModel::Ptr Map::getLayer(const std::string &name) const
 {
     std::unique_lock<std::mutex> l(layers_mutex_);
-    return layers_[name];
+    auto result = layers_.find(name);
+    return result != layers_.end() ? result->second : LayerModel::Ptr();
 }
 
 void Map::getLayers(std::vector<LayerModel::Ptr> &layers) const
@@ -43,16 +40,21 @@ void Map::setLayer(const LayerModel::Ptr &layer)
 {
     std::unique_lock<std::mutex> l(layers_mutex_);
     layers_[layer->getName<std::string>()] = layer;
-    updated();
 }
 
-QPointF Map::getMin() const
+void Map::removeLayer(const std::string &name)
+{
+    std::unique_lock<std::mutex> l(layers_mutex_);
+    layers_.erase(name);
+}
+
+dxf::DXFMap::Point Map::getMin() const
 {
     std::unique_lock<std::mutex> l(layers_mutex_);
     return min_;
 }
 
-QPointF Map::getMax() const
+dxf::DXFMap::Point Map::getMax() const
 {
     std::unique_lock<std::mutex> l(layers_mutex_);
     return max_;
@@ -63,17 +65,14 @@ void Map::load(const dxf::DXFMap::Ptr &map)
     std::unique_lock<std::mutex> l(layers_mutex_);
     layers_.clear();
 
-    dxf::DXFMap::Point min, max;
-    map->getBounding(min, max);
-    min_ = QPointF(min.x(), min.y());
-    max_ = QPointF(max.x(), max.y());
+    map->getBounding(min_, max_);
 
     std::vector<std::string> names;
     map->getLayerNames(names);
 
-    auto less = [] (const dxf::DXFMap::Point &p1,
-                    const dxf::DXFMap::Point &p2) {
-        return p1.x() < p2.x() || p1.y() < p2.y();
+    auto less = [](const dxf::DXFMap::Point &p1,
+                   const dxf::DXFMap::Point &p2) {
+        return p1.x() < p2.x() && p1.y() < p2.y();
     };
 
     std::set<dxf::DXFMap::Point, decltype(less)> corner_set(less);

@@ -3,6 +3,10 @@
 
 #include "layer_model.h"
 
+#include <cslibs_vectormaps/dxf/dxf_map.h>
+
+#include <QPointF>
+
 namespace cslibs_vectormaps {
 class PointLayerModel : public LayerModel
 {
@@ -11,9 +15,12 @@ public:
     typedef std::shared_ptr<PointLayerModel const>  ConstPtr;
     typedef std::vector<QPointF>                    QPointFList;
 
-    PointLayerModel();
+    PointLayerModel(double alpha = 0.6);
 
     virtual ~PointLayerModel();
+
+    QGraphicsItem* render(const QPen& pen);
+    void update(QGraphicsItem &group, const QPen& pen);
 
     virtual void setPoints(const dxf::DXFMap::Points &points);
 
@@ -25,7 +32,7 @@ public:
 
 protected:
     dxf::DXFMap::Points points_;
-
+    double alpha_;
 };
 }
 

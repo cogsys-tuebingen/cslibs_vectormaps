@@ -12,9 +12,9 @@ LayerModel::~LayerModel()
 {
 }
 
-void LayerModel::setVisible(const bool visbile)
+void LayerModel::setVisible(bool visible)
 {
-    visible_ = visbile;
+    visible_ = visible;
 }
 
 bool LayerModel::getVisibility() const
@@ -39,7 +39,7 @@ void LayerModel::setName(const QString &name)
 
 void LayerModel::getName(QString &name) const
 {
-    name = QString(name_.c_str());
+    name = QString::fromStdString(name_);
 }
 
 void LayerModel::setColor(const QColor &color)
