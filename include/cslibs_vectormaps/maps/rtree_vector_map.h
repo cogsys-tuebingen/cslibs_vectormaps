@@ -14,6 +14,7 @@ class RtreeVectorMap : public VectorMap {
 protected:
     using box_t = boost::geometry::model::box<VectorMap::Point>;
     using ring_t = boost::geometry::model::ring<VectorMap::Point>;
+    using polygon_t = boost::geometry::model::polygon<VectorMap::Point>;
     using cell_t = std::tuple<box_t, std::vector<const Vector*>, double>;
 
 public:
@@ -57,7 +58,7 @@ public:
                                 const float default_mesaurement = 0.f) const override;
 
     void insert(const Vectors& segments,
-                const std::vector<ring_t>& rooms,
+                const std::vector<polygon_t>& room_polygons,
                 const std::vector<std::vector<std::size_t>>& segment_indices);
 
     unsigned int handleInsertion() override;
@@ -66,7 +67,7 @@ public:
 
 protected:
     boost::geometry::index::rtree<cell_t, boost::geometry::index::rstar<16>> rtree_;
-    std::vector<ring_t> room_rings_;
+    std::vector<polygon_t> room_polygons_;
 };
 
 }

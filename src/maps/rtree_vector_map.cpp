@@ -132,31 +132,31 @@ void RtreeVectorMap::intersectScanPattern(const Point& pos,
 
 }
 
-// preconditions: room_rings.size() == room_segment_indices.size(), each room
+// preconditions: room_polygons.size() == room_segment_indices.size(), each room
 // must be a non-intersecting clockwise ring, every value in
 // room_segment_indices must be less than segments.size().
 // The map is newly created using the given data.
 void RtreeVectorMap::insert(const Vectors& segments,
-                            const std::vector<ring_t>& room_rings,
+                            const std::vector<polygon_t>& room_polygons,
                             const std::vector<std::vector<std::size_t>>& room_segment_indices)
 {
     namespace bg = boost::geometry;
     namespace bgi = bg::index;
 
     data_ = segments;
-    room_rings_ = room_rings;
+    room_polygons_ = room_polygons;
 
     // We bulk-insert into the R-tree so that the efficient packing algorithm is
     // used. All values have to be passed to the constructor at once.
-    std::vector<cell_t> values(room_rings.size());
+    std::vector<cell_t> values(room_polygons.size());
     std::size_t iroom = 0;
-    for (const ring_t& room_ring : room_rings) {
-        box_t envelope = bg::return_envelope<box_t>(room_ring);
+    for (const polygon_t& room_polygon : room_polygons_) {
+        box_t envelope = bg::return_envelope<box_t>(room_polygon);
         std::vector<const Vector*> segment_pointers(room_segment_indices[iroom].size());
         std::size_t nsegment = 0;
         for (std::size_t segment_index : room_segment_indices[iroom])
             segment_pointers[nsegment++] = &data_[segment_index];
-        values[iroom] = std::make_tuple(envelope, segment_pointers, bg::area(room_ring) / bg::area(envelope));
+        values[iroom] = std::make_tuple(envelope, segment_pointers, bg::area(room_polygon) / bg::area(envelope));
         iroom++;
     }
 
@@ -193,23 +193,33 @@ void RtreeVectorMap::doLoad(const YAML::Node& node)
 
     YAML::Binary room_ring_sizes_binary = node["room_ring_sizes"].as<YAML::Binary>();
     YAML::Binary room_ring_data_binary = node["room_ring_data"].as<YAML::Binary>();
-    std::vector<std::uint32_t> room_ring_sizes;
+    std::vector<std::int32_t> room_ring_sizes;
     std::vector<Point> room_ring_data;
     serialization::deserialize(room_ring_sizes_binary, room_ring_sizes);
     serialization::deserialize(room_ring_data_binary, room_ring_data);
 
-    std::vector<ring_t> room_rings(room_ring_sizes.size());
+    std::vector<polygon_t> room_polygons;
 
     auto it2 = room_ring_data.begin();
+    polygon_t* last_polygon = nullptr;
     for (std::size_t i = 0; i < room_ring_sizes.size(); ++i) {
-        std::uint32_t room_ring_size = room_ring_sizes[i];
-        ring_t& room_ring = room_rings[i];
-        room_ring.resize(room_ring_size);
-        for (std::uint32_t j = 0; j < room_ring_size; ++j, ++it2)
-            room_ring[j] = *it2;
+        std::int32_t ring_size = room_ring_sizes[i];
+        ring_t* ring;
+        if (ring_size > 0) {
+            room_polygons.push_back(polygon_t());
+            last_polygon = &room_polygons.back();
+            ring = &last_polygon->outer();
+        } else {
+            last_polygon->inners().push_back(ring_t());
+            ring = &last_polygon->inners().back();
+            ring_size = -ring_size;
+        }
+        ring->resize(ring_size);
+        for (std::int32_t j = 0; j < ring_size; ++j, ++it2)
+            (*ring)[j] = *it2;
     }
 
-    insert(data_, room_rings, room_segment_indices);
+    insert(data_, room_polygons, room_segment_indices);
 }
 
 void RtreeVectorMap::doSave(YAML::Node& node) const
@@ -221,7 +231,7 @@ void RtreeVectorMap::doSave(YAML::Node& node) const
 
     std::vector<std::uint32_t> room_sizes;
     std::vector<std::uint32_t> room_indices;
-    room_sizes.reserve(room_rings_.size());
+    room_sizes.reserve(room_polygons_.size());
     room_indices.reserve(data_.size());
 
 #if BOOST_VERSION >= 105900
@@ -253,13 +263,16 @@ void RtreeVectorMap::doSave(YAML::Node& node) const
     serialization::serialize(room_indices, room_indices_binary);
     node["room_indices"] = room_indices_binary;
 
-    std::vector<std::uint32_t> room_ring_sizes;
+    std::vector<std::int32_t> room_ring_sizes;
     std::vector<Point> room_ring_data;
-    room_ring_sizes.reserve(room_rings_.size());
 
-    for (const ring_t& ring : room_rings_) {
-        room_ring_sizes.push_back(ring.size());
-        room_ring_data.insert(room_ring_data.end(), ring.begin(), ring.end());
+    for (const polygon_t& polygon : room_polygons_) {
+        room_ring_sizes.push_back(polygon.outer().size());
+        room_ring_data.insert(room_ring_data.end(), polygon.outer().begin(), polygon.outer().end());
+        for (const ring_t& hole : polygon.inners()) {
+            room_ring_sizes.push_back(-static_cast<std::int32_t>(hole.size()));
+            room_ring_data.insert(room_ring_data.end(), hole.begin(), hole.end());
+        }
     }
 
     YAML::Binary room_ring_sizes_binary;

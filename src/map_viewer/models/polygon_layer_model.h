@@ -2,13 +2,12 @@
 #define POLYGON_LAYER_MODEL_H
 
 #include "layer_model.h"
+#include "../types.h"
 
-#include <cslibs_vectormaps/dxf/dxf_map.h>
-
-#include <QVector>
-#include <QPointF>
 #include <QGraphicsPolygonItem>
-#include <QMouseEvent>
+#include <QPolygonF>
+#include <QGraphicsPathItem>
+#include <QPainterPath>
 
 namespace cslibs_vectormaps {
 
@@ -23,21 +22,24 @@ public:
     QGraphicsItem* render(const QPen& pen);
     void update(QGraphicsItem &group, const QPen& pen);
 
-    void setPolygon(const dxf::DXFMap::Points& polygon);
-    void getPolygon(dxf::DXFMap::Points& polygon) const;
-
-    void setPolygon(const QVector<QPointF>& polygon);
-    void getPolygon(QVector<QPointF>& polygon) const;
+    void setPolygon(const polygon_t& polygon);
+    void getPolygon(polygon_t& polygon) const;
 
 protected:
-    dxf::DXFMap::Points polygon_;
+    polygon_t polygon_;
     double alpha_;
 };
 
-class ConsciousPolygonItem : public QGraphicsPolygonItem {
+class PolygonItem : public QGraphicsPolygonItem {
 public:
     PolygonLayerModel& model_;
-    ConsciousPolygonItem(PolygonLayerModel& model);
+    PolygonItem(const QPolygonF& qpolygonf, PolygonLayerModel& model);
+};
+
+class PolygonItemWithHoles : public QGraphicsPathItem {
+public:
+    PolygonLayerModel& model_;
+    PolygonItemWithHoles(const QPainterPath& qpainterpath, PolygonLayerModel& model);
 };
 
 }

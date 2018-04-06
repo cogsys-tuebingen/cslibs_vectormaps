@@ -40,9 +40,15 @@ struct QInteractiveGraphicsView : public QGraphicsView
     {
         QList<QGraphicsItem*> myitems = items(event->pos());
         for (QGraphicsItem* i : myitems) {
-            cslibs_vectormaps::ConsciousPolygonItem* c = dynamic_cast<cslibs_vectormaps::ConsciousPolygonItem*>(i);
-            if (c) {
-                c->model_.setVisible(false);
+            cslibs_vectormaps::PolygonItem* p = dynamic_cast<cslibs_vectormaps::PolygonItem*>(i);
+            if (p) {
+                p->model_.setVisible(false);
+                map_->updated();
+                break;
+            }
+            cslibs_vectormaps::PolygonItemWithHoles* h = dynamic_cast<cslibs_vectormaps::PolygonItemWithHoles*>(i);
+            if (h) {
+                h->model_.setVisible(false);
                 map_->updated();
                 break;
             }

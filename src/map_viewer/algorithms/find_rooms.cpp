@@ -1,5 +1,11 @@
 #include "find_rooms.h"
 
+#include <boost/version.hpp>
+#include <iostream>
+#include <boost/geometry/algorithms/is_valid.hpp> // this goof forgot to include iostream at least until 1.58
+#include <boost/geometry/algorithms/within.hpp> // this gimp does not work if you don't include additional stuff
+#include <boost/geometry.hpp> // so let's include everything
+
 #include <iostream>
 #include <utility>
 
@@ -9,7 +15,7 @@ FindRooms::FindRooms(const FindRoomsParameter &parameter) : parameter_(parameter
 {
 }
 
-std::vector<std::vector<point_t>> FindRooms::find_rooms(const std::vector<FindDoors::door_t>& doors)
+std::vector<polygon_t> FindRooms::find_rooms(const std::vector<FindDoors::door_t>& doors)
 {
     typedef FindDoors d;
     d::graph_t& graph = *parameter_.graph;
@@ -47,7 +53,7 @@ std::vector<std::vector<point_t>> FindRooms::find_rooms(const std::vector<FindDo
     };
 
     // iterate through all the doors and try to find rooms!
-    std::vector<std::vector<point_t>> rooms;
+    std::vector<ring_t> rings;
     for (const d::door_t& door : doors) {
         // first, find a face of the door that's not the door's right or left side
         d::node_t* door_nodes[] = {graph.corner_lookup[door[0].second]->node, graph.corner_lookup[door[1].second]->node};
@@ -61,7 +67,7 @@ std::vector<std::vector<point_t>> FindRooms::find_rooms(const std::vector<FindDo
             for (d::edge_t& door_edge : door_node->edges) {
                 if (door_edge.door && door_edge.target->node == other_door_node) {
                     current_node = door_edge.target->node;
-                    std::cout << "start traversing from door edge "
+                    std::cout << "traverse from door side "
                               << door_edge.start->point.x() << '|'
                               << door_edge.start->point.y() << "->"
                               << door_edge.target->point.x() << '|'
@@ -71,18 +77,19 @@ std::vector<std::vector<point_t>> FindRooms::find_rooms(const std::vector<FindDo
                     break;
                 }
             }
-            std::vector<point_t> room = {edge->start->point};
+            ring_t ring;
+            ring.push_back(edge->start->point);
             // traverse room walls in clockwise order
             do {
-                auto add_point = [&point_eq](std::vector<point_t>& room, const point_t& p) {
-                    if (!point_eq(p, room.back())) {
+                auto add_point = [&point_eq](ring_t& ring, const point_t& p) {
+                    if (!point_eq(p, ring.back())) {
                         // add new point only if last point does not compare equal
-                        if (room.size() <= 1 || !point_eq(p, *(room.end() - 2)))
+                        if (ring.size() <= 1 || !point_eq(p, *(ring.end() - 2)))
                             // add new point only if it would not form a spike
-                            room.push_back(p);
+                            ring.push_back(p);
                         else
                             // otherwise, remove spike
-                            room.pop_back();
+                            ring.pop_back();
                     }
                 };
                 for (std::size_t i = 0, n = current_node->edges.size(); i < n; i++) {
@@ -101,16 +108,16 @@ std::vector<std::vector<point_t>> FindRooms::find_rooms(const std::vector<FindDo
                             break;
                         }
                         if (edge != nullptr) {
-                            add_point(room, edge->target->point);
+                            add_point(ring, edge->target->point);
                         }
                         edge = new_edge;
                         if (edge->door) {
                             if (edge->checked) {
-                                std::cout << "room might have already been found at door edge "
+                                /*std::cout << "room might have already been found at door edge "
                                           << edge->start->point.x() << '|'
                                           << edge->start->point.y() << "->"
                                           << edge->target->point.x() << '|'
-                                          << edge->target->point.y() << '\n';
+                                          << edge->target->point.y() << '\n';*/
                                 goto next_door_face;
                             }
                             edge->checked = true;
@@ -120,16 +127,59 @@ std::vector<std::vector<point_t>> FindRooms::find_rooms(const std::vector<FindDo
                         break;
                     }
                 }
-                add_point(room, edge->start->point);
+                add_point(ring, edge->start->point);
             } while (current_node != door_node);
-            room.push_back(edge->target->point);
-            if (!point_eq(room.back(), room.front()))
-                room.push_back(room.front());
-            rooms.push_back(room);
+            ring.push_back(edge->target->point);
+            if (!point_eq(ring.back(), ring.front()))
+                ring.push_back(ring.front());
+            rings.push_back(ring);
 next_door_face:
             ;
         }
     }
+
+#if BOOST_VERSION < 105600
+    std::cerr << "Boost version >= 1.56.0 is required for finding holes in rooms, so your results might be flawed\n";
+#endif
+
+    // look for holes and drop invalid rings, form polygons
+    std::vector<polygon_t> rooms;
+    std::vector<ring_t> possible_holes;
+    std::size_t invalid = 0;
+    for (const ring_t& ring : rings) {
+        boost::geometry::validity_failure_type failure;
+        if (boost::geometry::is_valid(ring, failure)) {
+            rooms.push_back(polygon_t());
+            rooms.back().outer() = ring;
+        } else if (failure == boost::geometry::failure_wrong_orientation) {
+            possible_holes.push_back(ring);
+#if BOOST_VERSION < 105600
+            invalid++;
+#endif
+        } else {
+            invalid++;
+        }
+    }
+
+    // insert holes into polygons
+    std::size_t holes = 0;
+#if BOOST_VERSION >= 105600
+    for (const ring_t& possible_hole : possible_holes) {
+        for (polygon_t& room : rooms) {
+            if (boost::geometry::within(possible_hole, room)) {
+                room.inners().push_back(possible_hole);
+                holes++;
+                goto next_possible_hole;
+            }
+        }
+        invalid++;
+next_possible_hole:
+        ;
+    }
+#endif
+
+    std::cout << "Dropped " << invalid << " invalid rooms\n";
+    std::cout << "Found " << holes << " holes in rooms\n";
     std::cout << "Found " << rooms.size() << " rooms\n";
     return rooms;
 }
