@@ -1,7 +1,7 @@
 #ifndef FIND_DOORS_H
 #define FIND_DOORS_H
 
-#include "types.h"
+#include "../types.h"
 
 #include <cstddef>
 
@@ -59,10 +59,9 @@ public:
 
     FindDoors(const FindDoorsParameter &parameter);
 
-    // expresses segments in exact multiples of the map precision (e.g. converts
-    // decimal meters to integer millimeters: 2.030001 -> 2030.0)
+    // rounds segments to multiples of the map precision (e.g. cuts off
+    // after millimeters: 2.03500102 -> 2.035)
     std::vector<segment_t> round_segments(const std::vector<segment_t>& segments) const;
-    std::vector<point_t> round_points(const std::vector<point_t>& points) const;
 
     // removes overlapping segments
     std::vector<segment_t> clean_segments(const std::vector<segment_t>& rounded_segments) const;
@@ -73,8 +72,6 @@ public:
 
     static std::size_t delete_inner_edges(std::vector<node_t>& nodes);
     static std::size_t sort_edges_delete_duplicates(std::vector<node_t>& nodes);
-
-    point_t to_map_coords(const point_t& p) const;
 private:
     const FindDoorsParameter& parameter_;
 

@@ -1,7 +1,7 @@
 #include "polygon_layer_model.h"
 
 #include <QBrush>
-#include <QPolygonF>
+#include <QAbstractGraphicsShapeItem>
 
 using namespace cslibs_vectormaps;
 
@@ -13,40 +13,44 @@ PolygonLayerModel::~PolygonLayerModel()
 {
 }
 
-void PolygonLayerModel::setPolygon(const dxf::DXFMap::Points& polygon)
+void PolygonLayerModel::setPolygon(const polygon_t& polygon)
 {
     polygon_ = polygon;
 }
 
-void PolygonLayerModel::getPolygon(dxf::DXFMap::Points& polygon) const
+void PolygonLayerModel::getPolygon(polygon_t& polygon) const
 {
     polygon = polygon_;
 }
 
-void PolygonLayerModel::setPolygon(const QVector<QPointF>& polygon)
-{
-    polygon_.clear();
-    for (const auto& p : polygon)
-        polygon_.emplace_back(p.x(), p.y());
-}
-
-void PolygonLayerModel::getPolygon(QVector<QPointF>& polygon) const
-{
-    for (const auto& p : polygon_)
-        polygon.push_back(QPointF(p.x(), p.y()));
-}
-
 QGraphicsItem* PolygonLayerModel::render(const QPen& pen)
 {
-    ConsciousPolygonItem* i = new ConsciousPolygonItem(*this);
+    QPolygonF outerpolygon;
+    for (const auto& p : polygon_.outer())
+        outerpolygon.push_back(QPointF(p.x(), p.y()));
 
-    QVector<QPointF> polygon_points;
-    getPolygon(polygon_points);
-    QPolygonF qpolygon(polygon_points);
-    i->setPolygon(qpolygon);
+    QGraphicsItem* item;
+    if (polygon_.inners().size() == 0) {
+        PolygonItem* polygonitem = new PolygonItem(outerpolygon, *this);
+        item = polygonitem;
+    } else {
+        QPainterPath path;
+        path.addPolygon(outerpolygon);
+        for (const ring_t& hole : polygon_.inners()) {
+            QPainterPath inner;
+            //add inner points
+            QPolygonF innerpolygon;
+            for (const auto& p2 : hole)
+                innerpolygon.push_back(QPointF(p2.x(), p2.y()));
+            inner.addPolygon(innerpolygon);
+            path = path.subtracted(inner);
+        }
+        PolygonItemWithHoles* polygonitem = new PolygonItemWithHoles(path, *this);
+        item = polygonitem;
+    }
 
-    update(*i, pen);
-    return i;
+    update(*item, pen);
+    return item;
 }
 
 void PolygonLayerModel::update(QGraphicsItem& item, const QPen& pen)
@@ -56,11 +60,17 @@ void PolygonLayerModel::update(QGraphicsItem& item, const QPen& pen)
     p.setColor(c);
     c.setAlphaF(alpha_);
     QBrush b(c);
-    QGraphicsPolygonItem& polygon = static_cast<QGraphicsPolygonItem&>(item);
-    polygon.setPen(p);
-    polygon.setBrush(b);
+    QAbstractGraphicsShapeItem& shapeitem = static_cast<QAbstractGraphicsShapeItem&>(item);
+    shapeitem.setPen(p);
+    shapeitem.setBrush(b);
 }
 
-ConsciousPolygonItem::ConsciousPolygonItem(PolygonLayerModel& model) : model_(model)
+PolygonItem::PolygonItem(const QPolygonF& qpolygonf, PolygonLayerModel& model)
+    : QGraphicsPolygonItem(qpolygonf), model_(model)
+{
+}
+
+PolygonItemWithHoles::PolygonItemWithHoles(const QPainterPath& qpainterpath, PolygonLayerModel& model)
+    : QGraphicsPathItem(qpainterpath), model_(model)
 {
 }

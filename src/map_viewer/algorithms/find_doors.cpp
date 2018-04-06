@@ -4,6 +4,7 @@
 #include <boost/geometry/algorithms/intersection.hpp>
 #include <boost/geometry/index/rtree.hpp>
 #include <boost/math/constants/constants.hpp>
+#include <boost/version.hpp>
 
 #include <cstring>
 #include <cstdlib>
@@ -87,8 +88,6 @@ void FindDoors::get_corners(const std::vector<segment_t>& segments, const FindDo
 std::size_t FindDoors::merge_nodes(const FindDoorsParameter& params, const std::vector<double>& cpositions, const std::vector<std::vector<double>>& clines, std::map<point_t, corner_t*, point_compare>& corner_lookup)
 {
     double maxdist = params.merge_max_proximity;
-    if (params.map_precision != 0.)
-        maxdist *= params.map_precision;
     std::size_t merged = 0;
     auto mergenode = [&corner_lookup](point_t p1, point_t p2) {
         corner_t* c1 = corner_lookup[p1];
@@ -195,36 +194,19 @@ std::size_t FindDoors::sort_edges_delete_duplicates(std::vector<node_t>& nodes)
 
 std::vector<segment_t> FindDoors::round_segments(const std::vector<segment_t>& segments) const
 {
-    const FindDoorsParameter& params = parameter_;
-    std::vector<segment_t> roundedsegments;
-    for (const segment_t& segment : segments) {
-        segment_t roundedsegment = segment;
-        if (params.map_precision) {
-            double p = params.map_precision;
-            roundedsegment.first.x(std::round(roundedsegment.first.x() * p));
-            roundedsegment.first.y(std::round(roundedsegment.first.y() * p));
-            roundedsegment.second.x(std::round(roundedsegment.second.x() * p));
-            roundedsegment.second.y(std::round(roundedsegment.second.y() * p));
+    double p = parameter_.map_precision;
+    if (p != 0.) {
+        std::vector<segment_t> rounded_segments = segments;
+        for (segment_t& toround : rounded_segments) {
+            toround.first.x(std::round(toround.first.x() * p) / p);
+            toround.first.y(std::round(toround.first.y() * p) / p);
+            toround.second.x(std::round(toround.second.x() * p) / p);
+            toround.second.y(std::round(toround.second.y() * p) / p);
         }
-        roundedsegments.push_back(roundedsegment);
+        return rounded_segments;
+    } else {
+        return segments;
     }
-    return roundedsegments;
-}
-
-std::vector<point_t> FindDoors::round_points(const std::vector<point_t>& points) const
-{
-    const FindDoorsParameter& params = parameter_;
-    std::vector<point_t> roundedpoints;
-    for (const point_t& point : points) {
-        point_t roundedpoint = point;
-        if (params.map_precision) {
-            double p = params.map_precision;
-            roundedpoint.x(std::round(roundedpoint.x() * p));
-            roundedpoint.y(std::round(roundedpoint.y() * p));
-        }
-        roundedpoints.push_back(roundedpoint);
-    }
-    return roundedpoints;
 }
 
 std::vector<segment_t> FindDoors::clean_segments(const std::vector<segment_t>& rounded_segments) const
@@ -302,16 +284,16 @@ std::vector<segment_t> FindDoors::clean_segments(const std::vector<segment_t>& r
     }
     std::cout << "Merged " << overlaps << " overlapping segments\n";
 
+    // TODO: put the following lines in another function
+    // TODO: workaround for older Boost using bounding boxes
+#if BOOST_VERSION < 105600
+    std::cerr << "Boost version >= 1.56.0 is required for creating the segment graph! The results are probably unusable.\n";
+    return non_overlapping_segments;
+#else
     // replace intersecting line segments by multiple new segments that end in a common intersection point
     // use a spatial index because finding intersecting line segments globally is hard
     namespace bgi = boost::geometry::index;
     bgi::rtree<segment_t, bgi::rstar<16>> rtree(non_overlapping_segments);
-    auto point_eq = [](const point_t& p1, const point_t& p2) {
-        return p1.x() == p2.x() && p1.y() == p2.y();
-    };
-    auto segment_eq = [&point_eq](const segment_t& s1, const segment_t& s2) {
-        return point_eq(s1.first, s2.first) && point_eq(s1.second, s2.second);
-    };
     std::vector<segment_t> clean_segments;
     for (const segment_t& query_segment : non_overlapping_segments) {
         std::vector<point_t> intersections;
@@ -327,6 +309,7 @@ std::vector<segment_t> FindDoors::clean_segments(const std::vector<segment_t>& r
     std::cout << "Created " << (clean_segments.size() - non_overlapping_segments.size()) << " new segments because of intersections\n";
 
     return clean_segments;
+#endif
 }
 
 std::vector<FindDoors::door_t> FindDoors::find_doors(graph_t& graph, const std::vector<segment_t>& cleaned_segments)
@@ -390,13 +373,6 @@ std::vector<FindDoors::door_t> FindDoors::find_doors(graph_t& graph, const std::
     double door_depth_max = params.door_depth_max;
     double door_width_min = params.door_width_min;
     double door_width_max = params.door_width_max;
-    if (params.map_precision) {
-        double p = params.map_precision;
-        door_depth_min = std::round(door_depth_min * p);
-        door_depth_max = std::round(door_depth_max * p);
-        door_width_min = std::round(door_width_min * p);
-        door_width_max = std::round(door_width_max * p);
-    }
 
     auto check_length = [](const point_t& v, double min, double max) {
         // checks the length of a vector
@@ -533,12 +509,4 @@ std::vector<FindDoors::door_t> FindDoors::find_doors(graph_t& graph, const std::
     std::cout << "Found " << doors.size() << " doors!\n";
 
     return doors;
-}
-
-point_t FindDoors::to_map_coords(const point_t& p) const
-{
-    double scale = parameter_.map_precision;
-    if (scale == 0.)
-        return p;
-    return divide(p, scale);
 }

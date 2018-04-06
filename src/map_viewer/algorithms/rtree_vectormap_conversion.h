@@ -27,7 +27,7 @@ class RtreeVectormapConversion {
 public:
     RtreeVectormapConversion(const RtreeVectormapConversionParameter& parameters);
 
-    void index_rooms(const std::vector<std::vector<point_t>>& rooms);
+    void index_rooms(const std::vector<polygon_t> &rooms);
     bool index_segments(const std::vector<segment_t>& segments);
     bool drop_outliers();
     bool save(point_t min, point_t max) const;
@@ -40,7 +40,7 @@ private:
     // the tree's parameters do not have any impact on bulk-insertion as
     // noted here: https://lists.boost.org/boost-users/2014/10/83212.php
     boost::geometry::index::rtree<std::tuple<box_t, box_t, std::size_t>, boost::geometry::index::rstar<16>> rtree_;
-    std::vector<ring_t> rooms_;
+    std::vector<polygon_t> rooms_;
     std::vector<segment_t> segments_;
     std::vector<std::vector<std::size_t>> segment_indices_;
 };

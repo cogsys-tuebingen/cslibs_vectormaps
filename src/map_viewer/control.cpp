@@ -233,10 +233,10 @@ void Control::executeFindDoors(const FindDoorsParameter &params)
 
     std::size_t i = 0;
     for (const FindDoors::door_t& door : doors) {
-        std::vector<point_t> polygon;
+        polygon_t polygon;
         for (const segment_t& side : door) {
-            polygon.push_back(doorfinder.to_map_coords(side.first));
-            polygon.push_back(doorfinder.to_map_coords(side.second));
+            polygon.outer().push_back(side.first);
+            polygon.outer().push_back(side.second);
         }
 
         DoorLayerModel::Ptr layer(new DoorLayerModel);
@@ -273,8 +273,7 @@ void Control::executeFindRooms(const FindRoomsParameter &params)
     openProgressDialog("Find rooms");
 
     FindRooms roomfinder(params);
-    FindDoors doorfinder(*params.find_doors_parameter);
-    std::vector<std::vector<point_t>> rooms = roomfinder.find_rooms(doors);
+    std::vector<polygon_t> rooms = roomfinder.find_rooms(doors);
 
     std::size_t nrooms = rooms.size();
     std::size_t ndigits = 1;
@@ -291,15 +290,11 @@ void Control::executeFindRooms(const FindRoomsParameter &params)
     std::size_t i = 0;
     std::mt19937_64 mt;
     std::uniform_real_distribution<float> dist(0.f, 1.f);
-    for (std::vector<point_t>& room : rooms) {
-        std::vector<point_t> polygon = room;
-        for (point_t& point : polygon)
-            point = doorfinder.to_map_coords(point);
-
+    for (const polygon_t& room : rooms) {
         RoomLayerModel::Ptr layer(new RoomLayerModel);
         std::string layername = "Room #" + to_string(++i);
         layer->setName(layername);
-        layer->setPolygon(polygon);
+        layer->setPolygon(room);
         layer->setColor(QColor::fromHsvF(dist(mt), 1.f, 0.5f));
         map_->setLayer(layer);
     }
@@ -376,7 +371,7 @@ void Control::executeRtreeVectormapExport(const RtreeVectormapConversionParamete
 
     // get all line segments from visible layers
     dxf::DXFMap::Vectors segments;
-    std::vector<std::vector<point_t>> rooms;
+    std::vector<polygon_t> rooms;
     for (LayerModel::Ptr& l : layers) {
         if (l->getVisibility()) {
             VectorLayerModel::Ptr lv = LayerModel::as<VectorLayerModel>(l);
@@ -391,7 +386,7 @@ void Control::executeRtreeVectormapExport(const RtreeVectormapConversionParamete
             }
             RoomLayerModel::Ptr lr = LayerModel::as<RoomLayerModel>(l);
             if (lr) {
-                std::vector<point_t> room;
+                polygon_t room;
                 lr->getPolygon(room);
                 rooms.push_back(room);
             }

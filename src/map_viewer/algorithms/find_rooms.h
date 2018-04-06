@@ -14,7 +14,7 @@ class FindRooms {
 public:
     FindRooms(const FindRoomsParameter &parameter);
 
-    std::vector<std::vector<point_t>> find_rooms(const std::vector<FindDoors::door_t>& doors);
+    std::vector<polygon_t> find_rooms(const std::vector<FindDoors::door_t>& doors);
 private:
     const FindRoomsParameter& parameter_;
 };

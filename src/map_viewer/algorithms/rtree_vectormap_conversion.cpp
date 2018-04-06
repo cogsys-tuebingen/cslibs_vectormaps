@@ -1,6 +1,6 @@
 #include "rtree_vectormap_conversion.h"
 
-#include "types.h"
+#include "../types.h"
 
 #include <cslibs_vectormaps/maps/rtree_vector_map.h>
 
@@ -20,21 +20,18 @@ RtreeVectormapConversion::RtreeVectormapConversion(const RtreeVectormapConversio
 {
 }
 
-void RtreeVectormapConversion::index_rooms(const std::vector<std::vector<point_t>>& rooms)
+void RtreeVectormapConversion::index_rooms(const std::vector<polygon_t>& rooms)
 {
     namespace bg = boost::geometry;
     namespace bgi = bg::index;
 
-    rooms_.clear();
+    rooms_ = rooms;
 
     // We bulk-insert into R-tree, which uses more efficient packing algorithm.
     // All values have to be passed to the constructor at once.
     std::vector<std::tuple<box_t, box_t, std::size_t>> values(rooms.size());
-    std::size_t iroom = 0;
-    for (const std::vector<point_t>& room : rooms) {
-        ring_t ring(room.begin(), room.end());
-        rooms_.push_back(ring);
-        box_t envelope = bg::return_envelope<box_t>(ring);
+    for (std::size_t i = 0, size = rooms.size(); i < size; i++) {
+        box_t envelope = bg::return_envelope<box_t>(rooms[i]);
         box_t envelope_with_leeway = envelope;
         point_t& min = envelope_with_leeway.min_corner();
         min.x(min.x() - parameters_.leeway);
@@ -42,8 +39,7 @@ void RtreeVectormapConversion::index_rooms(const std::vector<std::vector<point_t
         point_t& max = envelope_with_leeway.max_corner();
         max.x(max.x() + parameters_.leeway);
         max.y(max.y() + parameters_.leeway);
-        values[iroom] = std::make_tuple(envelope_with_leeway, envelope, iroom);
-        iroom++;
+        values[i] = std::make_tuple(envelope_with_leeway, envelope, i);
     }
 
     rtree_.~rtree();
