@@ -189,6 +189,6 @@ next_possible_hole:
 
     std::cout << "Dropped " << invalid << " invalid rooms\n";
     std::cout << "Found " << holes << " holes in rooms\n";
-    std::cout << "Found " << rooms.size() << " rooms\n";
+    std::cout << "Found " << rooms.size() << " rooms!\n";
     return rooms;
 }

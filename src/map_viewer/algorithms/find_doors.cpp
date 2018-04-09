@@ -94,9 +94,12 @@ std::size_t FindDoors::merge_nodes(const FindDoorsParameter& params, const std::
         corner_t* c2 = corner_lookup[p2];
         if (c1->node != c2->node) {
             std::vector<edge_t>& edges2 = c2->node->edges;
+            for (const edge_t& edge : edges2) {
+                edge.start->node = c1->node;
+            }
+            // c2->node from before the loop is still in the nodes vector, but not referenced by any corner anymore
             c1->node->edges.insert(c1->node->edges.end(), edges2.begin(), edges2.end());
             std::vector<edge_t>().swap(edges2); // clear edges of c2
-            c2->node = c1->node; // the previous node is still in the nodes vector, it just is not referenced by any corner anymore
         }
     };
     auto point = [&params](double a, double b) {
@@ -368,7 +371,6 @@ std::vector<FindDoors::door_t> FindDoors::find_doors(graph_t& graph, const std::
     std::cout << "Deleted " << erased1 << " duplicate edges\n";
 
     // find doors
-    std::vector<door_t> doors;
     double door_depth_min = params.door_depth_min;
     double door_depth_max = params.door_depth_max;
     double door_width_min = params.door_width_min;
@@ -399,8 +401,9 @@ std::vector<FindDoors::door_t> FindDoors::find_doors(graph_t& graph, const std::
         // approximately 90 deg. 270 deg does not count! This is so that
         // v2's direction is consistent and so that no duplicates occur
         // when considering edges in both directions.
+        // The angles are not checked anymore right now.
         return check_length(v2, door_depth_min, door_depth_max)
-            && check_angle(v1, v2) && check_angle(v3, v2);
+            /*&& check_angle(v1, v2) && check_angle(v3, v2)*/;
     };
     auto check_node = [&check_door_side](const node_t& firstnode, const edge_t& e1, const edge_t& e2) {
         // checks if edge e2 from firstnode to secondnode could form
@@ -494,6 +497,10 @@ std::vector<FindDoors::door_t> FindDoors::find_doors(graph_t& graph, const std::
             }
         }
     }
+
+    // match side candidate pairs
+    std::vector<door_t> door_candidates;
+    std::vector<double> door_candidate_distances;
     for (std::size_t i1 = 0; i1 < ncandidates; i1++) {
         std::size_t i2 = side_candidate_partners[i1];
         if (i2 != static_cast<std::size_t>(-1) && i1 < i2
@@ -502,8 +509,62 @@ std::vector<FindDoors::door_t> FindDoors::find_doors(graph_t& graph, const std::
             const point_t& v22 = side_candidates[i1]->target->point;
             const point_t& w21 = side_candidates[i2]->start->point;
             const point_t& w22 = side_candidates[i2]->target->point;
-            std::array<segment_t, 2> s = {segment_t{v21, v22}, segment_t{w21, w22}};
-            doors.push_back(s);
+            door_t door_candidate = {segment_t{v21, v22}, segment_t{w21, w22}};
+            door_candidates.push_back(door_candidate);
+            door_candidate_distances.push_back(side_candidate_distances[i1]);
+        }
+    }
+    std::cout << "Found " << door_candidates.size() << " door candidates\n";
+
+    // check if area between door frame sides is unobstructed
+    std::vector<door_t> doors;
+    namespace bgi = boost::geometry::index;
+    bgi::rtree<segment_t, bgi::rstar<16>> rtree(cleaned_segments);
+    for (std::size_t i = 0; i < door_candidates.size(); i++) {
+        const door_t& door_candidate = door_candidates[i];
+        double d1 = boost::geometry::distance(door_candidate[0].first, door_candidate[0].second);
+        double d2 = boost::geometry::distance(door_candidate[1].first, door_candidate[1].second);
+
+        // aligned at the middle of the longer door frame side, create a
+        // rectangle between the door sides. it looks like this:
+        //      door_width
+        //      +---------+
+        //
+        //        +-----+             +
+        //  ----+ |     | +----       |
+        // frame| |rect | |frame      | door_width * unobstructed_area_depth
+        //  ----+ |     | +----       |
+        //        +-----+             +
+        //
+        //        +-----+
+        // door_width * unobstructed_area_width
+        const segment_t& longer_side = door_candidate[d1 > d2 ? 0 : 1];
+        double longer_side_length = d1 > d2 ? d1 : d2;
+        const point_t& v21 = longer_side.first;
+        const point_t& v22 = longer_side.second;
+        // r = middle + t * v
+        point_t middle = multiply(add(v21, v22), .5);
+        point_t v2 = subtract(v22, v21);
+        point_t v = {-v2.y(), v2.x()}; // 90 deg turn
+        double factor = door_candidate_distances[i] / longer_side_length;
+        // t2 and t are as long as the door is wide, t2 points in direction of
+        // the first door side, t points perpendicularly to the other door side
+        point_t t2 = multiply(v2, factor);
+        point_t t = multiply(v, factor);
+        double rectangle_length = params.unobstructed_area_depth;
+        double width_padding = .5 - params.unobstructed_area_width * .5;
+        point_t p1 = add(add(middle, multiply(t,      width_padding)), multiply(t2, -.5 * rectangle_length));
+        point_t p2 = add(add(middle, multiply(t, 1. - width_padding)), multiply(t2, -.5 * rectangle_length));
+        point_t p3 = add(add(middle, multiply(t, 1. - width_padding)), multiply(t2,  .5 * rectangle_length));
+        point_t p4 = add(add(middle, multiply(t,      width_padding)), multiply(t2,  .5 * rectangle_length));
+
+        // if this rectangle is not obstructed, we found an actual door
+        ring_t unobstructed_area;
+        unobstructed_area.insert(unobstructed_area.end(), {p1, p2, p3, p4, p1});
+        std::vector<segment_t> result;
+        bgi::query(rtree, bgi::intersects(unobstructed_area), std::back_inserter(result));
+        if (result.size() == 0) {
+            doors.push_back(door_candidate);
         }
     }
     std::cout << "Found " << doors.size() << " doors!\n";

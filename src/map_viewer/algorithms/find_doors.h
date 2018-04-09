@@ -15,10 +15,12 @@ struct FindDoorsParameter {
     double map_precision = 1000.; // 1 mm
     enum {ROWS, COLUMNS} find_mode = ROWS; // does not affect result, only maybe runtime
     double merge_max_proximity = .025; // 25 mm
-    double door_depth_min = .05; // 5 cm
-    double door_depth_max = .7; // 70 cm
     double door_width_min = .5; // 50 cm
     double door_width_max = 2.5; // 2.5 m
+    double door_depth_min = .05; // 5 cm
+    double door_depth_max = .7; // 70 cm
+    double unobstructed_area_width = .9; // relative to door width
+    double unobstructed_area_depth = 1.5; // relative to door width
     double door_angle_diff_max = .08726646259971647884618453842443; // 5 deg
 };
 
@@ -63,7 +65,7 @@ public:
     // after millimeters: 2.03500102 -> 2.035)
     std::vector<segment_t> round_segments(const std::vector<segment_t>& segments) const;
 
-    // removes overlapping segments
+    // merges overlapping segments, cuts segments that intersect others
     std::vector<segment_t> clean_segments(const std::vector<segment_t>& rounded_segments) const;
 
     // find doors using some heuristics
