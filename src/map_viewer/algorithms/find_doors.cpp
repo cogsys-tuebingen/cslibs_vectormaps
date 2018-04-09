@@ -516,6 +516,10 @@ std::vector<FindDoors::door_t> FindDoors::find_doors(graph_t& graph, const std::
     }
     std::cout << "Found " << door_candidates.size() << " door candidates\n";
 
+#if BOOST_VERSION < 105600
+    std::cerr << "Boost version >= 1.56.0 is required for checking space between door frames, so you might get more false positives\n";
+    return door_candidates;
+#else
     // check if area between door frame sides is unobstructed
     std::vector<door_t> doors;
     namespace bgi = boost::geometry::index;
@@ -568,6 +572,6 @@ std::vector<FindDoors::door_t> FindDoors::find_doors(graph_t& graph, const std::
         }
     }
     std::cout << "Found " << doors.size() << " doors!\n";
-
     return doors;
+#endif
 }
