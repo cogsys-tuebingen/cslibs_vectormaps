@@ -20,6 +20,8 @@ protected:
 public:
     typedef std::shared_ptr<RtreeVectorMap> Ptr;
 
+    RtreeVectorMap();
+
     RtreeVectorMap(const BoundingBox& bounding, bool debug);
 
     virtual ~RtreeVectorMap();

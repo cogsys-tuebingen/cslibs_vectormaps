@@ -20,8 +20,13 @@
 using namespace cslibs_vectormaps;
 using namespace cslibs_boost_geometry;
 
+RtreeVectorMap::RtreeVectorMap()
+{
+
+}
+
 RtreeVectorMap::RtreeVectorMap(const BoundingBox& bounding, bool debug) :
-    VectorMap(bounding, std::numeric_limits<double>::max(), debug)
+    VectorMap(bounding, 123456789., debug) // TODO
 {
 
 }
@@ -228,6 +233,7 @@ void RtreeVectorMap::doSave(YAML::Node& node) const
     namespace bgi = bg::index;
 
     VectorMap::doSave(node);
+    node["map_type"] = "rtree";
 
     std::vector<std::uint32_t> room_sizes;
     std::vector<std::uint32_t> room_indices;
