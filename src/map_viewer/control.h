@@ -66,9 +66,6 @@ private:
     void executeGridmapExport(const RasterizationParameter &params);
     void executeVectormapExport(const VectormapConversionParameter &params);
     void executeRtreeVectormapExport(const RtreeVectormapConversionParameter &params);
-
-public:
-    FindDoors::graph_t doors_graph_;
 };
 }
 

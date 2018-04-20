@@ -20,6 +20,7 @@
 #include "qt/QLayerListItem.hpp"
 #include "qt/QCornerParamDialog.hpp"
 #include "qt/QDoorParamDialog.hpp"
+#include "qt/QRoomParamDialog.hpp"
 #include "qt/QGridmapParamDialog.hpp"
 #include "qt/QVectormapParamDialog.hpp"
 #include "qt/QRtreeVectormapParamDialog.hpp"
@@ -271,10 +272,14 @@ void View::actionFind_doors()
 
 void View::actionFind_rooms()
 {
+    QRoomParamDialog param_dialog;
     FindRoomsParameter& params = parameters_->getFindRoomsParameters();
-    params.find_doors_parameter = &parameters_->getFindDoorsParameters();
-    params.graph = &control_->doors_graph_;
-    runFindRooms(params);
+    param_dialog.setup(params);
+    if(param_dialog.exec() == QDialog::Accepted) {
+        param_dialog.get(params);
+        parameters_->setFindRoomsParameters(params);
+        runFindRooms(params);
+    }
 }
 
 void View::updateLayer(const QString &name)

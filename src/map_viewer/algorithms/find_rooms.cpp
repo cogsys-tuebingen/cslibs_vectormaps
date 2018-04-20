@@ -22,13 +22,202 @@ FindRooms::FindRooms(const FindRoomsParameter &parameter) : parameter_(parameter
 {
 }
 
-std::vector<polygon_t> FindRooms::find_rooms(const std::vector<FindDoors::door_t>& doors)
+void FindRooms::get_corners(const std::vector<segment_t>& segments, const FindRoomsParameter& params, std::vector<double>& positions, std::vector<std::vector<double>>& lines)
 {
-    typedef FindDoors d;
-    d::graph_t& graph = *parameter_.graph;
+    std::map<double, std::set<double>> corner_map;
+
+    for (const segment_t& s : segments) {
+        if (params.find_mode == FindRoomsParameter::ROWS) {
+            corner_map[s.first.y()].insert(s.first.x());
+            corner_map[s.second.y()].insert(s.second.x());
+        } else { // params.find_mode == FindRoomsParameter::COLUMNS
+            corner_map[s.first.x()].insert(s.first.y());
+            corner_map[s.second.x()].insert(s.second.y());
+        }
+    }
+
+    positions.reserve(corner_map.size());
+    lines.reserve(corner_map.size());
+
+    for (const auto& pair : corner_map) {
+        positions.emplace_back(pair.first);
+        lines.emplace_back(pair.second.begin(), pair.second.end());
+    }
+}
+
+std::size_t FindRooms::merge_nodes(const FindRoomsParameter& params, const std::vector<double>& cpositions, const std::vector<std::vector<double>>& clines, std::map<point_t, corner_t*, point_compare>& corner_lookup)
+{
+    double maxdist = params.merge_max_proximity;
+    std::size_t merged = 0;
+    auto mergenode = [&corner_lookup](point_t p1, point_t p2) {
+        corner_t* c1 = corner_lookup[p1];
+        corner_t* c2 = corner_lookup[p2];
+        if (c1->node != c2->node) {
+            std::vector<edge_t>& edges2 = c2->node->edges;
+            for (const edge_t& edge : edges2) {
+                edge.start->node = c1->node;
+            }
+            // c2->node from before the loop is still in the nodes vector, but not referenced by any corner anymore
+            c1->node->edges.insert(c1->node->edges.end(), edges2.begin(), edges2.end());
+            std::vector<edge_t>().swap(edges2); // clear edges of c2
+        }
+    };
+    auto point = [&params](double a, double b) {
+        return params.find_mode == FindRoomsParameter::ROWS ? point_t{a, b} : point_t{b, a};
+    };
+    std::size_t n = cpositions.size();
+    for (std::size_t iy1 = 0; iy1 < n - 1; iy1++) {
+        const std::vector<double>& line1 = clines[iy1];
+        std::size_t nline1 = line1.size();
+        for (std::size_t ix1 = 0; ix1 < nline1; ix1++) {
+            double x1 = line1[ix1];
+            double y1 = cpositions[iy1];
+            if (ix1 > 0) {
+                double x0 = line1[ix1 - 1];
+                if (x1 - x0 <= maxdist) {
+                    mergenode(point(x0, y1), point(x1, y1));
+                    merged++;
+                }
+            }
+            for (std::size_t iy2 = iy1 + 1; iy2 < n && cpositions[iy2] - y1 <= maxdist; iy2++) {
+                double y2 = cpositions[iy2];
+                for (double x2 : clines[iy2]) {
+                    if (x1 - x2 <= maxdist && x2 - x1 <= maxdist) {
+                        mergenode(point(x1, y1), point(x2, y2));
+                        merged++;
+                    } else if (x2 - x1 > maxdist) {
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    return merged;
+}
+
+std::size_t FindRooms::delete_inner_edges(std::vector<node_t>& nodes)
+{
+    std::size_t deleted = 0;
+    for (node_t& node : nodes) {
+        for (auto it = node.edges.begin(); it != node.edges.end();) {
+            if (it->target->node == &node) {
+                it = node.edges.erase(it);
+                deleted++;
+            } else {
+                ++it;
+            }
+        }
+    }
+    return deleted;
+}
+
+std::size_t FindRooms::sort_edges_delete_duplicates(std::vector<node_t>& nodes)
+{
+    std::size_t erased = 0;
+    for (node_t& node : nodes) {
+        // because of the merging, there can be empty nodes that should not be considered
+        if (node.edges.size() > 0) {
+            // in order to sort the edges, we have to determine one of the node's points as a center point.
+            const point_t& center = node.edges[0].start->point;
+            // sort edges in anti-clockwise order.
+            // see https://stackoverflow.com/a/6989383 for a bad explanation
+            std::sort(node.edges.begin(), node.edges.end(), [&center](const edge_t& e1, const edge_t& e2) {
+                const point_t& a = e1.target->point;
+                const point_t& b = e2.target->point;
+                if (a.x() - center.x() >= 0 && b.x() - center.x() < 0)
+                    return false;
+                if (a.x() - center.x() < 0 && b.x() - center.x() >= 0)
+                    return true;
+                if (a.x() - center.x() == 0 && b.x() - center.x() == 0) {
+                    if (a.y() - center.y() >= 0 || b.y() - center.y() >= 0)
+                        return a.y() < b.y();
+                    return b.y() < a.y();
+                }
+                return (a.x() - center.x()) * (b.y() - center.y())
+                        > (b.x() - center.x()) * (a.y() - center.y());
+            });
+            for (std::size_t s = node.edges.size(), i = 0; i < s && s > 1; i++) {
+                std::size_t toerase = 0;
+                for (std::size_t j = i; j < s - (i == 0)
+                && node.edges[j].target->node == node.edges[(j + 1) % s].target->node/*
+                && node.edges[j].target->point.x() == node.edges[(j + 1) % s].target->point.x()
+                && node.edges[j].target->point.y() == node.edges[(j + 1) % s].target->point.y()*/;) {
+                    toerase++;
+                    j++;
+                }
+                auto begin = node.edges.begin();
+                node.edges.erase(begin + i, begin + i + toerase);
+                s -= toerase;
+                erased += toerase;
+            }
+        }
+    }
+    return erased;
+}
+
+void FindRooms::create_graph(const std::vector<segment_t>& cleaned_segments, graph_t& graph)
+{
+    const FindRoomsParameter& params = parameter_;
+
+    // get corners from line segments
+    std::vector<double> cpositions;
+    std::vector<std::vector<double>> clines;
+    get_corners(cleaned_segments, params, cpositions, clines);
+
+    // make vector of all corners and vector of all nodes
+    graph.nodes.clear();
+    graph.corners.clear();
+    for (std::size_t i = 0, n = cpositions.size(); i < n; i++) {
+        for (double p2 : clines[i]) {
+            graph.nodes.push_back({});
+            corner_t corner = {
+                {
+                    params.find_mode == FindRoomsParameter::ROWS ? p2 : cpositions[i],
+                    params.find_mode == FindRoomsParameter::ROWS ? cpositions[i] : p2
+                },
+                nullptr // fill that later, because pointers to nodes are invalidated in this loop
+            };
+            graph.corners.push_back(corner);
+        }
+    }
+
+    // make map for efficiently looking up corners by specifying coordinates
+    graph.corner_lookup.clear();
+    for (std::size_t i = 0, n = graph.corners.size(); i < n; i++) {
+        graph.corners[i].node = &graph.nodes[i];
+        graph.corner_lookup[graph.corners[i].point] = &graph.corners[i];
+    }
+
+    // then, connect those nodes. Each node's vector of connected nodes is populated.
+    for (const segment_t& segment : cleaned_segments) {
+        corner_t* c1 = graph.corner_lookup[segment.first];
+        corner_t* c2 = graph.corner_lookup[segment.second];
+        edge_t e1 = {c2, c1, false, false};
+        edge_t e2 = {c1, c2, false, false};
+        c1->node->edges.push_back(e2);
+        c2->node->edges.push_back(e1);
+    }
+
+    // merge nodes that are close to each other
+    std::size_t merged = merge_nodes(params, cpositions, clines, graph.corner_lookup);
+    std::cout << "Merged " << merged << " nodes into neighboring nodes\n";
+
+    // this can lead to redundant edges, remove those
+    std::size_t deleted = delete_inner_edges(graph.nodes);
+    std::cout << "Deleted " << deleted << " redundant edges connecting corners of the same node\n";
+
+    // sort each node's edges in counter-clockwise order and remove duplicate edges (those can happen because of shitty map data)
+    std::size_t erased1 = sort_edges_delete_duplicates(graph.nodes);
+    std::cout << "Deleted " << erased1 << " duplicate edges\n";
+}
+
+std::vector<polygon_t> FindRooms::find_rooms(const std::vector<segment_t>& cleaned_segments, const std::vector<FindDoors::door_t>& doors)
+{
+    graph_t graph;
+    create_graph(cleaned_segments, graph);
 
     // remove eventual door edges from previous call
-    for (d::node_t& node : graph.nodes) {
+    /*for (node_t& node : graph.nodes) {
         for (auto it = node.edges.begin(), end = node.edges.end(); it != end;) {
             if (it->door) {
                 it = node.edges.erase(it);
@@ -37,22 +226,22 @@ std::vector<polygon_t> FindRooms::find_rooms(const std::vector<FindDoors::door_t
                 ++it;
             }
         }
-    }
+    }*/
 
     // add two additional edges per door that connect the door's sides
-    for (const d::door_t& door : doors) {
+    for (const FindDoors::door_t& door : doors) {
         for (std::size_t side = 0; side < 2; side++) {
-            d::corner_t* c1 = graph.corner_lookup[door[side].first];
-            d::corner_t* c2 = graph.corner_lookup[door[(side + 1) % 2].second];
-            d::edge_t e1 = {c2, c1, true, false};
-            d::edge_t e2 = {c1, c2, true, false};
+            corner_t* c1 = graph.corner_lookup[door[side].first];
+            corner_t* c2 = graph.corner_lookup[door[(side + 1) % 2].second];
+            edge_t e1 = {c2, c1, true, false};
+            edge_t e2 = {c1, c2, true, false};
             c1->node->edges.push_back(e2);
             c2->node->edges.push_back(e1);
         }
     }
 
     // sort each node's edges in counter-clockwise order and remove duplicate edges again
-    std::size_t erased2 = d::sort_edges_delete_duplicates(graph.nodes);
+    std::size_t erased2 = sort_edges_delete_duplicates(graph.nodes);
     std::cout << "Deleted " << erased2 << " duplicate edges\n";
 
     auto point_eq = [](const point_t& p1, const point_t& p2) {
@@ -61,17 +250,17 @@ std::vector<polygon_t> FindRooms::find_rooms(const std::vector<FindDoors::door_t
 
     // iterate through all the doors and try to find rooms!
     std::vector<ring_t> rings;
-    for (const d::door_t& door : doors) {
+    for (const FindDoors::door_t& door : doors) {
         // first, find a face of the door that's not the door's right or left side
-        d::node_t* door_nodes[] = {graph.corner_lookup[door[0].second]->node, graph.corner_lookup[door[1].second]->node};
-        d::node_t* other_door_nodes[] = {graph.corner_lookup[door[1].first]->node, graph.corner_lookup[door[0].first]->node};
-        for (d::node_t* door_node : door_nodes) {
-            d::node_t* last_node = door_node;
-            d::node_t* current_node = nullptr; // initialized to suppress warning
-            d::edge_t* edge = nullptr;
+        node_t* door_nodes[] = {graph.corner_lookup[door[0].second]->node, graph.corner_lookup[door[1].second]->node};
+        node_t* other_door_nodes[] = {graph.corner_lookup[door[1].first]->node, graph.corner_lookup[door[0].first]->node};
+        for (node_t* door_node : door_nodes) {
+            node_t* last_node = door_node;
+            node_t* current_node = nullptr; // initialized to suppress warning
+            edge_t* edge = nullptr;
             // find door segment first
-            d::node_t* other_door_node = other_door_nodes[door_node == door_nodes[0] ? 0 : 1];
-            for (d::edge_t& door_edge : door_node->edges) {
+            node_t* other_door_node = other_door_nodes[door_node == door_nodes[0] ? 0 : 1];
+            for (edge_t& door_edge : door_node->edges) {
                 if (door_edge.door && door_edge.target->node == other_door_node) {
                     current_node = door_edge.target->node;
                     std::cout << "traverse from door side "
@@ -101,8 +290,8 @@ std::vector<polygon_t> FindRooms::find_rooms(const std::vector<FindDoors::door_t
                 };
                 for (std::size_t i = 0, n = current_node->edges.size(); i < n; i++) {
                     if (current_node->edges[i].target->node == last_node) {
-                        d::node_t* new_last_node = current_node;
-                        d::edge_t* new_edge = &current_node->edges[++i % n];
+                        node_t* new_last_node = current_node;
+                        edge_t* new_edge = &current_node->edges[++i % n];
                         // edge->target->node == current_node can happen when one node comprises multiple corners
                         std::size_t j;
                         for (j = 0; new_edge->target->node == current_node && j < n - 1; j++) {

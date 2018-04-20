@@ -21,7 +21,6 @@ public:
 
     void setup(const cslibs_vectormaps::FindDoorsParameter& params)
     {
-        ui_.doubleSpinBox_merge_max_proximity->setValue(params.merge_max_proximity);
         ui_.doubleSpinBox_door_width_min->setValue(params.door_width_min);
         ui_.doubleSpinBox_door_width_max->setValue(params.door_width_max);
         ui_.doubleSpinBox_door_depth_min->setValue(params.door_depth_min);
@@ -33,7 +32,6 @@ public:
 
     void get(cslibs_vectormaps::FindDoorsParameter& params)
     {
-        params.merge_max_proximity = ui_.doubleSpinBox_merge_max_proximity->value();
         params.door_width_min = ui_.doubleSpinBox_door_width_min->value();
         params.door_width_max = ui_.doubleSpinBox_door_width_max->value();
         params.door_depth_min = ui_.doubleSpinBox_door_depth_min->value();
