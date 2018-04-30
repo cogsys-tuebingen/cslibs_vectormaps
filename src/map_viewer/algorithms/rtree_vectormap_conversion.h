@@ -3,6 +3,8 @@
 
 #include "find_doors.h"
 
+#include <cslibs_vectormaps/maps/vector_map.h>
+
 #include <boost/geometry/geometries/box.hpp>
 #include <boost/geometry/geometries/ring.hpp>
 #include <boost/geometry/index/rtree.hpp>
@@ -18,19 +20,23 @@ namespace cslibs_vectormaps {
 
 struct RtreeVectormapConversionParameter {
     std::string path;
+    std::string type = "R-tree of rooms";
+    bool discard_segments = true;
     std::size_t max_elements_per_node = 16; // not used at the moment
     double leeway = 0.01; // for bad implementation reasons, this must always be greater than 1.0 / FindDoorsParameter::map_precision.
-    const FindDoorsParameter* find_doors_parameter;
 };
 
 class RtreeVectormapConversion {
 public:
     RtreeVectormapConversion(const RtreeVectormapConversionParameter& parameters);
 
+    bool operator()(const std::vector<polygon_t>& rooms, const std::vector<segment_t>& segments, point_t min, point_t max);
     void index_rooms(const std::vector<polygon_t> &rooms);
     bool index_segments(const std::vector<segment_t>& segments);
     bool drop_outliers();
-    bool save(point_t min, point_t max) const;
+    bool saveRooms(point_t min, point_t max);
+    bool saveSegments(point_t min, point_t max);
+    bool save(const VectorMap &map) const;
 private:
     using box_t = boost::geometry::model::box<point_t>;
     using ring_t = boost::geometry::model::ring<point_t>;

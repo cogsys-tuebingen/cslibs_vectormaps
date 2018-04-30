@@ -2,6 +2,7 @@
 
 #include <boost/geometry/arithmetic/arithmetic.hpp>
 #include <boost/geometry/algorithms/intersection.hpp>
+#include <boost/geometry/algorithms/length.hpp>
 #include <boost/geometry/index/rtree.hpp>
 #include <boost/math/constants/constants.hpp>
 #include <boost/version.hpp>
@@ -53,6 +54,11 @@ point_t divide(const point_t& p, double v)
     point_t p2 = p;
     boost::geometry::divide_value(p2, v);
     return p2;
+}
+
+bool equal(const point_t& a, const point_t& b)
+{
+    return a.x() == b.x() && a.y() == b.y();
 }
 
 }
@@ -392,7 +398,33 @@ std::vector<FindDoors::door_t> FindDoors::find_doors(const std::vector<segment_t
         std::vector<segment_t> result;
         bgi::query(rtree, bgi::intersects(unobstructed_area), std::back_inserter(result));
         if (result.size() == 0) {
-            doors.push_back(door_candidate);
+            door_t d = {
+                segment_t{door_candidate[0].second, door_candidate[1].first},
+                segment_t{door_candidate[1].second, door_candidate[0].first}
+            };
+            doors.push_back(d);
+        }
+    }
+
+    // near the door frames, the door might still intersect the map. prune door sides appropriately
+    for (door_t& door : doors) {
+        for (segment_t& side : door) {
+            std::vector<segment_t> intersections;
+            bgi::query(rtree, bgi::intersects(side), std::back_inserter(intersections));
+            for (const segment_t& intersection : intersections) {
+                // work around buggy boost::geometry::intersection rarely giving incorrect result
+                if (equal(intersection.first, side.first) || equal(intersection.first, side.second)
+                || equal(intersection.second, side.first) || equal(intersection.second, side.second))
+                    continue;
+                std::vector<point_t> intersection_points;
+                boost::geometry::intersection(side, intersection, intersection_points);
+                for (const point_t& intersection_point : intersection_points) {
+                    segment_t newside1 = {side.first, intersection_point};
+                    segment_t newside2 = {intersection_point, side.second};
+                    side = boost::geometry::length(newside1) > boost::geometry::length(newside2)
+                         ? newside1 : newside2;
+                }
+            }
         }
     }
     std::cout << "Found " << doors.size() << " doors!\n";

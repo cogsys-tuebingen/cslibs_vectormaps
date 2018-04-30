@@ -53,10 +53,10 @@ public:
 private:
     const FindRoomsParameter& parameter_;
 
-    void create_graph(const std::vector<segment_t>& cleaned_segments, graph_t& graph);
+    void create_graph(graph_t& graph, const std::vector<segment_t>& cleaned_segments, const std::vector<FindDoors::door_t> &doors);
 
-    static void get_corners(const std::vector<segment_t>& segments, const FindRoomsParameter& params, std::vector<double>& positions, std::vector<std::vector<double>>& lines);
-    static std::size_t merge_nodes(const FindRoomsParameter& params, const std::vector<double>& cpositions, const std::vector<std::vector<double>>& clines, std::map<point_t, corner_t*, point_compare>& corner_lookup);
+    static void get_corners(std::vector<double>& positions, std::vector<std::vector<double>>& lines, const std::vector<segment_t>& segments, const std::vector<FindDoors::door_t> &doors, const FindRoomsParameter& params);
+    static std::size_t merge_nodes(std::map<point_t, corner_t*, point_compare>& corner_lookup, const std::vector<double>& cpositions, const std::vector<std::vector<double>>& clines, const FindRoomsParameter& params);
 };
 
 }

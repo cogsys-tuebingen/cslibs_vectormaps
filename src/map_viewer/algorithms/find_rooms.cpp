@@ -22,17 +22,27 @@ FindRooms::FindRooms(const FindRoomsParameter &parameter) : parameter_(parameter
 {
 }
 
-void FindRooms::get_corners(const std::vector<segment_t>& segments, const FindRoomsParameter& params, std::vector<double>& positions, std::vector<std::vector<double>>& lines)
+void FindRooms::get_corners(std::vector<double>& positions, std::vector<std::vector<double>>& lines, const std::vector<segment_t>& segments, const std::vector<FindDoors::door_t>& doors, const FindRoomsParameter& params)
 {
     std::map<double, std::set<double>> corner_map;
 
-    for (const segment_t& s : segments) {
+    auto add_segment = [&params, &corner_map](const segment_t& s) {
         if (params.find_mode == FindRoomsParameter::ROWS) {
             corner_map[s.first.y()].insert(s.first.x());
             corner_map[s.second.y()].insert(s.second.x());
         } else { // params.find_mode == FindRoomsParameter::COLUMNS
             corner_map[s.first.x()].insert(s.first.y());
             corner_map[s.second.x()].insert(s.second.y());
+        }
+    };
+
+    for (const segment_t& s : segments) {
+        add_segment(s);
+    }
+
+    for (const FindDoors::door_t& door : doors) {
+        for (const segment_t& s : door) {
+            add_segment(s);
         }
     }
 
@@ -45,7 +55,7 @@ void FindRooms::get_corners(const std::vector<segment_t>& segments, const FindRo
     }
 }
 
-std::size_t FindRooms::merge_nodes(const FindRoomsParameter& params, const std::vector<double>& cpositions, const std::vector<std::vector<double>>& clines, std::map<point_t, corner_t*, point_compare>& corner_lookup)
+std::size_t FindRooms::merge_nodes(std::map<point_t, corner_t*, point_compare>& corner_lookup, const std::vector<double>& cpositions, const std::vector<std::vector<double>>& clines, const FindRoomsParameter& params)
 {
     double maxdist = params.merge_max_proximity;
     std::size_t merged = 0;
@@ -155,14 +165,14 @@ std::size_t FindRooms::sort_edges_delete_duplicates(std::vector<node_t>& nodes)
     return erased;
 }
 
-void FindRooms::create_graph(const std::vector<segment_t>& cleaned_segments, graph_t& graph)
+void FindRooms::create_graph(graph_t& graph, const std::vector<segment_t>& cleaned_segments, const std::vector<FindDoors::door_t>& doors)
 {
     const FindRoomsParameter& params = parameter_;
 
     // get corners from line segments
     std::vector<double> cpositions;
     std::vector<std::vector<double>> clines;
-    get_corners(cleaned_segments, params, cpositions, clines);
+    get_corners(cpositions, clines, cleaned_segments, doors, params);
 
     // make vector of all corners and vector of all nodes
     graph.nodes.clear();
@@ -197,9 +207,19 @@ void FindRooms::create_graph(const std::vector<segment_t>& cleaned_segments, gra
         c1->node->edges.push_back(e2);
         c2->node->edges.push_back(e1);
     }
+    for (const FindDoors::door_t& door : doors) {
+        for (std::size_t side = 0; side < 2; side++) {
+            corner_t* c1 = graph.corner_lookup[door[side].first];
+            corner_t* c2 = graph.corner_lookup[door[side].second];
+            edge_t e1 = {c2, c1, true, false};
+            edge_t e2 = {c1, c2, true, false};
+            c1->node->edges.push_back(e2);
+            c2->node->edges.push_back(e1);
+        }
+    }
 
     // merge nodes that are close to each other
-    std::size_t merged = merge_nodes(params, cpositions, clines, graph.corner_lookup);
+    std::size_t merged = merge_nodes(graph.corner_lookup, cpositions, clines, params);
     std::cout << "Merged " << merged << " nodes into neighboring nodes\n";
 
     // this can lead to redundant edges, remove those
@@ -214,7 +234,7 @@ void FindRooms::create_graph(const std::vector<segment_t>& cleaned_segments, gra
 std::vector<polygon_t> FindRooms::find_rooms(const std::vector<segment_t>& cleaned_segments, const std::vector<FindDoors::door_t>& doors)
 {
     graph_t graph;
-    create_graph(cleaned_segments, graph);
+    create_graph(graph, cleaned_segments, doors);
 
     // remove eventual door edges from previous call
     /*for (node_t& node : graph.nodes) {
@@ -228,22 +248,6 @@ std::vector<polygon_t> FindRooms::find_rooms(const std::vector<segment_t>& clean
         }
     }*/
 
-    // add two additional edges per door that connect the door's sides
-    for (const FindDoors::door_t& door : doors) {
-        for (std::size_t side = 0; side < 2; side++) {
-            corner_t* c1 = graph.corner_lookup[door[side].first];
-            corner_t* c2 = graph.corner_lookup[door[(side + 1) % 2].second];
-            edge_t e1 = {c2, c1, true, false};
-            edge_t e2 = {c1, c2, true, false};
-            c1->node->edges.push_back(e2);
-            c2->node->edges.push_back(e1);
-        }
-    }
-
-    // sort each node's edges in counter-clockwise order and remove duplicate edges again
-    std::size_t erased2 = sort_edges_delete_duplicates(graph.nodes);
-    std::cout << "Deleted " << erased2 << " duplicate edges\n";
-
     auto point_eq = [](const point_t& p1, const point_t& p2) {
         return p1.x() == p2.x() && p1.y() == p2.y();
     };
@@ -252,8 +256,8 @@ std::vector<polygon_t> FindRooms::find_rooms(const std::vector<segment_t>& clean
     std::vector<ring_t> rings;
     for (const FindDoors::door_t& door : doors) {
         // first, find a face of the door that's not the door's right or left side
-        node_t* door_nodes[] = {graph.corner_lookup[door[0].second]->node, graph.corner_lookup[door[1].second]->node};
-        node_t* other_door_nodes[] = {graph.corner_lookup[door[1].first]->node, graph.corner_lookup[door[0].first]->node};
+        node_t* door_nodes[] = {graph.corner_lookup[door[0].first]->node, graph.corner_lookup[door[1].first]->node};
+        node_t* other_door_nodes[] = {graph.corner_lookup[door[0].second]->node, graph.corner_lookup[door[1].second]->node};
         for (node_t* door_node : door_nodes) {
             node_t* last_node = door_node;
             node_t* current_node = nullptr; // initialized to suppress warning
@@ -342,7 +346,7 @@ next_door_face:
     std::vector<polygon_t> rooms;
     std::vector<ring_t> possible_holes;
     std::size_t invalid = 0;
-    for (const ring_t& ring : rings) {
+    for (ring_t& ring : rings) {
 #if BOOST_VERSION >= 105600
         boost::geometry::validity_failure_type failure;
         if (boost::geometry::is_valid(ring, failure)) {
@@ -352,8 +356,10 @@ next_door_face:
 #if BOOST_VERSION >= 105600
         } else if (failure == boost::geometry::failure_wrong_orientation) {
             possible_holes.push_back(ring);
-            invalid++;
         } else {
+            std::string f;
+            boost::geometry::is_valid(ring, f);
+            std::cout << f << '\n';
             invalid++;
         }
 #endif

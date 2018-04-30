@@ -50,6 +50,7 @@ add_library(${PROJECT_NAME}_maps
     src/maps/oriented_grid_vector_map.cpp
     src/maps/oriented_visibility_grid_vector_map.cpp
     src/maps/rtree_vector_map.cpp
+    src/maps/segment_rtree_vector_map.cpp
 )
 
 target_link_libraries(${PROJECT_NAME}_maps

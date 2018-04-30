@@ -166,7 +166,7 @@ void RtreeVectorMap::insert(const Vectors& segments,
     }
 
     rtree_.~rtree();
-    new (&rtree_) decltype(rtree_)(values);
+    new (&rtree_) tree_t(values);
 }
 
 unsigned int RtreeVectorMap::handleInsertion()
@@ -288,5 +288,14 @@ void RtreeVectorMap::doSave(YAML::Node& node) const
     YAML::Binary room_ring_data_binary;
     serialization::serialize(room_ring_data, room_ring_data_binary);
     node["room_ring_data"] = room_ring_data_binary;
+}
 
+const RtreeVectorMap::tree_t& RtreeVectorMap::rtree() const
+{
+    return rtree_;
+}
+
+const std::vector<RtreeVectorMap::polygon_t>& RtreeVectorMap::room_polygons() const
+{
+    return room_polygons_;
 }

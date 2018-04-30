@@ -25,7 +25,9 @@ public:
     void setup(const cslibs_vectormaps::RtreeVectormapConversionParameter& params)
     {
         ui_.lineEdit_path->setText(QString::fromStdString(params.path));
+        ui_.comboBox_type->setCurrentText(QString::fromStdString(params.type));
         ui_.doubleSpinBox_max_elements_per_node->setValue(params.max_elements_per_node);
+        ui_.checkBox_discard_segments->setCheckState(params.discard_segments ? Qt::Checked : Qt::Unchecked);
     }
 
     void get(cslibs_vectormaps::RtreeVectormapConversionParameter& params)
@@ -36,7 +38,9 @@ public:
             path += QString(".yaml");
         }
         params.path = path.toStdString();
+        params.type = ui_.comboBox_type->currentText().toStdString();
         params.max_elements_per_node = ui_.doubleSpinBox_max_elements_per_node->value();
+        params.discard_segments = ui_.checkBox_discard_segments->checkState() == Qt::Checked;
     }
 
 private slots:

@@ -3,6 +3,7 @@
 #include "../types.h"
 
 #include <cslibs_vectormaps/maps/rtree_vector_map.h>
+#include <cslibs_vectormaps/maps/segment_rtree_vector_map.h>
 
 #include <boost/version.hpp>
 #include <boost/geometry/algorithms/envelope.hpp>
@@ -18,6 +19,33 @@ using namespace cslibs_vectormaps;
 RtreeVectormapConversion::RtreeVectormapConversion(const RtreeVectormapConversionParameter& parameters) :
     parameters_(parameters)
 {
+}
+
+bool RtreeVectormapConversion::operator()(const std::vector<polygon_t>& rooms, const std::vector<segment_t>& segments, point_t min, point_t max)
+{
+    segments_ = segments;
+    if (parameters_.type == "R-tree of rooms") {
+        // checkbox is ignored here, we always discard outliers when indexing rooms
+        index_rooms(rooms);
+        if (!index_segments(segments)
+        || !drop_outliers()
+        || !saveRooms(min, max))
+            return false;
+    } else if (parameters_.type == "R-tree of segments") {
+        if (parameters_.discard_segments) {
+            index_rooms(rooms);
+            if (!index_segments(segments)
+            || !drop_outliers()
+            || !saveSegments(min, max))
+                return false;
+        } else {
+            if (!saveSegments(min, max))
+                return false;
+        }
+    } else {
+        std::cerr << "[RtreeVectorMapConversion]: Unknown map type '" << parameters_.type << "'!\n";
+        return false;
+    }
 }
 
 void RtreeVectormapConversion::index_rooms(const std::vector<polygon_t>& rooms)
@@ -55,7 +83,6 @@ bool RtreeVectormapConversion::index_segments(const std::vector<segment_t>& segm
     namespace bg = boost::geometry;
     namespace bgi = bg::index;
 
-    segments_ = segments;
     segment_indices_.clear();
     segment_indices_.resize(rooms_.size());
     std::size_t i = 0;
@@ -140,17 +167,31 @@ bool RtreeVectormapConversion::drop_outliers()
 #endif
 }
 
-bool RtreeVectormapConversion::save(point_t min, point_t max) const
+bool RtreeVectormapConversion::saveRooms(point_t min, point_t max)
+{
+    VectorMap::BoundingBox bounding(min, max);
+    RtreeVectorMap map(bounding, true);
+    map.insert(segments_, rooms_, segment_indices_);
+
+    return save(map);
+}
+
+bool RtreeVectormapConversion::saveSegments(point_t min, point_t max)
+{
+    VectorMap::BoundingBox bounding(min, max);
+    SegmentRtreeVectorMap map(bounding, true);
+    map.insert(segments_);
+
+    return save(map);
+}
+
+bool RtreeVectormapConversion::save(const VectorMap& map) const
 {
     auto ends_with = [](const std::string& value, const std::string& ending) {
         return ending.size() <= value.size()
             && std::equal(ending.rbegin(), ending.rend(), value.rbegin());
     };
 
-    VectorMap::BoundingBox bounding(min, max);
-    RtreeVectorMap::Ptr map(new RtreeVectorMap(bounding, true));
-
-    map->insert(segments_, rooms_, segment_indices_);
     const bool compress = ends_with(parameters_.path, std::string(".gzip"));
-    return map->save(parameters_.path, compress);
+    return map.save(parameters_.path, compress);
 }

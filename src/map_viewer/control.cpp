@@ -407,11 +407,7 @@ void Control::executeRtreeVectormapExport(const RtreeVectormapConversionParamete
     progress(-1);
 
     RtreeVectormapConversion converter(params);
-
-    converter.index_rooms(rooms);
-    if (!converter.index_segments(segments)
-    || !converter.drop_outliers()
-    || !converter.save(map_->getMin(), map_->getMax()))
+    if(!converter(rooms, segments, map_->getMin(), map_->getMax()))
         notification("Writing map failed!");
 
     closeProgressDialog();

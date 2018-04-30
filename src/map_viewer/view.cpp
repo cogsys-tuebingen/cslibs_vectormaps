@@ -233,7 +233,6 @@ void View::actionExport_rtree_vectormap()
     param_dialog.setup(params);
     if(param_dialog.exec() == QDialog::Accepted) {
         param_dialog.get(params);
-        params.find_doors_parameter = &parameters_->getFindDoorsParameters();
         parameters_->setRtreeVectormapConversionParameters(params);
         runRtreeVectormapExport(params);
     }
