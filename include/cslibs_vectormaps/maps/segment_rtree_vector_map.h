@@ -12,7 +12,7 @@ namespace cslibs_vectormaps {
 
 class SegmentRtreeVectorMap : public VectorMap {
 protected:
-    using tree_t = boost::geometry::index::rtree<Vector, boost::geometry::index::rstar<16>>;
+    using tree_t = boost::geometry::index::rtree<Vector, boost::geometry::index::rstar<8>>;
 
 public:
     typedef std::shared_ptr<SegmentRtreeVectorMap> Ptr;

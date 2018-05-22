@@ -15,8 +15,9 @@ protected:
     using box_t = boost::geometry::model::box<VectorMap::Point>;
     using ring_t = boost::geometry::model::ring<VectorMap::Point>;
     using polygon_t = boost::geometry::model::polygon<VectorMap::Point>;
-    using cell_t = std::tuple<box_t, std::vector<const Vector*>, double>;
-    using tree_t = boost::geometry::index::rtree<cell_t, boost::geometry::index::rstar<16>>;
+    using innertree_t = boost::geometry::index::rtree<const Vector*, boost::geometry::index::rstar<8>>;
+    using cell_t = std::tuple<box_t, innertree_t, double>;
+    using tree_t = boost::geometry::index::rtree<cell_t, boost::geometry::index::rstar<8>>;
 
 public:
     typedef std::shared_ptr<RtreeVectorMap> Ptr;

@@ -305,7 +305,7 @@ void Control::executeFindRooms(const FindRoomsParameter &params)
         std::string layername = "Room #" + to_string(++i);
         layer->setName(layername);
         layer->setPolygon(room);
-        layer->setColor(QColor::fromHsvF(dist(mt), 1.f, 0.5f));
+        layer->setColor(QColor::fromHsvF(dist(mt), 1.f, 1.f));
         map_->setLayer(layer);
     }
     map_->updated();
