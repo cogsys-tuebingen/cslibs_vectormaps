@@ -160,14 +160,13 @@ std::vector<segment_t> FindDoors::clean_segments(const std::vector<segment_t>& r
     }
     std::cout << "Merged " << overlaps << " overlapping segments\n";
 
-    // TODO: put the following lines in another function
     // TODO: workaround for older Boost using bounding boxes
 #if BOOST_VERSION < 105600
     std::cerr << "Boost version >= 1.56.0 is required for creating the segment graph! The results are probably unusable.\n";
     return non_overlapping_segments;
 #else
     // replace intersecting line segments by multiple new segments that end in a common intersection point
-    // use a spatial index because finding intersecting line segments globally is hard
+    // use a spatial index to ease finding those intersecting line segments
     namespace bgi = boost::geometry::index;
     bgi::rtree<segment_t, bgi::rstar<16>> rtree(non_overlapping_segments);
     std::vector<segment_t> clean_segments;

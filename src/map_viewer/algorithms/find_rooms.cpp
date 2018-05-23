@@ -5,7 +5,7 @@
 #if BOOST_VERSION < 106000
 #include <iostream>
 #endif
-// this goof forgot to include iostream until 1.60
+// this goof forgot to include its iostream dependency until 1.60
 #include <boost/geometry/algorithms/is_valid.hpp>
 #endif
 // this gimp does not seem to work without additional stuff
@@ -13,8 +13,12 @@
 // so let's include everything
 #include <boost/geometry.hpp>
 
+#include <boost/geometry/index/rtree.hpp>
+#include <boost/function_output_iterator.hpp>
+
 #include <iostream>
 #include <utility>
+#include <algorithm>
 
 using namespace cslibs_vectormaps;
 
@@ -22,8 +26,9 @@ FindRooms::FindRooms(const FindRoomsParameter &parameter) : parameter_(parameter
 {
 }
 
-void FindRooms::get_corners(std::vector<double>& positions, std::vector<std::vector<double>>& lines, const std::vector<segment_t>& segments, const std::vector<FindDoors::door_t>& doors, const FindRoomsParameter& params)
+void FindRooms::get_corners(std::vector<double>& cpositions, std::vector<std::vector<double>>& clines, const std::vector<segment_t>& segments, const std::vector<FindDoors::door_t>& doors) const
 {
+    const FindRoomsParameter& params = parameter_;
     std::map<double, std::set<double>> corner_map;
 
     auto add_segment = [&params, &corner_map](const segment_t& s) {
@@ -46,17 +51,18 @@ void FindRooms::get_corners(std::vector<double>& positions, std::vector<std::vec
         }
     }
 
-    positions.reserve(corner_map.size());
-    lines.reserve(corner_map.size());
+    cpositions.reserve(corner_map.size());
+    clines.reserve(corner_map.size());
 
     for (const auto& pair : corner_map) {
-        positions.emplace_back(pair.first);
-        lines.emplace_back(pair.second.begin(), pair.second.end());
+        cpositions.emplace_back(pair.first);
+        clines.emplace_back(pair.second.begin(), pair.second.end());
     }
 }
 
-std::size_t FindRooms::merge_nodes(std::map<point_t, corner_t*, point_compare>& corner_lookup, const std::vector<double>& cpositions, const std::vector<std::vector<double>>& clines, const FindRoomsParameter& params)
+std::size_t FindRooms::merge_nodes(std::map<point_t, corner_t*, point_compare>& corner_lookup, const std::vector<double>& cpositions, const std::vector<std::vector<double>>& clines) const
 {
+    const FindRoomsParameter& params = parameter_;
     double maxdist = params.merge_max_proximity;
     std::size_t merged = 0;
     auto mergenode = [&corner_lookup](point_t p1, point_t p2) {
@@ -105,10 +111,10 @@ std::size_t FindRooms::merge_nodes(std::map<point_t, corner_t*, point_compare>& 
     return merged;
 }
 
-std::size_t FindRooms::delete_inner_edges(std::vector<node_t>& nodes)
+std::size_t FindRooms::delete_inner_edges(graph_t& graph) const
 {
     std::size_t deleted = 0;
-    for (node_t& node : nodes) {
+    for (node_t& node : graph.nodes) {
         for (auto it = node.edges.begin(); it != node.edges.end();) {
             if (it->target->node == &node) {
                 it = node.edges.erase(it);
@@ -121,10 +127,10 @@ std::size_t FindRooms::delete_inner_edges(std::vector<node_t>& nodes)
     return deleted;
 }
 
-std::size_t FindRooms::sort_edges_delete_duplicates(std::vector<node_t>& nodes)
+std::size_t FindRooms::sort_edges_delete_duplicates(graph_t& graph) const
 {
     std::size_t erased = 0;
-    for (node_t& node : nodes) {
+    for (node_t& node : graph.nodes) {
         // because of the merging, there can be empty nodes that should not be considered
         if (node.edges.size() > 0) {
             // in order to sort the edges, we have to determine one of the node's points as a center point.
@@ -165,14 +171,75 @@ std::size_t FindRooms::sort_edges_delete_duplicates(std::vector<node_t>& nodes)
     return erased;
 }
 
-void FindRooms::create_graph(graph_t& graph, const std::vector<segment_t>& cleaned_segments, const std::vector<FindDoors::door_t>& doors)
+std::size_t FindRooms::connect_lone_corners(graph_t& graph) const
+{
+    const FindRoomsParameter& params = parameter_;
+    namespace bg = boost::geometry;
+    namespace bgi = boost::geometry::index;
+    struct point_getter {
+        using result_type = const point_t&;
+        result_type& operator()(corner_t* const& corner) const
+        {
+            return corner->point;
+        }
+    };
+    std::vector<corner_t*> lone_corners;
+    for (corner_t& corner : graph.corners) {
+        if (corner.node->edges.size() == 1)
+            lone_corners.push_back(&corner);
+    }
+    bgi::rtree<corner_t*, bgi::rstar<16>, point_getter> rtree(lone_corners);
+    std::size_t connected = 0;
+
+    // check neighborhood of each lone node
+    double connect_max_proximity_squared = params.connect_max_proximity * params.connect_max_proximity;
+    for (corner_t*& lone_corner : lone_corners) {
+        // found lone node
+        corner_t* candidate = lone_corner->node->edges[0].start;
+        corner_t* partner = nullptr;
+        bool found_self = false;
+        double dist_squared_partner;
+        // find queried node and the 2 closest other nodes.
+        auto pred = bgi::nearest(candidate->point, 3);
+        rtree.query(pred, boost::make_function_output_iterator([&](corner_t* const& corner) {
+            double dist_squared = bg::comparable_distance(corner->point, candidate->point);
+            if (dist_squared == 0.) {
+                found_self = true;
+            } else if (partner == nullptr) {
+                dist_squared_partner = dist_squared;
+                partner = corner;
+            } else {
+                corner_t* next_corner = corner;
+                if (dist_squared < dist_squared_partner) {
+                    std::swap(partner, next_corner);
+                    std::swap(dist_squared, dist_squared_partner);
+                }
+                if (found_self
+                && dist_squared_partner <= connect_max_proximity_squared
+                && dist_squared > connect_max_proximity_squared
+                && partner->node->edges.size() == 1) {
+                    // found exactly one other lone node within threshold! connect them.
+                    edge_t e1 = {candidate, partner, false, false};
+                    edge_t e2 = {partner, candidate, false, false};
+                    lone_corner->node->edges.push_back(e1);
+                    partner->node->edges.push_back(e2);
+                    connected++;
+                }
+            }
+        }));
+    }
+
+    return connected;
+}
+
+void FindRooms::create_graph(graph_t& graph, const std::vector<segment_t>& cleaned_segments, const std::vector<FindDoors::door_t>& doors) const
 {
     const FindRoomsParameter& params = parameter_;
 
     // get corners from line segments
     std::vector<double> cpositions;
     std::vector<std::vector<double>> clines;
-    get_corners(cpositions, clines, cleaned_segments, doors, params);
+    get_corners(cpositions, clines, cleaned_segments, doors);
 
     // make vector of all corners and vector of all nodes
     graph.nodes.clear();
@@ -219,19 +286,27 @@ void FindRooms::create_graph(graph_t& graph, const std::vector<segment_t>& clean
     }
 
     // merge nodes that are close to each other
-    std::size_t merged = merge_nodes(graph.corner_lookup, cpositions, clines, params);
+    std::size_t merged = merge_nodes(graph.corner_lookup, cpositions, clines);
     std::cout << "Merged " << merged << " nodes into neighboring nodes\n";
 
     // this can lead to redundant edges, remove those
-    std::size_t deleted = delete_inner_edges(graph.nodes);
+    std::size_t deleted = delete_inner_edges(graph);
     std::cout << "Deleted " << deleted << " redundant edges connecting corners of the same node\n";
 
     // sort each node's edges in counter-clockwise order and remove duplicate edges (those can happen because of shitty map data)
-    std::size_t erased1 = sort_edges_delete_duplicates(graph.nodes);
+    std::size_t erased1 = sort_edges_delete_duplicates(graph);
     std::cout << "Deleted " << erased1 << " duplicate edges\n";
+
+    // close gaps between lone endpoints by inserting additional edges
+    std::size_t connected = connect_lone_corners(graph);
+    std::cout << "Closed " << connected << " gaps between lone endpoints\n";
+
+    // we have to sort again...
+    std::size_t erased2 = sort_edges_delete_duplicates(graph);
+    std::cout << "Deleted " << erased2 << " duplicate edges\n";
 }
 
-std::vector<polygon_t> FindRooms::find_rooms(const std::vector<segment_t>& cleaned_segments, const std::vector<FindDoors::door_t>& doors)
+std::vector<polygon_t> FindRooms::find_rooms(const std::vector<segment_t>& cleaned_segments, const std::vector<FindDoors::door_t>& doors) const
 {
     graph_t graph;
     create_graph(graph, cleaned_segments, doors);
@@ -267,11 +342,11 @@ std::vector<polygon_t> FindRooms::find_rooms(const std::vector<segment_t>& clean
             for (edge_t& door_edge : door_node->edges) {
                 if (door_edge.door && door_edge.target->node == other_door_node) {
                     current_node = door_edge.target->node;
-                    std::cout << "traverse from door side "
+                    /*std::cout << "traverse from door side "
                               << door_edge.start->point.x() << '|'
                               << door_edge.start->point.y() << "->"
                               << door_edge.target->point.x() << '|'
-                              << door_edge.target->point.y() << '\n';
+                              << door_edge.target->point.y() << '\n';*/
                     door_edge.checked = true;
                     edge = &door_edge;
                     break;

@@ -9,6 +9,7 @@ struct FindRoomsParameter {
     double map_precision = 1000.; // 1 mm
     enum {ROWS, COLUMNS} find_mode = ROWS; // does not affect result, only maybe runtime
     double merge_max_proximity = .025; // 25 mm
+    double connect_max_proximity = .25; // 25 cm
 };
 
 class FindRooms {
@@ -46,17 +47,18 @@ public:
 
     FindRooms(const FindRoomsParameter &parameter);
 
-    std::vector<polygon_t> find_rooms(const std::vector<segment_t>& cleaned_segments, const std::vector<FindDoors::door_t>& doors);
+    std::vector<polygon_t> find_rooms(const std::vector<segment_t>& cleaned_segments, const std::vector<FindDoors::door_t>& doors) const;
 
-    static std::size_t delete_inner_edges(std::vector<node_t>& nodes);
-    static std::size_t sort_edges_delete_duplicates(std::vector<node_t>& nodes);
 private:
     const FindRoomsParameter& parameter_;
 
-    void create_graph(graph_t& graph, const std::vector<segment_t>& cleaned_segments, const std::vector<FindDoors::door_t> &doors);
+    void create_graph(graph_t& graph, const std::vector<segment_t>& cleaned_segments, const std::vector<FindDoors::door_t> &doors) const;
 
-    static void get_corners(std::vector<double>& positions, std::vector<std::vector<double>>& lines, const std::vector<segment_t>& segments, const std::vector<FindDoors::door_t> &doors, const FindRoomsParameter& params);
-    static std::size_t merge_nodes(std::map<point_t, corner_t*, point_compare>& corner_lookup, const std::vector<double>& cpositions, const std::vector<std::vector<double>>& clines, const FindRoomsParameter& params);
+    void get_corners(std::vector<double>& cpositions, std::vector<std::vector<double>>& clines, const std::vector<segment_t>& segments, const std::vector<FindDoors::door_t> &doors) const;
+    std::size_t merge_nodes(std::map<point_t, corner_t*, point_compare>& corner_lookup, const std::vector<double>& cpositions, const std::vector<std::vector<double>>& clines) const;
+    std::size_t delete_inner_edges(graph_t& graph) const;
+    std::size_t sort_edges_delete_duplicates(graph_t& graph) const;
+    std::size_t connect_lone_corners(graph_t& graph) const;
 };
 
 }

@@ -20,11 +20,13 @@ public:
     void setup(const cslibs_vectormaps::FindRoomsParameter& params)
     {
         ui_.doubleSpinBox_merge_max_proximity->setValue(params.merge_max_proximity);
+        ui_.doubleSpinBox_connect_max_proximity->setValue(params.connect_max_proximity);
     }
 
     void get(cslibs_vectormaps::FindRoomsParameter& params)
     {
         params.merge_max_proximity = ui_.doubleSpinBox_merge_max_proximity->value();
+        params.connect_max_proximity = ui_.doubleSpinBox_connect_max_proximity->value();
     }
 
 private:
