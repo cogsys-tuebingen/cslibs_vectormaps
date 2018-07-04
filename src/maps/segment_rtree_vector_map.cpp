@@ -1,3 +1,7 @@
+// Apparently, indexing line segments is only supported since Boost.Geometry
+// 1.56. Only for code compatibility, an empty implementation of
+// SegmentRtreeVectorMap is provided that does not do anything.
+
 #include <cslibs_vectormaps/maps/segment_rtree_vector_map.h>
 
 #include <cslibs_vectormaps/utility/serialization.hpp>
@@ -13,9 +17,6 @@
 
 #include <limits>
 #include <cstdint>
-
-// workarounds for older Boost versions according to
-// https://stackoverflow.com/a/27799356/1007605
 
 using namespace cslibs_vectormaps;
 using namespace cslibs_boost_geometry;
@@ -55,17 +56,11 @@ double SegmentRtreeVectorMap::minSquaredDistanceNearbyStructure(const Point& pos
 
     double min_squared_dist = std::numeric_limits<double>::max();
 
-#if BOOST_VERSION >= 105500
+#if BOOST_VERSION >= 105600
     for (auto it = rtree_.qbegin(bgi::nearest(pos, 1)), end = rtree_.qend(); it != end; ++it) {
         const Vector& segment = *it;
-#else
-    rtree_.query(bgi::nearest(pos, 1), boost::make_function_output_iterator([&](const Vector& segment) {
-#endif
         min_squared_dist = bg::comparable_distance(pos, segment);
-#if BOOST_VERSION >= 105500
     }
-#else
-    }));
 #endif
 
     return min_squared_dist;
@@ -104,50 +99,39 @@ double SegmentRtreeVectorMap::intersectScanRay(const Vector& ray,
                                                double angle,
                                                double max_range) const
 {
+#if BOOST_VERSION >= 105600
     namespace bg = boost::geometry;
     namespace bgi = bg::index;
 
     // Boost.Geometry has a nice path tracing feature, but it's still experimental as of 24.04.2018
 #ifdef BOOST_GEOMETRY_INDEX_DETAIL_EXPERIMENTAL
     double dist = max_range;
-#if BOOST_VERSION >= 105500
     for (auto it = rtree_.qbegin(bgi::path(ray, 1)), end = rtree_.qend(); it != end; ++it) {
         const Vector& segment = *it;
-#else
-    rtree_.query(bgi::path(ray, 1), boost::make_function_output_iterator([&](const Vector& segment) {
-#endif
         std::vector<Point> tmp;
         bg::intersection(ray, segment, tmp);
         dist = bg::distance(ray.first, tmp.front());
-#if BOOST_VERSION >= 105500
     }
-#else
-    }));
-#endif
     return dist;
 #else
     // the workaround is to use intersects(), so we still have to find out the closest segment
     double min_squared_dist = std::numeric_limits<double>::max();
     std::vector<Point> tmp;
-#if BOOST_VERSION >= 105500
     for (auto it = rtree_.qbegin(bgi::intersects(ray)), end = rtree_.qend(); it != end; ++it) {
         const Vector& segment = *it;
-#else
-    rtree_.query(bgi::intersects(ray), boost::make_function_output_iterator([&](const Vector& segment) {
-#endif
         tmp.clear();
         bg::intersection(ray, segment, tmp);
         double squared_dist = bg::comparable_distance(ray.first, tmp.front());
         if (squared_dist < min_squared_dist)
             min_squared_dist = squared_dist;
-#if BOOST_VERSION >= 105500
     }
-#else
-    }));
-#endif
     return min_squared_dist != std::numeric_limits<double>::max()
            ? std::sqrt(min_squared_dist)
            : max_range;
+#endif
+
+#else
+    return max_range;
 #endif
 }
 
@@ -174,8 +158,12 @@ void SegmentRtreeVectorMap::insert(const Vectors& segments)
 
     // We bulk-insert into the R-tree so that the efficient packing algorithm is
     // used. All values have to be passed to the constructor at once.
+#if BOOST_VERSION >= 105600
     rtree_.~rtree();
     new (&rtree_) tree_t(data_);
+#else
+    rtree_ = 0;
+#endif
 }
 
 unsigned int SegmentRtreeVectorMap::handleInsertion()

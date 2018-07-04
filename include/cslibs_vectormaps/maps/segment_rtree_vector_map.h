@@ -1,8 +1,13 @@
+// Apparently, indexing line segments is only supported since Boost.Geometry
+// 1.56. Only for code compatibility, an empty implementation of
+// SegmentRtreeVectorMap is provided that does not do anything.
+
 #ifndef SEGMENT_RTREE_VECTOR_MAP_H
 #define SEGMENT_RTREE_VECTOR_MAP_H
 
 #include "vector_map.h"
 
+#include <boost/version.hpp>
 #include <boost/geometry/index/rtree.hpp>
 
 #include <string>
@@ -12,7 +17,11 @@ namespace cslibs_vectormaps {
 
 class SegmentRtreeVectorMap : public VectorMap {
 protected:
+#if BOOST_VERSION >= 105600
     using tree_t = boost::geometry::index::rtree<Vector, boost::geometry::index::rstar<8>>;
+#else
+    using tree_t = int; // dummy
+#endif
 
 public:
     typedef std::shared_ptr<SegmentRtreeVectorMap> Ptr;

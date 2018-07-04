@@ -82,6 +82,7 @@ double RtreeVectorMap::minSquaredDistanceNearbyStructure(const Point& pos,
 {
     double min_squared_dist = std::numeric_limits<double>::max();
 
+#if BOOST_VERSION >= 105600
     if (cell_ptr == nullptr)
         return min_squared_dist;
 
@@ -90,17 +91,10 @@ double RtreeVectorMap::minSquaredDistanceNearbyStructure(const Point& pos,
     namespace bg = boost::geometry;
     namespace bgi = bg::index;
 
-#if BOOST_VERSION >= 105500
     for (auto it = std::get<1>(cell).qbegin(bgi::nearest(pos, 1)), end = std::get<1>(cell).qend(); it != end; ++it) {
         const Vector* const& segment = *it;
-#else
-    std::get<1>(cell).query(bgi::nearest(pos, 1), boost::make_function_output_iterator([&](const Vector* const& segment) {
-#endif
         min_squared_dist = bg::comparable_distance(pos, *segment);
-#if BOOST_VERSION >= 105500
     }
-#else
-    }));
 #endif
 
     return min_squared_dist;
@@ -139,6 +133,7 @@ double RtreeVectorMap::intersectScanRay(const Vector& ray,
                                         double angle,
                                         double max_range) const
 {
+#if BOOST_VERSION >= 105600
     if (!cell_ptr)
         return max_range;
 
@@ -151,44 +146,31 @@ double RtreeVectorMap::intersectScanRay(const Vector& ray,
     const auto& celltree = std::get<1>(cell);
 #ifdef BOOST_GEOMETRY_INDEX_DETAIL_EXPERIMENTAL
     double dist = max_range;
-#if BOOST_VERSION >= 105500
     for (auto it = celltree.qbegin(bgi::path(ray, 1)), end = celltree.qend(); it != end; ++it) {
         const Vector* const& segment = *it;
-#else
-    celltree.query(bgi::path(ray, 1), boost::make_function_output_iterator([&](const Vector* const& segment) {
-#endif
         std::vector<Point> tmp;
         bg::intersection(ray, *segment, tmp);
         dist = bg::distance(ray.first, tmp.front());
-#if BOOST_VERSION >= 105500
     }
-#else
-    }));
-#endif
     return dist;
 #else
     // the workaround is to use intersects(), so we still have to find out the closest segment
     double min_squared_dist = std::numeric_limits<double>::max();
     std::vector<Point> tmp;
-#if BOOST_VERSION >= 105500
     for (auto it = celltree.qbegin(bgi::intersects(ray)), end = celltree.qend(); it != end; ++it) {
         const Vector* const& segment = *it;
-#else
-    celltree.query(bgi::intersects(ray), boost::make_function_output_iterator([&](const Vector* const& segment) {
-#endif
         tmp.clear();
         bg::intersection(ray, *segment, tmp);
         double squared_dist = bg::comparable_distance(ray.first, tmp.front());
         if (squared_dist < min_squared_dist)
             min_squared_dist = squared_dist;
-#if BOOST_VERSION >= 105500
     }
-#else
-    }));
-#endif
     return min_squared_dist != std::numeric_limits<double>::max()
            ? std::sqrt(min_squared_dist)
            : max_range;
+#endif
+#else
+    return max_range;
 #endif
 }
 
@@ -312,7 +294,7 @@ void RtreeVectorMap::doSave(YAML::Node& node) const
     room_indices.reserve(data_.size());
 
 #if BOOST_VERSION >= 105900
-    for (const cell_t& room : rtree_) {
+    for (const cell_t& cell : rtree_) {
 #else
     auto dummy_pred = [](const cell_t&) { return true; };
  #if BOOST_VERSION >= 105500
@@ -323,23 +305,15 @@ void RtreeVectorMap::doSave(YAML::Node& node) const
  #endif
 #endif
         room_sizes.push_back(std::get<1>(cell).size());
-#if BOOST_VERSION >= 105900
-        for (const Vector* segment : std::get<1>(cell)) {
+#if BOOST_VERSION >= 105900 || BOOST_VERSION < 105600
+        for (const Vector* const& segment : std::get<1>(cell)) {
 #else
         auto dummy_pred2 = [](const Vector* const&) { return true; };
- #if BOOST_VERSION >= 105500
         for (auto it2 = std::get<1>(cell).qbegin(bgi::satisfies(dummy_pred2)), end2 = std::get<1>(cell).qend(); it2 != end2; ++it2) {
             const Vector* const& segment = *it2;
- #else
-        std::get<1>(cell).query(bgi::satisfies(dummy_pred), boost::make_function_output_iterator([&](const Vector* const& segment) {
- #endif
 #endif
             room_indices.push_back(static_cast<std::uint32_t>(segment - data_.data()));
-#if BOOST_VERSION >= 105500
         }
-#else
-        }));
-#endif
 #if BOOST_VERSION >= 105500
     }
 #else
