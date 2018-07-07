@@ -22,7 +22,6 @@ struct RtreeVectormapConversionParameter {
     std::string path;
     std::string type = "R-tree of rooms";
     bool discard_segments = true;
-    std::size_t max_elements_per_node = 16; // not used at the moment
     double leeway = 0.01; // for bad implementation reasons, this must always be greater than 1.0 / FindDoorsParameter::map_precision.
 };
 

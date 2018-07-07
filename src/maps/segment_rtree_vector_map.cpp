@@ -38,12 +38,6 @@ SegmentRtreeVectorMap::~SegmentRtreeVectorMap()
 
 const void* SegmentRtreeVectorMap::cell(const Point& pos) const
 {
-    namespace bg = boost::geometry;
-    namespace bgi = bg::index;
-
-    double max_area_ratio = 0.;
-    const void* cell_ptr = nullptr;
-
     return nullptr;
 }
 

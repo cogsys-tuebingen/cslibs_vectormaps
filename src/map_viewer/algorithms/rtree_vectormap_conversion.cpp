@@ -46,6 +46,7 @@ bool RtreeVectormapConversion::operator()(const std::vector<polygon_t>& rooms, c
         std::cerr << "[RtreeVectorMapConversion]: Unknown map type '" << parameters_.type << "'!\n";
         return false;
     }
+    return true;
 }
 
 void RtreeVectormapConversion::index_rooms(const std::vector<polygon_t>& rooms)
