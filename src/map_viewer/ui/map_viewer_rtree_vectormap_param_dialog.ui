@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>404</width>
-    <height>47</height>
+    <width>467</width>
+    <height>141</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,13 +18,6 @@
     <widget class="QLabel" name="label_path">
      <property name="text">
       <string>Path:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="3">
-    <widget class="QLabel" name="label_max_elements_per_node">
-     <property name="text">
-      <string>Maximum number of elements per node:</string>
      </property>
     </widget>
    </item>
@@ -58,26 +51,35 @@
      </item>
     </layout>
    </item>
-   <item row="1" column="7">
-    <widget class="QDoubleSpinBox" name="doubleSpinBox_max_elements_per_node">
-     <property name="maximumSize">
-      <size>
-       <width>16777215</width>
-       <height>16777215</height>
-      </size>
-     </property>
-     <property name="decimals">
-      <number>0</number>
-     </property>
-     <property name="minimum">
-      <double>2.000000000000000</double>
-     </property>
-     <property name="maximum">
-      <double>1000.000000000000000</double>
+   <item row="1" column="3">
+    <widget class="QLabel" name="label_type">
+     <property name="text">
+      <string>Type:</string>
      </property>
     </widget>
    </item>
-   <item row="2" column="7">
+   <item row="1" column="7">
+    <widget class="QComboBox" name="comboBox_type">
+     <item>
+      <property name="text">
+       <string>R-tree of rooms</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>R-tree of segments</string>
+      </property>
+     </item>
+    </widget>
+   </item>
+   <item row="2" column="3">
+    <widget class="QCheckBox" name="checkBox_discard_segments">
+     <property name="text">
+      <string>Discard line segments outside of rooms</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="7">
     <widget class="QDialogButtonBox" name="buttonBox">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>

@@ -20,8 +20,13 @@
 using namespace cslibs_vectormaps;
 using namespace cslibs_boost_geometry;
 
+RtreeVectorMap::RtreeVectorMap()
+{
+
+}
+
 RtreeVectorMap::RtreeVectorMap(const BoundingBox& bounding, bool debug) :
-    VectorMap(bounding, std::numeric_limits<double>::max(), debug)
+    VectorMap(bounding, 123456789., debug) // TODO
 {
 
 }
@@ -29,6 +34,20 @@ RtreeVectorMap::RtreeVectorMap(const BoundingBox& bounding, bool debug) :
 RtreeVectorMap::~RtreeVectorMap()
 {
 }
+
+namespace boost { namespace geometry { namespace index {
+
+// indirect R-tree indexing (see "Specializing index::indexable function object" in docs)
+template <typename Segment>
+struct indexable<const Segment*>
+{
+    typedef const Segment* V;
+
+    typedef const Segment& result_type;
+    result_type operator()(const V& v) const { return *v; }
+};
+
+}}} // namespace boost::geometry::index
 
 const void* RtreeVectorMap::cell(const Point& pos) const
 {
@@ -63,15 +82,20 @@ double RtreeVectorMap::minSquaredDistanceNearbyStructure(const Point& pos,
 {
     double min_squared_dist = std::numeric_limits<double>::max();
 
+#if BOOST_VERSION >= 105600
     if (cell_ptr == nullptr)
         return min_squared_dist;
 
     const cell_t& cell = *static_cast<const cell_t*>(cell_ptr);
-    for (const Vector* line : std::get<1>(cell)) {
-        double squared_dist = boost::geometry::comparable_distance(pos, *line);
-        if (squared_dist < min_squared_dist)
-            min_squared_dist = squared_dist;
+
+    namespace bg = boost::geometry;
+    namespace bgi = bg::index;
+
+    for (auto it = std::get<1>(cell).qbegin(bgi::nearest(pos, 1)), end = std::get<1>(cell).qend(); it != end; ++it) {
+        const Vector* const& segment = *it;
+        min_squared_dist = bg::comparable_distance(pos, *segment);
     }
+#endif
 
     return min_squared_dist;
 }
@@ -109,11 +133,45 @@ double RtreeVectorMap::intersectScanRay(const Vector& ray,
                                         double angle,
                                         double max_range) const
 {
+#if BOOST_VERSION >= 105600
     if (!cell_ptr)
         return max_range;
 
     const cell_t& cell = *static_cast<const cell_t*>(cell_ptr);
-    return algorithms::nearestIntersectionDistance<double, types::Point2d>(ray, std::get<1>(cell), max_range);
+
+    namespace bg = boost::geometry;
+    namespace bgi = bg::index;
+
+    // Boost.Geometry has a nice path tracing feature, but it's still experimental as of 24.04.2018
+    const auto& celltree = std::get<1>(cell);
+#ifdef BOOST_GEOMETRY_INDEX_DETAIL_EXPERIMENTAL
+    double dist = max_range;
+    for (auto it = celltree.qbegin(bgi::path(ray, 1)), end = celltree.qend(); it != end; ++it) {
+        const Vector* const& segment = *it;
+        std::vector<Point> tmp;
+        bg::intersection(ray, *segment, tmp);
+        dist = bg::distance(ray.first, tmp.front());
+    }
+    return dist;
+#else
+    // the workaround is to use intersects(), so we still have to find out the closest segment
+    double min_squared_dist = std::numeric_limits<double>::max();
+    std::vector<Point> tmp;
+    for (auto it = celltree.qbegin(bgi::intersects(ray)), end = celltree.qend(); it != end; ++it) {
+        const Vector* const& segment = *it;
+        tmp.clear();
+        bg::intersection(ray, *segment, tmp);
+        double squared_dist = bg::comparable_distance(ray.first, tmp.front());
+        if (squared_dist < min_squared_dist)
+            min_squared_dist = squared_dist;
+    }
+    return min_squared_dist != std::numeric_limits<double>::max()
+           ? std::sqrt(min_squared_dist)
+           : max_range;
+#endif
+#else
+    return max_range;
+#endif
 }
 
 int RtreeVectorMap::intersectScanPattern(
@@ -156,12 +214,12 @@ void RtreeVectorMap::insert(const Vectors& segments,
         std::size_t nsegment = 0;
         for (std::size_t segment_index : room_segment_indices[iroom])
             segment_pointers[nsegment++] = &data_[segment_index];
-        values[iroom] = std::make_tuple(envelope, segment_pointers, bg::area(room_polygon) / bg::area(envelope));
+        values[iroom] = std::make_tuple(envelope, innertree_t(segment_pointers), bg::area(room_polygon) / bg::area(envelope));
         iroom++;
     }
 
     rtree_.~rtree();
-    new (&rtree_) decltype(rtree_)(values);
+    new (&rtree_) tree_t(values);
 }
 
 unsigned int RtreeVectorMap::handleInsertion()
@@ -228,6 +286,7 @@ void RtreeVectorMap::doSave(YAML::Node& node) const
     namespace bgi = bg::index;
 
     VectorMap::doSave(node);
+    node["map_type"] = "rtree";
 
     std::vector<std::uint32_t> room_sizes;
     std::vector<std::uint32_t> room_indices;
@@ -235,7 +294,7 @@ void RtreeVectorMap::doSave(YAML::Node& node) const
     room_indices.reserve(data_.size());
 
 #if BOOST_VERSION >= 105900
-    for (const cell_t& room : rtree_) {
+    for (const cell_t& cell : rtree_) {
 #else
     auto dummy_pred = [](const cell_t&) { return true; };
  #if BOOST_VERSION >= 105500
@@ -246,7 +305,13 @@ void RtreeVectorMap::doSave(YAML::Node& node) const
  #endif
 #endif
         room_sizes.push_back(std::get<1>(cell).size());
-        for (const Vector* segment : std::get<1>(cell)) {
+#if BOOST_VERSION >= 105900 || BOOST_VERSION < 105600
+        for (const Vector* const& segment : std::get<1>(cell)) {
+#else
+        auto dummy_pred2 = [](const Vector* const&) { return true; };
+        for (auto it2 = std::get<1>(cell).qbegin(bgi::satisfies(dummy_pred2)), end2 = std::get<1>(cell).qend(); it2 != end2; ++it2) {
+            const Vector* const& segment = *it2;
+#endif
             room_indices.push_back(static_cast<std::uint32_t>(segment - data_.data()));
         }
 #if BOOST_VERSION >= 105500
@@ -282,5 +347,14 @@ void RtreeVectorMap::doSave(YAML::Node& node) const
     YAML::Binary room_ring_data_binary;
     serialization::serialize(room_ring_data, room_ring_data_binary);
     node["room_ring_data"] = room_ring_data_binary;
+}
 
+const RtreeVectorMap::tree_t& RtreeVectorMap::rtree() const
+{
+    return rtree_;
+}
+
+const std::vector<RtreeVectorMap::polygon_t>& RtreeVectorMap::room_polygons() const
+{
+    return room_polygons_;
 }

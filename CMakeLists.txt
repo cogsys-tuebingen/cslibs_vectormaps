@@ -50,6 +50,7 @@ add_library(${PROJECT_NAME}_maps
     src/maps/oriented_grid_vector_map.cpp
     src/maps/oriented_visibility_grid_vector_map.cpp
     src/maps/rtree_vector_map.cpp
+    src/maps/segment_rtree_vector_map.cpp
 )
 
 target_link_libraries(${PROJECT_NAME}_maps
@@ -87,6 +88,7 @@ if(${Qt5_FOUND})
         src/map_viewer/ui/map_viewer_list_item.ui
         src/map_viewer/ui/map_viewer_corner_param_dialog.ui
         src/map_viewer/ui/map_viewer_door_param_dialog.ui
+        src/map_viewer/ui/map_viewer_room_param_dialog.ui
         src/map_viewer/ui/map_viewer_gridmap_param_dialog.ui
         src/map_viewer/ui/map_viewer_vectormap_param_dialog.ui
         src/map_viewer/ui/map_viewer_rtree_vectormap_param_dialog.ui
@@ -112,6 +114,7 @@ if(${Qt5_FOUND})
         src/map_viewer/qt/QLayerListItem.hpp
         src/map_viewer/qt/QCornerParamDialog.hpp
         src/map_viewer/qt/QDoorParamDialog.hpp
+        src/map_viewer/qt/QRoomParamDialog.hpp
         src/map_viewer/qt/QGridmapParamDialog.hpp
         src/map_viewer/qt/QVectormapParamDialog.hpp
         src/map_viewer/qt/QRtreeVectormapParamDialog.hpp

@@ -84,6 +84,7 @@ public:
     Point        maxCorner() const;
     Dimension    dimension() const;
     BoundingBox  bounding()  const;
+    const Vectors& data() const;
 
 protected:
     double          range_;

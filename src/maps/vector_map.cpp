@@ -151,6 +151,11 @@ VectorMap::BoundingBox VectorMap::bounding() const
     return BoundingBox(min_corner_, max_corner_);
 }
 
+const VectorMap::Vectors &VectorMap::data() const
+{
+    return data_;
+}
+
 void VectorMap::doLoad(const YAML::Node &node)
 {
     assert(node.IsMap());

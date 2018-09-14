@@ -4,6 +4,8 @@
 /// COMPONENT
 #include <cslibs_vectormaps/maps/simple_grid_vector_map.h>
 #include <cslibs_vectormaps/maps/oriented_grid_vector_map.h>
+#include <cslibs_vectormaps/maps/rtree_vector_map.h>
+#include <cslibs_vectormaps/maps/segment_rtree_vector_map.h>
 
 /// SYSTEM
 #include <boost/iostreams/copy.hpp>
@@ -49,6 +51,10 @@ struct MapLoader {
                 map.reset(new SimpleGridVectorMap);
             } else if (type == "oriented_grid") {
                 map.reset(new OrientedGridVectorMap);
+            } else if (type == "rtree") {
+                map.reset(new RtreeVectorMap);
+            } else if (type == "segment_rtree") {
+                map.reset(new SegmentRtreeVectorMap);
             }
 
             map->load(node);

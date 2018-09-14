@@ -213,11 +213,11 @@ void Control::executeFindDoors(const FindDoorsParameter &params)
 
     openProgressDialog("Find doors");
 
+    std::vector<segment_t> rounded_segments = FindDoors::round_segments(segments, params.map_precision);
+    std::vector<segment_t> cleaned_segments = FindDoors::clean_segments(rounded_segments);
+
     FindDoors doorfinder(params);
-    std::vector<segment_t> rounded_segments = doorfinder.round_segments(segments);
-    std::vector<segment_t> cleaned_segments = doorfinder.clean_segments(rounded_segments);
-    // doors_graph_ is stored for finding rooms
-    std::vector<FindDoors::door_t> doors = doorfinder.find_doors(doors_graph_, cleaned_segments);
+    std::vector<FindDoors::door_t> doors = doorfinder.find_doors(cleaned_segments);
 
     std::size_t ndoors = doors.size();
     std::size_t ndigits = 1;
@@ -256,9 +256,16 @@ void Control::executeFindRooms(const FindRoomsParameter &params)
     std::vector<LayerModel::Ptr> layers;
     map_->getLayers(layers);
 
-    // get visible doors, delete all rooms
+    // get all line segments from visible layers, get visible doors, delete all rooms
+    dxf::DXFMap::Vectors segments;
     std::vector<FindDoors::door_t> doors;
     for (LayerModel::Ptr& l : layers) {
+        VectorLayerModel::Ptr lv = LayerModel::as<VectorLayerModel>(l);
+        if (lv && lv->getVisibility()) {
+            dxf::DXFMap::Vectors s;
+            lv->getVectors(s);
+            segments.insert(segments.end(), s.begin(), s.end());
+        }
         DoorLayerModel::Ptr ld = LayerModel::as<DoorLayerModel>(l);
         if (ld && ld->getVisibility()) {
             FindDoors::door_t door;
@@ -272,8 +279,11 @@ void Control::executeFindRooms(const FindRoomsParameter &params)
 
     openProgressDialog("Find rooms");
 
+    std::vector<segment_t> rounded_segments = FindDoors::round_segments(segments, params.map_precision);
+    std::vector<segment_t> cleaned_segments = FindDoors::clean_segments(rounded_segments);
+
     FindRooms roomfinder(params);
-    std::vector<polygon_t> rooms = roomfinder.find_rooms(doors);
+    std::vector<polygon_t> rooms = roomfinder.find_rooms(cleaned_segments, doors);
 
     std::size_t nrooms = rooms.size();
     std::size_t ndigits = 1;
@@ -295,7 +305,7 @@ void Control::executeFindRooms(const FindRoomsParameter &params)
         std::string layername = "Room #" + to_string(++i);
         layer->setName(layername);
         layer->setPolygon(room);
-        layer->setColor(QColor::fromHsvF(dist(mt), 1.f, 0.5f));
+        layer->setColor(QColor::fromHsvF(dist(mt), 1.f, 1.f));
         map_->setLayer(layer);
     }
     map_->updated();
@@ -397,11 +407,7 @@ void Control::executeRtreeVectormapExport(const RtreeVectormapConversionParamete
     progress(-1);
 
     RtreeVectormapConversion converter(params);
-
-    converter.index_rooms(rooms);
-    if (!converter.index_segments(segments)
-    || !converter.drop_outliers()
-    || !converter.save(map_->getMin(), map_->getMax()))
+    if(!converter(rooms, segments, map_->getMin(), map_->getMax()))
         notification("Writing map failed!");
 
     closeProgressDialog();
