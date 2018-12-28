@@ -58,6 +58,13 @@ public:
                             const double angle,
                             const double max_range = 0.0) const;
 
+    double intersectScanRay(const Vector &ray,
+                            const unsigned int row,
+                            const unsigned int col,
+                            const double angle,
+                            Point        &p,
+                            const double max_range = 0.0) const;
+
     void intersectScanRay(const Vector &ray,
                           const unsigned int row,
                           const unsigned int col,
@@ -94,6 +101,11 @@ public:
                                     Vectors &lines) const;
 
     virtual bool   retrieve(const Point &pos,
+                            Vectors &lines) const;
+
+    virtual bool   retrieve(const Point &pos,
+                            const double min_angle,
+                            const double max_angle,
                             Vectors &lines) const;
 
     virtual int    intersectScanPattern(const Point        &position,
@@ -151,7 +163,7 @@ protected:
             angle_corr -= _2M_PI;
 
 
-        return (angle_corr+ M_PI) * _1_2MPI * theta_bins_;
+        return (angle_corr + M_PI) * _1_2MPI * theta_bins_;
     }
 };
 }

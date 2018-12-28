@@ -641,6 +641,21 @@ double OrientedGridVectorMap::intersectScanRay(const Vector &ray,
     return algorithms::nearestIntersectionDistance<double, types::Point2d>(ray, cell, max_range);
 }
 
+double OrientedGridVectorMap::intersectScanRay(const Vector &ray,
+                                               const unsigned int row,
+                                               const unsigned int col,
+                                               const double angle,
+                                               Point &p,
+                                               const double max_range) const
+{
+    const VectorPtrs &cell = grid_.at(grid_dimensions_.index(row, col, angle2index(angle)));
+    types::PointSet2d points;
+    algorithms::nearestIntersection<types::Point2d>(ray, cell, points);
+
+
+    return algorithms::nearestIntersectionDistance<double, types::Point2d>(ray, cell, max_range);
+}
+
 void OrientedGridVectorMap::intersectScanRay(const Vector &ray,
                                              const unsigned int row,
                                              const unsigned int col,
@@ -721,6 +736,40 @@ bool OrientedGridVectorMap::retrieve(const Point &pos,
 
     return lines.size() > 0;
 }
+
+bool OrientedGridVectorMap::retrieve(const Point &pos,
+                                     const double min_angle,
+                                     const double max_angle,
+                                     Vectors     &lines) const
+{
+    if(tools::pointOutsideMap(pos, min_corner_, max_corner_)) {
+        if(debug_) {
+            std::cerr << "[OrientedGridVectorMap] : Position to test "
+                         "not within grid structured area!\n";
+        }
+        return false;
+    }
+
+    // find the cell of point pos
+    unsigned int row = GridVectorMap::row(pos);
+    unsigned int col = GridVectorMap::col(pos);
+
+    const unsigned int min_angle_index = angle2index(min_angle);
+    const unsigned int max_angle_index = angle2index(max_angle);
+
+    std::cout << "\n" << min_angle_index << " " << max_angle_index << std::endl;
+
+    for(unsigned int theta = min_angle_index ; theta <= max_angle_index ; ++theta) {
+        const VectorPtrs &cell = grid_.at(grid_dimensions_.index(row, col, theta));
+
+        for(const Vector* line : cell) {
+            lines.push_back(*line);
+        }
+    }
+
+    return lines.size() > 0;
+}
+
 
 int OrientedGridVectorMap::intersectScanPattern (
         const Point& pos,

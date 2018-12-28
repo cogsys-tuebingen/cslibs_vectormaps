@@ -8,7 +8,7 @@ find_package(GDAL   REQUIRED)
 find_package(gazebo QUIET)
 find_package(xacro  QUIET)
 find_package(Qt5 COMPONENTS Core Gui Widgets QUIET)
-find_package(Boost REQUIRED COMPONENTS system iostreams regex)
+find_package(Boost REQUIRED COMPONENTS regex system iostreams)
 
 catkin_package(
   INCLUDE_DIRS     include
