@@ -652,8 +652,12 @@ double OrientedGridVectorMap::intersectScanRay(const Vector &ray,
     types::PointSet2d points;
     algorithms::nearestIntersection<types::Point2d>(ray, cell, points);
 
+    if(points.size() == 0)
+        return max_range;
 
-    return algorithms::nearestIntersectionDistance<double, types::Point2d>(ray, cell, max_range);
+    p = points.front();
+
+    return boost::geometry::distance(ray.first, p);
 }
 
 void OrientedGridVectorMap::intersectScanRay(const Vector &ray,
@@ -756,8 +760,6 @@ bool OrientedGridVectorMap::retrieve(const Point &pos,
 
     const unsigned int min_angle_index = angle2index(min_angle);
     const unsigned int max_angle_index = angle2index(max_angle);
-
-    std::cout << "\n" << min_angle_index << " " << max_angle_index << std::endl;
 
     for(unsigned int theta = min_angle_index ; theta <= max_angle_index ; ++theta) {
         const VectorPtrs &cell = grid_.at(grid_dimensions_.index(row, col, theta));
