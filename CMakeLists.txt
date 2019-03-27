@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(cslibs_vectormaps)
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fext-numeric-literals")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fext-numeric-literals")
 
 find_package(catkin REQUIRED cslibs_boost_geometry cslibs_indexed_storage)
 find_package(GDAL   REQUIRED)
